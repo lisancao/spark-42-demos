@@ -1,0 +1,26 @@
+# Generated demo data — regenerate with each demo's generate_data
+**/data/
+*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local env / secrets
+.env
+**/.env
+
+# Spark local artifacts (when running SPARK_LOCAL=1)
+spark-warehouse/
+metastore_db/
+derby.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

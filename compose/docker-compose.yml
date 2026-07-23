@@ -1,0 +1,55 @@
+# Spark 4.2 Demos — CONTAINED sandbox.
+#
+# Isolation contract (do not weaken without a reason):
+#   * project name .......... spark42demos      (docker compose -p, own namespace)
+#   * network ............... bridge, spark42demos_net  (NOT host — lakehouse-stack uses host net)
+#   * ports ................. fresh 15099 / 7999 / 819x band, verified free 2026-07-20
+#   * volumes ............... spark42demos_* prefix, never shared with lakehouse-stack
+#   * touches ............... nothing in ~/lakehouse-stack, nothing in ~/repos/safe-spark-agents
+#
+# This stack is PARKED. It is not started as part of setup. Bring it up only when you
+# actively want to run a demo:
+#     docker compose -p spark42demos -f compose/docker-compose.yml up -d
+#     docker compose -p spark42demos -f compose/docker-compose.yml down -v   # full teardown
+#
+# Image note: no stable Apache Spark 4.2 image exists yet (2026-07-20). The closest local
+# artifact is the source-built master snapshot that already carries the 4.2/5.0 features
+# (metric views, NEAREST BY, RTM). Swap SPARK_IMAGE in .env when an official 4.2 image ships.
+
+services:
+  spark:
+    image: ${SPARK_IMAGE:-lakehouse/spark:5.0.0-snapshot-cdc}
+    container_name: spark42demos-connect
+    networks: [spark42demos_net]
+    env_file: .env
+    ports:
+      - "127.0.0.1:${CONNECT_PORT:-15099}:15002"   # Spark Connect (gRPC) — localhost only
+      - "127.0.0.1:${MASTER_UI_PORT:-8190}:8190"    # Spark UI
+    volumes:
+      - spark42demos_data:/opt/spark-data
+      - ../demos:/demos:ro
+      - ../data:/data
+      # Mount the project at its REAL host path so parquet paths a Connect client sends
+      # (host-absolute) resolve identically on the server. Local-dev convenience.
+      - ${PROJECT_HOST_DIR:-/home/lnc/Documents/spark_content/spark_42_demos}:${PROJECT_HOST_DIR:-/home/lnc/Documents/spark_content/spark_42_demos}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    command:
+      - bash
+      - -c
+      - >-
+        /opt/spark/sbin/start-connect-server.sh
+        --packages org.apache.iceberg:iceberg-spark-runtime-4.1_2.13:1.11.0
+        --conf spark.connect.grpc.binding.port=15002
+        --conf spark.ui.port=8190
+        && sleep 5 && tail -f /opt/spark/logs/*.out
+
+networks:
+  spark42demos_net:
+    name: spark42demos_net
+    driver: bridge
+
+volumes:
+  spark42demos_data:
+    name: spark42demos_data
+    driver: local

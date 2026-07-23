@@ -1,0 +1,7 @@
+# python
+__pycache__/
+*.pyc
+.venv/
+.env
+.ipynb_checkpoints/
+spark-warehouse/

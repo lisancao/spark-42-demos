@@ -1,0 +1,20 @@
+[project]
+name = "spark-connect-demo"
+version = "0.1.0"
+description = "Spark 4.2 Spark Connect demo — same DataFrame code, thin client, embed in an AI tool"
+requires-python = ">=3.10"
+dependencies = [
+    # The whole point: a THIN client. No local Spark install, just the Connect wheel.
+    "pyspark[connect]>=4.1.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["ipykernel", "ruff"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

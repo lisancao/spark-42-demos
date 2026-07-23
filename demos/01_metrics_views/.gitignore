@@ -1,0 +1,10 @@
+# generated data — regenerate with `python -m metrics_views_demo.generate_data`
+data/
+*.parquet
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.env
+.ipynb_checkpoints/
