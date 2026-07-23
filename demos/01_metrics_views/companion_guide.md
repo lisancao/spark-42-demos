@@ -354,23 +354,49 @@ thread that connects this demo to Demo 2 (Spark Connect) and Demo 5 (vector sear
 
 ---
 
-## 10. What we did not cover
+## 10. Going complex — and the grammar's real limits
 
-The demo pins down the core: dimensions, measures, `MEASURE()`, and the aggregation-safety
-guarantee. The metric-view spec has more surface that this demo does **not** exercise and that
-you should verify against your target Spark 4.2 build before relying on it:
+We probed the running Spark 4.2 (5.0-snapshot) server to find the *actual* metric-view
+grammar in this build. It is deliberately small, and it differs from the Databricks hosted
+docs — so here's the verified truth, and where the real power lives.
 
-- `filter:` — a boolean predicate applied to every query of the view.
-- `joins:` — pulling dimensions/measures from more than one source table (e.g. joining
-  `orders` for revenue measures). We kept the demo single-source (`sessions`) to keep the
-  grammar risk low.
-- `window:` on measures (moving/period-over-period aggregation).
-- `format:` metadata (display formatting like percentage) and `display_name` / `synonyms`.
-- Materialization of a metric view for performance.
+**The whole accepted schema (probed, not guessed):**
 
-Each of those is a candidate for a follow-up clip. None of them changes the core lesson of
-this one: **define the aggregation with the metric, query it through `MEASURE()`, and the two
-oldest wrong-number bugs in analytics stop being possible.**
+- Top-level keys are **only**: `version`, `source`, `dimensions`, `filter`, `measures`.
+  There is **no `joins`** key — the parser rejects it. Metric views in this build do not join.
+- A dimension or measure has **only** `name` and `expr`. There is **no** `display_name`,
+  `format`, `window`, or `synonyms` (the parser lists exactly two known properties). The
+  Databricks-doc extras aren't in OSS Spark yet.
+- `filter` is a global predicate applied to **every** query of the view.
+- `expr` accepts arbitrarily complex SQL — **this is where all the power is.**
+
+**So "complex" = model a wide table, then write rich `expr`s.** Since you can't join inside
+the view, you denormalize first (`sessions ⟕ orders ⟕ users → session_facts`) and define the
+metrics on the wide fact. That's the realistic production shape anyway — the semantic layer
+sits on a modeled table. See `sql/04_complex_metric_view.sql` and
+`python -m metrics_views_demo.complex_view`. It demonstrates:
+
+- a global `filter` (`region <> 'remote'`),
+- **derived dimensions** — `day_type` (`CASE … dayofweek …`), `region_tier` (`CASE … IN …`),
+- **non-additive measures** that are exactly the footgun-prone kind:
+  - `conversion_rate = SUM(converted)/COUNT(1)` — ratio of aggregates,
+  - `aov = SUM(order_total)/NULLIF(COUNT(order_id), 0)` — guarded division,
+  - `paying_users = COUNT(DISTINCT CASE WHEN order_id IS NOT NULL THEN user_id END)` —
+    conditional distinct,
+  - `arppu = SUM(order_total)/NULLIF(COUNT(DISTINCT CASE WHEN order_id IS NOT NULL THEN
+    user_id END), 0)` — a ratio of a sum and a conditional distinct.
+
+The payoff, live: overall **AOV = 32.02**, but the four `region_tier × day_type` slices read
+40.90 / 34.35 / 49.69 / 40.85. Averaging the slices would be wrong; `MEASURE()` re-derives AOV
+from `SUM(order_total)/COUNT(order_id)` at *each* grain — including the whole-population grain —
+so it's always the honest number. Every non-additive KPI you'd normally get wrong is defined
+once and safe everywhere.
+
+**Still genuinely out of scope in this build** (rejected or absent): joins, window measures,
+display/format metadata, and materialization. Those are candidates for a follow-up once the
+4.2 GA grammar settles — but none of them changes the core lesson: **define the aggregation
+with the metric, query it through `MEASURE()`, and the oldest wrong-number bugs in analytics
+stop being possible.**
 
 ---
 

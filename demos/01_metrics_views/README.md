@@ -30,10 +30,13 @@ so the aggregation is deferred to query time and recomputed correctly per grain.
     generate_data.py             # pure-python -> parquet, engineers the footgun
     config.py                    # get_spark() (Connect default / SPARK_LOCAL=1), register_tables()
     run_footgun.py               # the demo: lie -> fix, side by side
+    run_footgun.py               # the demo: lie -> fix, side by side
+    complex_view.py              # advanced: wide fact + rich non-additive measures
   sql/
     01_naive_wrong.sql           # the lie (runs on any Spark 4.x)
     02_metric_view.sql           # CREATE VIEW ... WITH METRICS  (needs 4.2)
     03_query_metric_view.sql     # MEASURE() at 3 grains
+    04_complex_metric_view.sql   # wide fact + filter + derived dims + AOV/ARPPU (needs 4.2)
   data/                          # generated parquet (gitignored)
 ```
 
@@ -56,6 +59,9 @@ docker compose -p spark42demos -f compose/docker-compose.yml up -d
 cd demos/01_metrics_views
 cp .env.example .env
 python -m metrics_views_demo.run_footgun
+
+# Going deeper — a complex metric view (wide fact + filter + derived dims + AOV/ARPPU):
+python -m metrics_views_demo.complex_view
 ```
 
 Both halves are **verified working** (2026-07-20): the lie on local Spark 4.1, and the full
