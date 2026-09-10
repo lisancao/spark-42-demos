@@ -4,7 +4,7 @@
     python extras/bench/shuffle_partitions.py --mode connect --remote sc://localhost:15002
     python extras/bench/shuffle_partitions.py --mode classic   # full pyspark and a JDK
 
-Results: VERIFIED_FACTS.md §3, "Shuffle Partition Sensitivity".
+Results: companion guide §13, "Aggregations and Partition Count".
 """
 
 from __future__ import annotations

@@ -11,9 +11,8 @@ This project accompanies the [companion guide](companion_guide.md) and the video
 The migration of a 357-line production pipeline is included as a written case study, and
 [`setup/TOPOLOGIES.md`](setup/TOPOLOGIES.md) describes where a Connect server can run.
 
-Everything here was verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-10.
-Measurements, error messages and JIRA references are recorded in
-[`VERIFIED_FACTS.md`](VERIFIED_FACTS.md).
+Everything here was verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-09 and
+2026-09-10; "Verification Status", below, lists what was run.
 
 ## About Spark Connect
 
@@ -85,7 +84,7 @@ configurations. The configurations read `.env`.
 `compose.yaml` builds `spark-connect-demo/spark:4.2.0` from the `Dockerfile`: the official
 `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` image with `pyarrow` 25.0.1 and `pandas` 2.3.3
 added. The official image does not include PyArrow, and Spark 4.2 runs Python UDFs through Arrow by
-default, so on the unmodified image every Python UDF fails (companion guide §7).
+default, so with default settings every Python UDF fails on the unmodified image (companion guide §7).
 
 *Table 3. Services*
 
@@ -218,26 +217,41 @@ reached, the Connect runs are skipped; with the cluster stopped, `make test` rep
 ├── tools/           doctor.py, compat_audit.py, check.py, teleprompter_export.py
 ├── setup/           TOPOLOGIES.md, standalone/start-connect-server.sh, kubernetes/
 ├── case_study/      lakehouse_stack/: the production pipeline migration, as a written case study
-├── extras/          extras/bench/ (protocol overhead) and extras/version_matrix/ (versions)
+├── extras/          Optional measurements behind companion guide §2 and §13; not needed for the demos
 ├── graphics/        Video graphics as 1920 by 1080 SVG, with light versions in graphics/light/
 ├── compose.yaml, Dockerfile, Makefile, pyproject.toml, uv.lock
-├── companion_guide.md, video_spark_connect.md, VERIFIED_FACTS.md
+├── companion_guide.md, video_spark_connect.md, video_spark_connect_teleprompter.txt
 └── .vscode/         Run configurations in video order, tasks and settings
 ```
 
-## Case Study and Extras
+## Case Study
 
-- **`case_study/lakehouse_stack/`** describes the migration of a 357-line production pipeline that
-  writes 10 Iceberg tables; parity was verified for all 10 tables, including 1,027,129 bronze orders.
-  It requires `~/lakehouse-stack` data and a locally built Iceberg runtime, because Apache Iceberg
-  has no Spark 4.2 release, and it has its own Makefile.
-- **`extras/bench/`** holds the protocol overhead measurements in companion guide §13, recorded with
-  CPython 3.12.3.
-- **`extras/version_matrix/`** holds `matrix.py`, which `make matrix` runs for each pairing of
-  `pyspark-client` 4.1.2 or 4.2.0 with a 4.1.2 or 4.2.0 server (companion guide Table 2-1,
-  `VERIFIED_FACTS.md` §8).
-- **`setup/`** contains `TOPOLOGIES.md`, a script that starts a server from a Spark distribution, and
-  Kubernetes manifests, which are untested here.
+`case_study/lakehouse_stack/` describes the migration of a 357-line production pipeline that writes
+10 Iceberg tables; parity was verified for all 10 tables, including 1,027,129 bronze orders. It
+requires `~/lakehouse-stack` data and a locally built Iceberg runtime, because Apache Iceberg has no
+Spark 4.2 release, and it has its own Makefile.
+
+`setup/` contains `TOPOLOGIES.md`, a script that starts a server from a Spark distribution, and
+Kubernetes manifests, which are untested here.
+
+## Extras
+
+The demos do not use `extras/`. It holds the two measurements that the companion guide reports, so
+that the figures can be rerun.
+
+- **`extras/bench/`: what the client and server split costs.** `protocol_overhead.py` times the same
+  work on Spark Classic and on Spark Connect on one machine: starting a session, small queries,
+  reading a schema, collecting results and aggregating. `shuffle_partitions.py` repeats one
+  aggregation at 8, 32, 200 and 800 shuffle partitions, because Connect's overhead grows with the
+  partition count. The JSON files are the recorded runs, made with CPython 3.12.3 before the project
+  was pinned to Python 3.10. The results are in companion guide §13. There is no `make` target; each
+  script's docstring shows how to run it.
+- **`extras/version_matrix/`: whether a client and server of different versions work together.**
+  `make matrix` starts a Spark 4.1.2 Connect server beside the 4.2.0 one, runs the same fourteen
+  operations for each pairing of `pyspark-client` 4.1.2 or 4.2.0 with either server, twice, and
+  prints a table. `results/` holds each run's output, including the first line of every error. The
+  summary, and the one surprising failure (a 4.2.0 client cannot create a DataFrame from local Python
+  data on a 4.1.2 server), are in companion guide §2, Table 2-1.
 
 ## Verification Status
 
@@ -251,8 +265,9 @@ On 2026-09-10, against the cluster in `compose.yaml`:
 - A copy of the project without virtual environments or `.env`, started from an empty cluster
   volume, ran `make setup`, `up`, `examples`, `doctor`, `audit`, `pipeline`, `test` and `check`, each
   exiting with status 0, in about a minute with warm uv and Docker caches.
-
-The details are in `VERIFIED_FACTS.md` §8 and §9.
+- All 14 graphics, in both themes, passed checks for the shared palette, text contrast of at least
+  4.5:1, a 20 px minimum text size and a 1920 by 1080 canvas, and were rendered in cairosvg and
+  Chrome.
 
 ## Known Constraints
 

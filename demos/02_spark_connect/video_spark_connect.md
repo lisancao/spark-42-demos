@@ -3,7 +3,7 @@
 **Alt Title:** Spark Connect in Apache Spark 4.2: From First Server to Migrated Pipeline
 **Target Audience:** Platform and data engineers running self-hosted Spark who know of Spark Connect but have not yet migrated a workload to it
 **Estimated Runtime:** 41–43 minutes
-**Tone:** Technical and measured; a senior engineer presenting to peers. Assumes Spark fluency. Every figure on screen matches `VERIFIED_FACTS.md`.
+**Tone:** Technical and measured; a senior engineer presenting to peers. Assumes Spark fluency. Every figure on screen comes from a measured run against Spark 4.2.0.
 **Spark Version:** 4.2.0 (released 2026-07-14)
 
 ---
@@ -1220,7 +1220,7 @@ Likely questions, with the correct answers:
 - **"Didn't 4.2 add geospatial types?"** No. A scan of every JAR in the official 4.2.0 image (git revision `32f72996011`) finds no `GeographyVal`, `GeometryVal` or `ST_*` functions.
 - **"Is the Iceberg runtime official?"** No, and the video says so. There is no Iceberg release for Spark 4.2 (Maven Central stops at `4.1_2.13`), so the case study uses a local source build, documented in `case_study/lakehouse_stack/BUILDING_ICEBERG_FOR_SPARK_4_2.md`. Nothing else in the material depends on it.
 - **"Does YARN cluster mode work?"** SPARK-55239 is resolved with fix version 4.2.0, but it isn't itemized in the release notes and wasn't tested here; cite the JIRA.
-- **"Can the client and server run different Spark versions?"** The documentation describes an existing client with a newer server, but publishes no compatibility matrix. A sample of fourteen operations between 4.1.2 and 4.2.0 (guide Table 2-1, `VERIFIED_FACTS.md` §8) found that a 4.1.2 client behaved the same against a 4.2.0 server as against its own. A 4.2.0 client against a 4.1.2 server failed on `createDataFrame()` from local Python data, because the older server reports `spark.sql.session.localRelationSizeLimit` as `3221225472b`, and on the new `GetStatus` RPC. Present it as a sample, not a support statement. Python UDFs still need matching Python minor versions.
+- **"Can the client and server run different Spark versions?"** The documentation describes an existing client with a newer server, but publishes no compatibility matrix. A sample of fourteen operations between 4.1.2 and 4.2.0 (guide Table 2-1) found that a 4.1.2 client behaved the same against a 4.2.0 server as against its own. A 4.2.0 client against a 4.1.2 server failed on `createDataFrame()` from local Python data, because the older server reports `spark.sql.session.localRelationSizeLimit` as `3221225472b`, and on the new `GetStatus` RPC. Present it as a sample, not a support statement. Python UDFs still need matching Python minor versions.
 - **"When did Structured Streaming and ML come to Connect?"** The 3.5.0 release notes list Structured Streaming (SPARK-42938) and PyTorch-based distributed ML (SPARK-42471); the 4.0.0 release notes list ML on Spark Connect. The JIRA umbrellas for the 3.5.0 items have no fix version set, so cite the release notes.
 
 ### Cross-Promotion

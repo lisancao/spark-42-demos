@@ -193,7 +193,7 @@ clients.
 Four aspects of this command are significant:
 
 - **`binding.host=0.0.0.0`.** States the listening interface explicitly. A 4.2.0 server with no
-  binding setting already listens on all interfaces (`VERIFIED_FACTS.md` §2); a specific address
+  binding setting already listens on all interfaces (companion guide §4); a specific address
   restricts it.
 - **Catalog and extension configuration is set on the server.** These values are class names, and
   the client has no JVM in which to load them.
