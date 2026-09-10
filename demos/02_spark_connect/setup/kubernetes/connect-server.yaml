@@ -1,0 +1,172 @@
+# A Spark Connect server on Kubernetes (setup/TOPOLOGIES.md, topology 4).
+#
+# Untested here: no Kubernetes cluster was available when this project was built. Treat the
+# manifest as a starting point and validate it on your own cluster.
+#
+#   kubectl create namespace spark
+#   kubectl apply -f connect-server.yaml
+#   kubectl -n spark port-forward svc/spark-connect 15002:15002
+#   python tools/doctor.py --remote sc://localhost:15002
+#
+# The Apache Spark Kubernetes Operator publishes an example that runs a Connect server as a
+# SparkApplication: https://apache.github.io/spark-kubernetes-operator/spark-connect-server.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark-connect
+  namespace: spark
+---
+# The Connect server is the Spark driver, so it creates and deletes executor pods and needs
+# permission to do so.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: spark-connect
+  namespace: spark
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "configmaps", "services", "persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "delete", "deletecollection", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark-connect
+  namespace: spark
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: spark-connect
+subjects:
+  - kind: ServiceAccount
+    name: spark-connect
+    namespace: spark
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-connect
+  namespace: spark
+spec:
+  # One replica. Sessions live in the server process, so a Service that spreads one client's
+  # requests across several pods sends some of them to a pod that does not hold the session. To
+  # run more servers, deploy one per team or workload, each with its own Service.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-connect
+  template:
+    metadata:
+      labels:
+        app: spark-connect
+    spec:
+      serviceAccountName: spark-connect
+      containers:
+        - name: spark-connect
+          image: apache/spark:4.2.0-scala2.13-java21-python3-ubuntu
+          # --wait keeps the server in the foreground, so the container keeps running.
+          command: ["/opt/spark/sbin/start-connect-server.sh"]
+          args:
+            - "--wait"
+            - "--master"
+            - "k8s://https://kubernetes.default.svc"
+            - "--deploy-mode"
+            - "client"
+            - "--conf"
+            - "spark.kubernetes.container.image=apache/spark:4.2.0-scala2.13-java21-python3-ubuntu"
+            - "--conf"
+            - "spark.kubernetes.namespace=spark"
+            - "--conf"
+            - "spark.kubernetes.authenticate.driver.serviceAccountName=spark-connect"
+            # Executors connect back to the driver, so it needs a stable address. The headless
+            # Service below provides one.
+            - "--conf"
+            - "spark.driver.host=spark-connect-headless.spark.svc.cluster.local"
+            - "--conf"
+            - "spark.driver.port=7078"
+            # Listen on all interfaces so that the Service can reach the server.
+            - "--conf"
+            - "spark.connect.grpc.binding.host=0.0.0.0"
+            - "--conf"
+            - "spark.connect.grpc.binding.port=15002"
+            - "--conf"
+            - "spark.ui.port=4040"
+            # Catalogs and extensions are configured on the server. Their values are Java class
+            # names, which a client cannot load. Catalog credentials, if the catalog needs them,
+            # also belong in the server's configuration.
+            - "--conf"
+            - "spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+            - "--conf"
+            - "spark.sql.catalog.iceberg=org.apache.iceberg.spark.SparkCatalog"
+            - "--conf"
+            - "spark.sql.catalog.iceberg.type=rest"
+            - "--conf"
+            - "spark.sql.catalog.iceberg.uri=http://iceberg-rest.spark.svc:8181"
+            # --jars alone is enough for spark.sql.extensions (VERIFIED_FACTS.md §4). Expect a
+            # ClassNotFoundException at WARN during startup; see standalone/start-connect-server.sh.
+            - "--jars"
+            - "/opt/extra-jars/iceberg-spark-runtime.jar"
+          ports:
+            - name: grpc
+              containerPort: 15002
+            - name: driver
+              containerPort: 7078
+            - name: ui
+              containerPort: 4040
+          volumeMounts:
+            - name: extra-jars
+              mountPath: /opt/extra-jars
+          resources:
+            requests: { cpu: "1", memory: "2Gi" }
+            limits: { cpu: "2", memory: "4Gi" }
+          readinessProbe:
+            tcpSocket: { port: 15002 }
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: { port: 15002 }
+            initialDelaySeconds: 60
+            periodSeconds: 30
+      volumes:
+        - name: extra-jars
+          # Replace with the way you deliver jars: an init container that downloads them, a
+          # persistent volume, or a derived image.
+          emptyDir: {}
+---
+# Headless Service, so that executors have a stable address for the driver.
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-connect-headless
+  namespace: spark
+spec:
+  clusterIP: None
+  selector:
+    app: spark-connect
+  ports:
+    - name: driver
+      port: 7078
+      targetPort: 7078
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-connect
+  namespace: spark
+spec:
+  # ClusterIP keeps the gRPC port inside the cluster. Spark Connect has no built-in
+  # authentication, so put an authenticating proxy in front of it before exposing it outside the
+  # cluster (ingress-grpc.yaml).
+  type: ClusterIP
+  selector:
+    app: spark-connect
+  ports:
+    - name: grpc
+      port: 15002
+      targetPort: 15002
+  # With more than one replica, ClientIP affinity keeps each client on one pod.
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800

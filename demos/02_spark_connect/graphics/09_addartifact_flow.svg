@@ -1,0 +1,82 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dotgrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotgrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <g stroke="#e25a1c" stroke-width="3" opacity="0.35" fill="none">
+    <path d="M 30 90 L 30 30 L 90 30"/>
+    <path d="M 1830 30 L 1890 30 L 1890 90"/>
+    <path d="M 30 990 L 30 1062 L 64 1062"/>
+    <path d="M 1890 990 L 1890 1062 L 1856 1062"/>
+  </g>
+
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">Shipping Python Dependencies</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">SparkSession.addArtifact under Spark Connect</text>
+
+  <!-- Column 1: Spark Classic mechanisms -->
+  <rect x="80" y="210" width="560" height="570" rx="12" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="110" y="262" font-size="32" font-weight="700" fill="#ff8a4c">Spark Classic Mechanisms</text>
+
+  <text x="110" y="340" font-family="Consolas, 'Courier New', monospace" font-size="26" fill="#e6edf3">--py-files</text>
+  <text x="110" y="374" font-size="24" fill="#8b949e">a spark-submit option with no</text>
+  <text x="110" y="404" font-size="24" fill="#8b949e">client equivalent</text>
+
+  <text x="110" y="500" font-family="Consolas, 'Courier New', monospace" font-size="26" fill="#e6edf3">SparkContext.addPyFile()</text>
+  <text x="110" y="534" font-size="24" fill="#8b949e">SparkContext is unavailable</text>
+  <text x="110" y="564" font-size="24" fill="#8b949e">under Connect</text>
+
+  <text x="110" y="660" font-size="26" fill="#e6edf3">conda-pack, venv-pack and PEX</text>
+  <text x="110" y="694" font-size="24" fill="#8b949e">documented for Spark Classic</text>
+
+  <!-- Column 2: spark.addArtifact -->
+  <rect x="680" y="210" width="560" height="570" rx="12" fill="#1f1a33" stroke="#8957e5" stroke-width="3"/>
+  <text x="710" y="262" font-family="Consolas, 'Courier New', monospace" font-size="28" font-weight="700" fill="#b392f0">spark.addArtifact(path, ...)</text>
+
+  <text x="710" y="352" font-family="Consolas, 'Courier New', monospace" font-size="28" font-weight="700" fill="#b392f0">pyfile=True</text>
+  <text x="710" y="386" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">.py, .zip, .egg, .jar</text>
+  <text x="710" y="420" font-size="24" fill="#8b949e">added to the executors' PYTHONPATH</text>
+
+  <text x="710" y="476" font-family="Consolas, 'Courier New', monospace" font-size="28" font-weight="700" fill="#b392f0">archive=True</text>
+  <text x="710" y="510" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">.zip, .tar.gz, .tgz, .tar</text>
+  <text x="710" y="544" font-size="24" fill="#8b949e">unpacked on the executors</text>
+
+  <text x="710" y="600" font-family="Consolas, 'Courier New', monospace" font-size="28" font-weight="700" fill="#b392f0">file=True</text>
+  <text x="710" y="634" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">any file</text>
+  <text x="710" y="668" font-size="24" fill="#8b949e">copied as is</text>
+
+  <!-- Column 3: three-step check -->
+  <rect x="1280" y="210" width="560" height="570" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+
+  <circle cx="1328" cy="254" r="18" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="1328" y="262" font-size="24" font-weight="700" fill="#e6edf3" text-anchor="middle">1</text>
+  <text x="1360" y="262" font-size="26" fill="#e6edf3">UDF fails:</text>
+  <text x="1360" y="296" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#ff7b72">ModuleNotFoundError: No module</text>
+  <text x="1360" y="326" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#ff7b72">named 'geo'</text>
+
+  <circle cx="1328" cy="382" r="18" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="1328" y="390" font-size="24" font-weight="700" fill="#e6edf3" text-anchor="middle">2</text>
+  <text x="1360" y="390" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">spark.addArtifact(</text>
+  <text x="1380" y="420" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">"pipeline/lib/geo.py",</text>
+  <text x="1380" y="450" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">pyfile=True)</text>
+
+  <circle cx="1328" cy="510" r="18" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="1328" y="518" font-size="24" font-weight="700" fill="#e6edf3" text-anchor="middle">3</text>
+  <text x="1360" y="518" font-size="26" fill="#e6edf3">UDF runs:</text>
+  <text x="1360" y="548" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#7ee787">Montreal 503.9 km</text>
+
+  <!-- Install on the Server Instead -->
+  <rect x="80" y="800" width="1760" height="190" rx="12" fill="#2a1618" stroke="#ff7b72" stroke-width="2"/>
+  <text x="110" y="842" font-size="32" font-weight="700" fill="#ff7b72">Install on the Server Instead</text>
+  <text x="110" y="898" font-size="26" fill="#e6edf3">JARs for catalogs and extensions</text>
+  <text x="990" y="898" font-size="26" fill="#e6edf3">native libraries</text>
+  <text x="110" y="940" font-size="26" fill="#e6edf3">classes named in spark.sql.extensions</text>
+  <text x="990" y="940" font-size="26" fill="#e6edf3">transitive JAR dependencies are not resolved</text>
+
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#x00A7;9, Table 9-4; examples/08_add_artifact.py</text>
+</svg>

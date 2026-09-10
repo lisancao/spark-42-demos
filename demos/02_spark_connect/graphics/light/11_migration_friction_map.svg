@@ -1,0 +1,207 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#d8dee4" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1920" height="1080" fill="#f6f8fa"/>
+  <rect x="0" y="6" width="1920" height="1074" fill="url(#dots)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#d9531a"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#d9531a" stroke-width="4" opacity="0.35">
+    <line x1="30" y1="30" x2="30" y2="80"/>
+    <line x1="30" y1="30" x2="80" y2="30"/>
+    <line x1="1890" y1="30" x2="1890" y2="80"/>
+    <line x1="1890" y1="30" x2="1840" y2="30"/>
+    <line x1="30" y1="1062" x2="30" y2="1012"/>
+    <line x1="30" y1="1062" x2="64" y2="1062"/>
+    <line x1="1890" y1="1062" x2="1890" y2="1012"/>
+    <line x1="1890" y1="1062" x2="1856" y2="1062"/>
+  </g>
+
+  <!-- Title -->
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#1f2328">Where the Pipeline Changed</text>
+  <text x="80" y="150" font-size="26" fill="#57606a">pipeline_before.py and pipeline_after.py, colored by migration layer</text>
+
+  <!-- Column headers -->
+  <text x="110" y="205" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#1f2328">pipeline_before.py</text>
+  <text x="444" y="205" font-size="20" fill="#57606a">(50 lines)</text>
+  <text x="980" y="205" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#1f2328">pipeline_after.py</text>
+  <text x="1297" y="205" font-size="20" fill="#57606a">(58 lines)</text>
+
+  <!-- Before gutter: 50 lines, one bar per line -->
+  <rect x="110" y="230" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="240" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="250" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="260" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="270" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="280" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="290" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="300" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="310" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="320" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="330" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="340" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="350" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="360" width="36" height="8" fill="#875c00"/>
+  <rect x="110" y="370" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="380" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="390" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="400" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="410" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="420" width="36" height="8" fill="#0860ca"/>
+  <rect x="110" y="430" width="36" height="8" fill="#0860ca"/>
+  <rect x="110" y="440" width="36" height="8" fill="#b5400e"/>
+  <rect x="110" y="450" width="36" height="8" fill="#b5400e"/>
+  <rect x="110" y="460" width="36" height="8" fill="#0860ca"/>
+  <rect x="110" y="470" width="36" height="8" fill="#0860ca"/>
+  <rect x="110" y="480" width="36" height="8" fill="#c5202c"/>
+  <rect x="110" y="490" width="36" height="8" fill="#6639ba"/>
+  <rect x="110" y="500" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="510" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="520" width="36" height="8" fill="#177a33"/>
+  <rect x="110" y="530" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="540" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="550" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="560" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="570" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="580" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="590" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="600" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="610" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="620" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="630" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="640" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="650" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="660" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="670" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="680" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="690" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="700" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="710" width="36" height="8" fill="#d0d7de"/>
+  <rect x="110" y="720" width="36" height="8" fill="#d0d7de"/>
+
+  <!-- Before leader lines -->
+  <line x1="146" y1="364" x2="170" y2="265" stroke="#875c00" stroke-width="2"/>
+  <line x1="150" y1="420" x2="150" y2="478" stroke="#0860ca" stroke-width="3"/>
+  <line x1="150" y1="420" x2="170" y2="336" stroke="#0860ca" stroke-width="2"/>
+  <line x1="146" y1="444" x2="170" y2="407" stroke="#b5400e" stroke-width="2"/>
+  <line x1="146" y1="454" x2="170" y2="478" stroke="#b5400e" stroke-width="2"/>
+  <line x1="146" y1="484" x2="170" y2="549" stroke="#c5202c" stroke-width="2"/>
+  <line x1="146" y1="494" x2="170" y2="620" stroke="#6639ba" stroke-width="2"/>
+  <line x1="146" y1="524" x2="170" y2="691" stroke="#177a33" stroke-width="2"/>
+
+  <!-- Before labels -->
+  <text x="185" y="271" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#875c00">14  INPUT = str(HERE / "input")</text>
+  <text x="185" y="342" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#0860ca">20 to 25  SparkSession.builder ... .getOrCreate()</text>
+  <text x="185" y="413" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#b5400e">22  .config("spark.sql.shuffle.partitions", "8")</text>
+  <text x="185" y="484" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#b5400e">23  .enableHiveSupport()</text>
+  <text x="185" y="555" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#c5202c">26  spark.sparkContext.setLogLevel("WARN")</text>
+  <text x="185" y="626" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#6639ba">27  spark.sparkContext.addPyFile(...)</text>
+  <text x="185" y="697" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#177a33">30  events.rdd.isEmpty()</text>
+
+  <!-- After gutter: 58 lines, one bar per line -->
+  <rect x="980" y="230" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="240" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="250" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="260" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="270" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="280" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="290" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="300" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="310" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="320" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="330" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="340" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="350" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="360" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="370" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="380" width="36" height="8" fill="#875c00"/>
+  <rect x="980" y="390" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="400" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="410" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="420" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="430" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="440" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="450" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="460" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="470" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="480" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="490" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="500" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="510" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="520" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="530" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="540" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="550" width="36" height="8" fill="#0860ca"/>
+  <rect x="980" y="560" width="36" height="8" fill="#b5400e"/>
+  <rect x="980" y="570" width="36" height="8" fill="#6639ba"/>
+  <rect x="980" y="580" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="590" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="600" width="36" height="8" fill="#177a33"/>
+  <rect x="980" y="610" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="620" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="630" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="640" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="650" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="660" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="670" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="680" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="690" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="700" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="710" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="720" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="730" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="740" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="750" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="760" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="770" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="780" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="790" width="36" height="8" fill="#d0d7de"/>
+  <rect x="980" y="800" width="36" height="8" fill="#d0d7de"/>
+
+  <!-- After leader lines -->
+  <line x1="1016" y1="384" x2="1040" y2="272" stroke="#875c00" stroke-width="2"/>
+  <line x1="1020" y1="450" x2="1020" y2="558" stroke="#0860ca" stroke-width="3"/>
+  <line x1="1020" y1="450" x2="1040" y2="390" stroke="#0860ca" stroke-width="2"/>
+  <line x1="1016" y1="564" x2="1040" y2="500" stroke="#b5400e" stroke-width="2"/>
+  <line x1="1016" y1="574" x2="1040" y2="610" stroke="#6639ba" stroke-width="2"/>
+  <line x1="1016" y1="604" x2="1040" y2="720" stroke="#177a33" stroke-width="2"/>
+
+  <!-- After labels -->
+  <text x="1055" y="266" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#875c00">16  INPUT = os.environ.get(</text>
+  <text x="1055" y="292" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#875c00">"PIPELINE_INPUT", "/demo/pipeline/input")</text>
+  <text x="1055" y="396" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#0860ca">23 to 33  build_session()</text>
+  <text x="1055" y="506" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#b5400e">34  spark.conf.set("spark.sql.shuffle.partitions", "8")</text>
+  <text x="1055" y="616" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#6639ba">35  spark.addArtifact(..., pyfile=True)</text>
+  <text x="1055" y="726" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#177a33">38  events.isEmpty()</text>
+
+  <!-- Note -->
+  <text x="960" y="838" font-size="22" fill="#57606a" text-anchor="middle">Apart from the module docstrings and import os, every other line is the same in both files</text>
+
+  <!-- Legend row 1 -->
+  <rect x="110" y="859" width="16" height="16" fill="#0860ca"/>
+  <text x="136" y="875" font-size="22" fill="#1f2328">L0  Session creation</text>
+  <rect x="540" y="859" width="16" height="16" fill="#177a33"/>
+  <text x="566" y="875" font-size="22" fill="#1f2328">L1  Pipeline logic</text>
+  <rect x="970" y="859" width="16" height="16" fill="#875c00"/>
+  <text x="996" y="875" font-size="22" fill="#1f2328">L2  Data sources and catalogs</text>
+  <rect x="1400" y="859" width="16" height="16" fill="#b5400e"/>
+  <text x="1426" y="875" font-size="22" fill="#1f2328">L3  Configuration</text>
+
+  <!-- Legend row 2 -->
+  <rect x="110" y="904" width="16" height="16" fill="#6639ba"/>
+  <text x="136" y="920" font-size="22" fill="#1f2328">L4  Dependencies</text>
+  <rect x="700" y="904" width="16" height="16" fill="#c5202c"/>
+  <text x="726" y="920" font-size="22" fill="#1f2328">L5  Execution and operations</text>
+  <text x="726" y="944" font-size="20" fill="#57606a">setLogLevel removed in pipeline_after.py</text>
+  <rect x="1290" y="904" width="16" height="16" fill="#08707a"/>
+  <text x="1316" y="920" font-size="22" fill="#1f2328">L6  Security and identity</text>
+  <text x="1316" y="944" font-size="20" fill="#57606a">not used by this pipeline</text>
+
+  <!-- Footer -->
+  <text x="80" y="1046" font-size="20" fill="#57606a">Source: git diff --no-index --stat reports 21 insertions and 13 deletions</text>
+</svg>

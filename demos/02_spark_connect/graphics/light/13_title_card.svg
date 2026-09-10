@@ -1,0 +1,31 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#d8dee4" opacity="0.6"/>
+    </pattern>
+    <marker id="arrowPurple" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8250df"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#f6f8fa"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dots)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#d9531a"/>
+
+  <g stroke="#d9531a" stroke-width="3" fill="none" opacity="0.35">
+    <path d="M 40 100 L 40 40 L 100 40"/>
+    <path d="M 1820 40 L 1880 40 L 1880 100"/>
+    <path d="M 40 980 L 40 1062 L 64 1062"/>
+    <path d="M 1880 980 L 1880 1062 L 1856 1062"/>
+  </g>
+
+  <text x="960" y="420" font-size="84" font-weight="700" fill="#1f2328" text-anchor="middle">Spark Connect in Apache Spark 4.2</text>
+  <text x="960" y="490" font-size="40" fill="#57606a" text-anchor="middle">Architecture, Setup, and Migration</text>
+  <text x="960" y="545" font-size="28" fill="#b5400e" text-anchor="middle">Apache Spark 4.2.0</text>
+
+  <rect x="530" y="700" width="320" height="140" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="690" y="781" font-size="32" font-weight="700" fill="#1f2328" text-anchor="middle">Client</text>
+
+  <rect x="1070" y="700" width="320" height="140" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1230" y="781" font-size="32" font-weight="700" fill="#1f2328" text-anchor="middle">Server</text>
+
+  <line x1="850" y1="770" x2="1065" y2="770" stroke="#8250df" stroke-width="3" marker-end="url(#arrowPurple)"/>
+</svg>

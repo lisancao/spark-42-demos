@@ -1,0 +1,111 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+    <marker id="arrow-orange" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#e25a1c"/></marker>
+    <marker id="arrow-purple" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8957e5"/></marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="6" width="1920" height="1074" fill="url(#dots)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#e25a1c" stroke-width="4" opacity="0.35">
+    <line x1="30" y1="30" x2="30" y2="80"/>
+    <line x1="30" y1="30" x2="80" y2="30"/>
+    <line x1="1890" y1="30" x2="1890" y2="80"/>
+    <line x1="1890" y1="30" x2="1840" y2="30"/>
+    <line x1="30" y1="1062" x2="30" y2="1012"/>
+    <line x1="30" y1="1062" x2="64" y2="1062"/>
+    <line x1="1890" y1="1062" x2="1890" y2="1012"/>
+    <line x1="1890" y1="1062" x2="1856" y2="1062"/>
+  </g>
+
+  <!-- Title -->
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">The Same Pipeline, Two Ways</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">make pipeline runs both, then compares the output</text>
+
+  <!-- Left column: Before -->
+  <text x="110" y="270" font-size="32" font-weight="700" fill="#ff8a4c">Before: Spark Classic</text>
+
+  <rect x="110" y="305" width="600" height="90" rx="8" fill="#0d1117" stroke="#e25a1c" stroke-width="2"/>
+  <text x="135" y="345" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">docker compose exec spark-connect spark-submit</text>
+  <text x="135" y="375" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">/demo/pipeline/pipeline_before.py</text>
+
+  <line x1="410" y1="403" x2="410" y2="530" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="110" y="545" width="600" height="55" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="410" y="581" font-size="24" fill="#e6edf3" text-anchor="middle">Driver inside the container</text>
+
+  <line x1="410" y1="608" x2="410" y2="620" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="110" y="635" width="600" height="55" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="410" y="671" font-size="24" fill="#e6edf3" text-anchor="middle">Standalone master</text>
+
+  <line x1="410" y1="698" x2="410" y2="710" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="110" y="725" width="600" height="55" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="410" y="761" font-size="24" fill="#e6edf3" text-anchor="middle">Worker</text>
+
+  <line x1="410" y1="788" x2="410" y2="800" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="110" y="815" width="600" height="50" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="135" y="848" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">/opt/spark/work-dir/out/classic</text>
+
+  <!-- Right column: After -->
+  <text x="1210" y="270" font-size="32" font-weight="700" fill="#b392f0">After: Spark Connect</text>
+
+  <rect x="1210" y="305" width="600" height="90" rx="8" fill="#0d1117" stroke="#8957e5" stroke-width="2"/>
+  <text x="1235" y="345" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">python pipeline/pipeline_after.py</text>
+  <text x="1235" y="375" font-size="20" fill="#8b949e">on the host</text>
+
+  <text x="1235" y="425" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#b392f0">sc://localhost:15002/;</text>
+  <text x="1235" y="447" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#b392f0">user_agent=</text>
+  <text x="1235" y="469" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#b392f0">orders-pipeline</text>
+  <line x1="1510" y1="403" x2="1510" y2="530" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <rect x="1210" y="545" width="600" height="55" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1510" y="581" font-size="24" fill="#e6edf3" text-anchor="middle">Connect server</text>
+
+  <line x1="1510" y1="608" x2="1510" y2="620" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <rect x="1210" y="635" width="600" height="55" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1510" y="671" font-size="24" fill="#e6edf3" text-anchor="middle">Standalone master</text>
+
+  <line x1="1510" y1="698" x2="1510" y2="710" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <rect x="1210" y="725" width="600" height="55" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1510" y="761" font-size="24" fill="#e6edf3" text-anchor="middle">Worker</text>
+
+  <line x1="1510" y1="788" x2="1510" y2="800" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <rect x="1210" y="815" width="600" height="50" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="1235" y="848" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">/opt/spark/work-dir/out/connect</text>
+
+  <!-- Shared card -->
+  <rect x="790" y="305" width="340" height="100" rx="10" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="960" y="350" font-size="26" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3" text-anchor="middle">lib/transforms.py</text>
+  <text x="960" y="382" font-size="20" fill="#8b949e" text-anchor="middle">unchanged, imported by both</text>
+  <line x1="790" y1="350" x2="710" y2="345" stroke="#30363d" stroke-width="2" stroke-dasharray="6,6"/>
+  <line x1="1130" y1="350" x2="1210" y2="345" stroke="#30363d" stroke-width="2" stroke-dasharray="6,6"/>
+
+  <!-- Parity check -->
+  <text x="110" y="895" font-size="26" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">parity.py</text>
+  <text x="280" y="895" font-size="24" fill="#8b949e">compares both outputs</text>
+
+  <rect x="110" y="920" width="1730" height="95" rx="10" fill="#12261a" stroke="#7ee787" stroke-width="2"/>
+  <text x="140" y="955" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">bronze_events 238</text>
+  <text x="558" y="955" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">bronze_stores 4</text>
+  <text x="975" y="955" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">bronze_brands 5</text>
+  <text x="1393" y="955" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">silver_orders_enriched 235</text>
+  <text x="140" y="995" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">silver_order_lifecycle 55</text>
+  <text x="558" y="995" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">gold_delivery_performance 4</text>
+  <text x="975" y="995" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">gold_brand_summary 5</text>
+  <text x="1393" y="995" font-size="20" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#7ee787">7/7 tables identical</text>
+
+  <!-- Footer -->
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: make pipeline; VERIFIED_FACTS.md &#xa7;9</text>
+</svg>

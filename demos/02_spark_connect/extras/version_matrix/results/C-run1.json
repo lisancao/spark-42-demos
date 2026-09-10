@@ -1,0 +1,71 @@
+{
+  "environment": {
+    "client_pyspark": "4.1.2",
+    "client_python": "3.10.20",
+    "server_version": "4.2.0",
+    "recorded_at": "2026-09-10T21:46:17+00:00"
+  },
+  "operations": {
+    "connect": {
+      "status": "ok",
+      "detail": "4.2.0"
+    },
+    "sql": {
+      "status": "ok",
+      "detail": "1"
+    },
+    "createDataFrame (local data)": {
+      "status": "ok",
+      "detail": "3"
+    },
+    "group by": {
+      "status": "ok",
+      "detail": "[Row(k=0, s=20), Row(k=1, s=25)]"
+    },
+    "toPandas": {
+      "status": "ok",
+      "detail": "100000"
+    },
+    "observe": {
+      "status": "ok",
+      "detail": "25"
+    },
+    "python udf": {
+      "status": "ok",
+      "detail": "3.10.12"
+    },
+    "addArtifact": {
+      "status": "ok",
+      "detail": "fails before addArtifact, 111.2 km after"
+    },
+    "zipWithIndex": {
+      "status": "n/a",
+      "detail": "not in this client version"
+    },
+    "read.json(DataFrame)": {
+      "status": "fails",
+      "detail": "AssertionError (no message)"
+    },
+    "emptyDataFrame(schema)": {
+      "status": "n/a",
+      "detail": "not in this client version"
+    },
+    "GetStatus (private API)": {
+      "status": "n/a",
+      "detail": "not in this client version"
+    },
+    "analysis error": {
+      "status": "ok",
+      "detail": "AnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION], SQL state 42703"
+    },
+    "interruptAll": {
+      "status": "ok",
+      "detail": "0 operations interrupted"
+    }
+  },
+  "cell": {
+    "id": "C",
+    "description": "client 4.1.2, server 4.2.0",
+    "remote": "sc://localhost:15095"
+  }
+}

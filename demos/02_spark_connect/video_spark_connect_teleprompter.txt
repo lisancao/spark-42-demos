@@ -1,0 +1,736 @@
+SPARK CONNECT IN APACHE SPARK 4.2: ARCHITECTURE, SETUP, AND MIGRATION
+
+
+=== CHAPTER 0. COLD OPEN (0:00 - 1:30) ===
+
+[ROLL SIDE-BY-SIDE IDE FOOTAGE]
+
+Two machines. The same file. The same output.
+
+One of these machines doesn't have Java installed. It doesn't have Spark installed either.
+
+It has a Python package of one point six megabytes, and a URL.
+
+That's Spark Connect.
+
+In this video, we'll look at why it exists and how it works.
+
+Then we'll stand up a server, migrate a pipeline onto it, and check that the migration didn't change a single row of output.
+
+[TITLE CARD]
+
+
+=== CHAPTER 1. WHY CONNECT EXISTS, AND HOW IT WORKS (1:30 - 5:30) ===
+
+
+-- THE DRIVER-COUPLED ARCHITECTURE --
+
+[SHOW DRIVER COUPLING DIAGRAM]
+
+For most of Spark's history, an application and its Spark driver have been tied together.
+
+In PySpark, that's literal. Your Python process starts a driver JVM, and calls into it through a bridge called Py4J.
+
+So the application has to run close to the cluster. It has to carry a full Spark runtime and a JDK. And it shares the driver's lifetime.
+
+In June of twenty twenty-two, Martin Grund filed the Spark Improvement Proposal for Spark Connect.
+
+[SHOW SPARK-39375]
+
+It names four limitations of that design.
+
+First, remote access. Apart from SQL, there was no built-in way to connect to a cluster remotely.
+
+Second, developer experience. The architecture didn't suit notebooks or modern code editors.
+
+Third, stability. On a shared driver, one user's out-of-memory error could take the cluster down for everyone.
+
+And fourth, upgrades. Client and platform dependencies shared one classpath, so you couldn't upgrade Spark independently of the applications using it.
+
+
+-- THE DESIGN DECISION --
+
+The proposal's answer was to separate the client from the driver, along a line Spark already had. The DataFrame API.
+
+A DataFrame program doesn't compute anything as you write it. It builds a plan.
+
+Spark Connect sends that plan, unresolved, to a server.
+
+The server resolves it, optimizes it with Catalyst, runs it, and streams the results back as Arrow.
+
+[SHOW TIMELINE]
+
+Spark Connect shipped as a Python client in Spark three point four, in twenty twenty-three.
+
+Spark three point five added Scala and Go clients.
+
+Spark four point oh added the pure-Python package, pyspark dash client, and a setting called spark dot api dot mode.
+
+And Spark four point two, which is what we're running today, is largely about operating it in production.
+
+
+-- THE SESSION LIVES ON THE SERVER --
+
+[SHOW PLAN-IN, ARROW-OUT DIAGRAM]
+
+Here's the most useful fact to hold on to.
+
+The Spark session lives on the server. The client just holds a reference to it.
+
+Most practical questions follow from that.
+
+Where are catalogs configured? On the server, because that's where names get resolved.
+
+How does the client know what tables exist? It asks the server.
+
+Which settings can a client change? The ones the server reads at run time. Values, not class names.
+
+Take this line. The client doesn't know whether that table exists, or what columns it has.
+
+It sends the name, and the server resolves it.
+
+That's why a client with no Iceberg JARs can still query an Iceberg table.
+
+[RUN LAUNCH CONFIGURATION 3 (EXAMPLE 02, FIRST QUERY), THEN SCROLL TO THE EXPLAIN OUTPUT]
+
+You can see the division of labor directly. This is df dot explain, run from a client with no optimizer.
+
+The physical plan, the adaptive execution node, the two-hundred-partition exchange. All of it came back from the server.
+
+
+=== CHAPTER 2. THE FOUR DISTRIBUTIONS (5:30 - 9:30) ===
+
+[SHOW FOUR DISTRIBUTIONS GRAPHIC]
+
+On PyPI, there are four distributions that all give you the pyspark namespace.
+
+Only one of them is a client without a JVM.
+
+
+-- THE TABLE --
+
+[FULL-SCREEN TABLE]
+
+Here they are. Plain pyspark. Pyspark with the connect extra. Pyspark dash connect. And pyspark dash client.
+
+
+-- MEASURING IT --
+
+[RUN MAKE SETUP (SPEED UP THE FULL INSTALL)]
+
+Let's look at two of them installed. One command builds both environments.
+
+[RUN LAUNCH CONFIGURATION 4 (EXAMPLE 03 WITH PYSPARK-CLIENT), THEN LAUNCH CONFIGURATION 5 (EXAMPLE 03 WITH FULL PYSPARK)]
+
+[HOLD ON OUTPUT]
+
+The same script inspects each environment.
+
+The client's pyspark directory adds up to seventeen megabytes. The full distribution's adds up to five hundred, and it includes two hundred seventy-six JAR files.
+
+Those are sums of file sizes. The table shows disk usage, so its numbers are slightly different.
+
+And on the client side, there's no JARs directory at all. That's a more reliable test than any size.
+
+
+-- PYSPARK DASH CONNECT IS NOT THE CLIENT --
+
+[RUN THE PYPI METADATA QUERY FOR PYSPARK-CONNECT, THEN HIGHLIGHT REQUIRES_DIST]
+
+The name that causes confusion is pyspark dash connect.
+
+It's ten kilobytes of metadata. Its first dependency is the full pyspark distribution, and the rest are the Connect client's own dependencies.
+
+So installing it installs the full distribution, JARs and all.
+
+The one point six megabyte figure belongs to pyspark dash client. That package was introduced in Spark four point oh.
+
+The Connect overview page has recommended it since four point one. The four point oh page recommended pyspark with the connect extra.
+
+So older instructions aren't wrong. They're out of date.
+
+
+-- WHAT IT ACTUALLY SAVES --
+
+[SHOW SAVINGS TABLE, THEN REVEAL THE LAST ROW]
+
+So what does the client actually save?
+
+Spark's own Python payload drops by ninety-six percent. The JARs are gone entirely. And there's no JDK on the client.
+
+But a working client environment is still three hundred fifty-nine megabytes.
+
+That's because PyArrow alone is a hundred fifty-four megabytes. That's about eight times the size of the Spark client. And pandas and NumPy are required too.
+
+So the benefit isn't a small environment.
+
+It's no JVM, no JDK, and none of those two hundred seventy-six JAR files.
+
+
+=== CHAPTER 3. DEMO A, PART 1: SIX TOPOLOGIES (9:30 - 15:00) ===
+
+[IDE: EXPAND THE PROJECT TREE]
+
+This is the companion project. Ten short examples, a small pipeline to migrate, server setup, and seventy-five tests.
+
+Setting up Spark Connect involves two decisions.
+
+How you start the server. And where it runs, relative to your data and your users.
+
+The second decision has the larger consequences.
+
+
+-- THE SIX TOPOLOGIES --
+
+[OPEN SETUP/TOPOLOGIES.MD]
+
+There are six topologies.
+
+In-process, for tests and CI.
+
+A separate process on the same host, for development.
+
+A remote standalone cluster, for a shared team.
+
+Kubernetes, for multi-tenant platforms.
+
+YARN cluster mode, new in four point two, for existing Hadoop deployments.
+
+And multiple clusters, for routing work between them.
+
+The client code is identical in all six. That's convenient.
+
+It also means nothing in your code tells you which topology you're on.
+
+So in the second half of this demo, we'll check it explicitly.
+
+
+-- TOPOLOGY ONE: A SERVER INSIDE THE PYTHON PROCESS --
+
+[RUN LAUNCH CONFIGURATION 6 (EXAMPLE 04, IN-PROCESS SERVER)]
+
+Topology one. No container, and no cluster.
+
+Setting spark dot remote to local star starts a Connect server inside this Python process.
+
+And this is the real Connect code path. Watch. Spark context raises an error here, just as it does against a remote server.
+
+That makes this a good fit for Connect compatibility tests in CI. The tests run under the same restrictions as production, without a cluster.
+
+[ZOOM ON THE PORT CHECK, THEN THE SPARK VERSION LINE]
+
+One detail matters in this mode.
+
+The client always connects to localhost, on port fifteen-oh-oh-two, whatever the binding port is set to.
+
+If another server already holds that port, the local server can't start, and you get a bind exception. That's the safe outcome.
+
+The unsafe one is moving the local server to a different port. The client still connects to fifteen-oh-oh-two, and you get a working session on the other server, with no error.
+
+So this example checks the port first, and stops with an explanation if it's taken.
+
+
+-- THE CLIENT WITHOUT A JVM CANNOT DO THIS --
+
+[RUN LAUNCH CONFIGURATION 7 (EXAMPLE 04 WITH PYSPARK-CLIENT)]
+
+Now the same script, with pyspark dash client.
+
+It accepts only S-C URLs. It has no JVM, so there's no server for it to start.
+
+
+-- TOPOLOGY SIX: MULTIPLE CLUSTERS AND SESSION REUSE --
+
+[RUN LAUNCH CONFIGURATION 8 (EXAMPLE 05, SESSIONS)]
+
+Topology six. One client, several servers.
+
+Here we ask get-or-create for a session on port one.
+
+Nothing is listening on port one. And we get the first session back anyway. No error, and no warning.
+
+So in a client that works with several clusters, asking for the second cluster returns the first.
+
+And calling stop on that shared session ends it for everything else in the process.
+
+Use builder dot create instead, and each call gets its own session.
+
+[HOLD ON ISOLATION OUTPUT]
+
+The same view name holds three rows in one session and seven in the other. Stopping one leaves the other running.
+
+One limit. Create won't accept a local connection string, so in-process mode still needs get-or-create.
+
+
+-- TOPOLOGIES THREE AND FOUR: PRODUCTION DEPLOYMENTS --
+
+[OPEN START-CONNECT-SERVER.SH, THEN SCROLL THE OPTIONS]
+
+For production, the standalone launch script is a handful of options, each with a comment.
+
+Without a binding setting, a four point two server listens on every network interface. So this script sets the binding host explicitly, and defaults to loopback.
+
+And catalogs and extensions are configured here, on the server. Not on the client.
+
+You'll also see a warning in the server log. A class-not-found error, for the session extension.
+
+It looks serious, but it isn't. It refers to the server's bootstrap session, which starts before the extra JARs are on the classpath.
+
+Client sessions created afterward load the extension normally.
+
+I checked it with and without the extra driver classpath option. The warning is the same, and the extensions work either way.
+
+So check a session extension by using it. Not by reading the log.
+
+[OPEN CONNECT-SERVER.YAML, THEN STOP ON REPLICAS: 1]
+
+On Kubernetes, the line to notice is replicas, one.
+
+Each Connect server holds its own session state.
+
+If a service balances traffic across three pods, a client's next request can land on a pod that doesn't have its session.
+
+So use session affinity, or one deployment per tenant.
+
+And Spark Connect has no authentication of its own. The documentation says to run it behind an authenticating proxy.
+
+Don't expose port fifteen-oh-oh-two directly.
+
+
+=== CHAPTER 3b. DEMO A, PART 2: VALIDATING THE SETUP (15:00 - 20:00) ===
+
+Six topologies. Identical client code. Nothing in the application to tell them apart.
+
+So let's validate.
+
+
+-- THE SERVER --
+
+[RUN MAKE UP, THEN OPEN COMPOSE.YAML AT THE SPARK-CONNECT SERVICE]
+
+This starts a standalone master, one worker, and a Connect server that runs its work on that cluster.
+
+Three details in this command.
+
+Dash dash wait keeps the server in the foreground. Without it, the script moves to the background, and the container exits immediately.
+
+The Connect server takes one of the worker's two cores. That leaves one for a spark-submit job on the same cluster, which we'll need in chapter seven.
+
+And there's no packages option for the Connect JAR. Guides written for Spark three point five include one. Since Spark four point oh, the server ships in the distribution, so it isn't needed.
+
+
+-- DOCTOR --
+
+[RUN LAUNCH CONFIGURATION 9 (DOCTOR)]
+
+This is the doctor. It doesn't assume what Connect supports. It asks the server you're connected to.
+
+[HOLD ON FULL OUTPUT]
+
+The client is pyspark dash client. No JARs, and no Py4J.
+
+The server reports version four point two point oh.
+
+Every capability check passes, including a Python UDF, and adding an artifact.
+
+Now look at spark dot api dot mode. It's unset, and an application that doesn't set it runs on Spark Classic.
+
+Connect isn't the default in Spark four. The JIRA proposing that change is still open.
+
+And both Arrow settings are true. They became the default in four point two. Nothing here sets them.
+
+
+-- PYTHON VERSIONS ARE STILL COUPLED --
+
+[RUN LAUNCH CONFIGURATION 10 (EXAMPLE 06, PYTHON VERSIONS)]
+
+Removing the JVM from the client doesn't remove every coupling.
+
+A Python UDF is serialized on the client, and deserialized on an executor. And PySpark won't run across Python minor versions.
+
+Here the client runs Python three point ten point twenty, and the executors run three point ten point twelve. The minor versions match, so the UDF runs.
+
+[RERUN EXAMPLE 06 FROM A PYTHON 3.12 ENVIRONMENT]
+
+From Python three point twelve, the same example fails with a version mismatch.
+
+The official Spark four point two images ship Python three point ten. So this project pins its client to Python three point ten.
+
+[RUN THE DOCTOR AGAINST THE UNMODIFIED 4.2.0 IMAGE, THEN ZOOM ON THE TWO FAILURES]
+
+There's a second catch in the official image.
+
+Spark four point two runs Python UDFs through Arrow by default, and the image doesn't include PyArrow.
+
+So against the unmodified image, every Python UDF fails. Module not found, pyarrow.
+
+The Dockerfile in this project adds PyArrow and pandas to the official image, and nothing else.
+
+
+-- CONNECTION STRING VALIDATION --
+
+[RUN LAUNCH CONFIGURATION 11 (EXAMPLE 07, CONNECTION STRINGS)]
+
+[HOLD ON ERROR]
+
+One more check. Connection strings.
+
+The error says the path must be empty. But this URL doesn't have a path.
+
+The problem is the slash inside the user agent value. The parser reads it as the start of a path, so the error names the path, not the parameter.
+
+With a dash instead of a slash, the same connection string is accepted.
+
+So validate parameter values before you build the URL.
+
+
+-- SHIPPING PYTHON DEPENDENCIES --
+
+[BROWSER: PYTHON PACKAGE MANAGEMENT PAGE]
+
+Finally, dependencies.
+
+This is the official page on shipping Python dependencies to Spark. Py-files, conda-pack, venv-pack, and PEX.
+
+It describes Spark Classic. It doesn't cover Spark Connect.
+
+None of these apply here. Py-files is a spark-submit option. And add-py-file lives on Spark context, which isn't available.
+
+The Connect mechanism is spark dot add-artifact, and it has three modes.
+
+[RUN LAUNCH CONFIGURATION 12 (EXAMPLE 08, ADDARTIFACT)]
+
+Notice how this check works.
+
+First, it confirms the UDF fails. Then it ships the dependency. Then it confirms the UDF succeeds.
+
+A test of the success case alone would also pass on a server that already had the module installed.
+
+It wouldn't be testing add-artifact at all.
+
+
+=== CHAPTER 4. SPARK DOT API DOT MODE (20:00 - 22:30) ===
+
+[SHOW API MODE DIAGRAM]
+
+This one setting lets you migrate one job at a time, instead of everything at once.
+
+
+-- HOW IT DIFFERS FROM SPARK DOT REMOTE --
+
+So how is it different from spark dot remote?
+
+Spark dot remote does one of two things. It connects to a server that's already running. Or it has Spark start a local one.
+
+What it can't do is take an existing cluster master URL, and start a server on that cluster.
+
+That's what spark dot api dot mode does.
+
+Your submit command keeps its master URL, and one setting decides the execution path.
+
+So you can move a job to Connect, watch it, and move it back. No branch, and no second copy of the pipeline.
+
+
+-- COMPARING BOTH MODES IN CI --
+
+It also means CI can run a job both ways, and compare the output.
+
+In chapter seven, we'll make that comparison meaningful.
+
+
+=== CHAPTER 5. API DIFFERENCES, AND WHAT 4.2 ADDED (22:30 - 27:00) ===
+
+[SHOW JIRA GRID]
+
+Now, the API differences. These come straight from the client source.
+
+
+-- UNSUPPORTED APIS --
+
+[SHOW BLOCKED ATTRIBUTE LIST]
+
+The four point two Connect client rejects six session attributes, and five DataFrame attributes.
+
+Only two of them are likely to show up in application code. Spark context, and R-D-D.
+
+The rest are private handles into the JVM.
+
+New session is also on the list. It isn't prominent in the documentation, so it's worth knowing about.
+
+And RDDs are a permanent difference. The protocol has no way to represent a function that runs directly against RDD partitions.
+
+[RUN LAUNCH CONFIGURATION 13 (EXAMPLE 09, API DIFFERENCES), THEN ZOOM ON THE THREE ERRORS]
+
+Here are three of them, raising the same error class. Spark context, the JVM handle, and R-D-D.
+
+
+-- ACCUMULATORS AND BROADCAST --
+
+[REPL: ACCUMULATOR RAISES]
+
+Accumulators are created through Spark context. Spark context isn't available, so neither are accumulators.
+
+Here it is, raising.
+
+Broadcast needs more care.
+
+The broadcast join hint, in the functions module, works fine. A broadcast variable, created from Spark context, doesn't.
+
+And if you need to count something during a job, use DataFrame dot observe. That's the Connect replacement for an accumulator.
+
+
+-- WHAT 4.2 ADDED --
+
+[SCROLL EXAMPLE 09 TO THE ZIPWITHINDEX, READ.JSON AND EMPTYDATAFRAME OUTPUT]
+
+Spark four point two also closed several gaps.
+
+Zip-with-index now works over Connect. The JSON reader accepts a DataFrame. And empty DataFrame is available.
+
+Two details.
+
+The DataFrame-input readers cover JSON, XML, and CSV only. Not Parquet, and not ORC.
+
+And empty DataFrame is a method that takes a schema. It isn't a property.
+
+
+=== CHAPTER 6. THE SEVEN LAYERS OF A MIGRATION (27:00 - 33:00) ===
+
+[SHOW SEVEN LAYERS GRAPHIC]
+
+A Connect migration isn't one change.
+
+It's seven independent layers, and only one of them is mandatory.
+
+Treating it as a single cutover is what makes it hard to predict.
+
+
+-- LAYER TWO: DATA SOURCES AND CATALOGS --
+
+[SHOW CONFIGURATION BOUNDARY GRAPHIC]
+
+Layer two, data sources and catalogs, is mostly about the mental model. Not the code.
+
+Your Iceberg catalog configuration doesn't change at all. It just has to be on the server.
+
+The value of that setting is a Java class name. And a client without a JVM has no class loader to load it.
+
+Nothing is preloaded or cached on the client.
+
+The client never reads Iceberg metadata, Parquet files, or your object store. It sends a table name, and gets rows back as Arrow.
+
+
+-- LAYER THREE: VALUES, NOT CLASS NAMES --
+
+Layer three, configuration, follows one rule. A client can set values. It can't set class names.
+
+Shuffle partitions is a value, so a client can set it.
+
+Extensions and JARs are loaded when the server starts, so a client can't.
+
+One case produces no error at all.
+
+Setting the Iceberg catalog from the client is accepted silently. It fails later, when the catalog is first used. Possibly in the middle of a write.
+
+
+-- LAYER FOUR: WHAT STAYS IN THE SERVER IMAGE --
+
+Layer four, dependencies. Add-artifact ships Python code.
+
+It doesn't ship catalog JARs, native libraries, or session extensions. Those belong in the server image.
+
+And transitive JAR dependencies aren't resolved for you.
+
+
+-- LAYER SIX: CREDENTIALS --
+
+Layer six, security and identity.
+
+In the lakehouse-stack deployment from the case study, the catalog credentials are mounted into the master and every worker. That's a Postgres password, and object storage keys.
+
+Any job that's submitted can read them.
+
+After the migration, only the Connect server needs them. Laptops, CI runners, and notebooks don't hold catalog credentials at all.
+
+Remember, though, that Spark Connect has no built-in authentication. It belongs behind an authenticating proxy.
+
+
+-- ORDER OF OPERATIONS --
+
+The layers are numbered by where they sit in an application. But you carry them out in dependency order.
+
+Stand up the server first. Point one job at it. Run the audit. Move dependencies. Then update operations.
+
+And remove client credentials last, because that's the hardest step to reverse.
+
+
+=== CHAPTER 7. DEMO B: MIGRATING A PIPELINE (33:00 - 41:00) ===
+
+[SHOW BEFORE-AND-AFTER GRAPHIC]
+
+Now the migration. This pipeline is small on purpose, so we can see every change.
+
+It reads three inputs: order events, stores, and brands. It writes three bronze tables, two silver tables, and two gold tables. Seven in all.
+
+The enrichment step uses a Python UDF, which computes each delivery's distance with a helper module.
+
+There are two versions of the entry point. Pipeline before runs on Spark Classic, submitted with spark-submit. Pipeline after runs the same pipeline over Spark Connect, as an ordinary Python program.
+
+Both call the same transformation functions, in lib slash transforms. Those don't change.
+
+
+-- AUDITING THE PIPELINE --
+
+[RUN LAUNCH CONFIGURATION 14 (AUDIT)]
+
+Apache Spark doesn't ship a Connect compatibility checker. The official mechanism is a label in the API reference.
+
+So this project includes a static audit. It's a demo tool, not part of Apache Spark, and the source is in the repository.
+
+[ZOOM ON THE FOUR PIPELINE_BEFORE.PY FINDINGS]
+
+In pipeline before, it finds four things.
+
+Set log level and add-py-file, which both go through Spark context. R-D-D dot is-empty. And enable Hive support, which doesn't raise under Connect, but doesn't do anything either.
+
+Each finding carries its layer. Set log level is layer five, add-py-file is layer four, the RDD call is layer one, and Hive support is layer three.
+
+In pipeline after, it finds nothing.
+
+
+-- FINDINGS A TEXT SEARCH CANNOT DETECT --
+
+[ZOOM ON THE TWO EXAMPLE 10 FINDINGS]
+
+The audit also ran on example ten, and its two findings are a different kind.
+
+A try block that catches an analysis exception around a transformation. And a temporary view registered twice under the same name.
+
+Neither is a name you can search for. They depend on the structure of the program. That's why the audit parses the code.
+
+[RUN LAUNCH CONFIGURATION 15 (EXAMPLE 10 ON SPARK CLASSIC), THEN LAUNCH CONFIGURATION 16 (EXAMPLE 10 ON SPARK CONNECT)]
+
+Here's what those findings mean when the code runs.
+
+On Spark Classic, the invalid column raises when the DataFrame is defined. On Spark Connect, it raises only when an action runs. So a handler around the definition never sees the error.
+
+And the view. Spark Classic captured the plan when the view was registered, so the earlier DataFrame still counts three rows.
+
+Spark Connect looks the view up by name when the query runs, so the same DataFrame now counts seven.
+
+
+-- THE DIFF --
+
+[IDE SIDE-BY-SIDE DIFF OF PIPELINE_BEFORE.PY AND PIPELINE_AFTER.PY]
+
+Here's the whole diff. Twenty-one lines added and thirteen removed, counting the docstrings. Each change is on a line marked with its layer.
+
+Layer zero. The session comes from a small builder function, which returns a Connect session when spark remote is set.
+
+Layer one. R-D-D dot is-empty becomes is-empty.
+
+Layer three. Shuffle partitions is a value the server reads, so the client still sets it. Enable Hive support is gone.
+
+Layer four. Add-py-file becomes add-artifact.
+
+Layer five. Set log level is gone. The log level belongs to the server.
+
+No transformation logic changed. Connect changes where the code runs. Not the code itself.
+
+
+-- FILE PATHS RESOLVE ON THE SERVER --
+
+[HIGHLIGHT THE TWO INPUT LINES]
+
+Layer two is the change the audit can't find.
+
+Under Connect, the server opens the input files. So the path has to be one the server can see.
+
+The cluster mounts the pipeline directory at slash demo slash pipeline, and the migrated version reads from there.
+
+Point it at the path on this laptop instead, and the run fails with path not found.
+
+The audit can't catch that, because a path is just a string.
+
+
+-- VERIFYING THE OUTPUT --
+
+[RUN MAKE PIPELINE]
+
+A run that finishes without errors doesn't prove the behavior was preserved.
+
+Make pipeline runs the Classic version with spark-submit inside the cluster, runs the Connect version from this laptop, and then compares what they wrote.
+
+It compares every table in three ways. Schema, row count, and a content hash that doesn't depend on row order.
+
+The hash matters. A row count can't catch a result with the right number of rows, but the wrong values.
+
+And that's exactly what an unintended change to a join produces.
+
+The comparison has tests that build that case, to confirm it gets caught.
+
+[HOLD ON 7/7]
+
+Seven of seven tables match.
+
+
+-- THE SAME LAYERS IN A PRODUCTION PIPELINE --
+
+[OPEN CASE_STUDY/LAKEHOUSE_STACK/README.MD AT THE PARITY RESULTS]
+
+The same layers apply at a larger scale.
+
+The case study in the repository migrates a three-hundred-fifty-seven-line production pipeline that writes ten Iceberg tables.
+
+Its only blocking call was set log level. And its parity check found ten of ten tables identical, including more than a million bronze orders.
+
+One note on that case study. Apache Iceberg doesn't publish a runtime for Spark four point two yet, so it uses a local source build. That isn't a supported release, and none of the demos in this video depend on it.
+
+
+=== CHAPTER 8. OPERATING CONNECT, AND WHERE TO START (41:00 - 43:00) ===
+
+[SHOW JIRA GRID: OPERATIONS CELLS]
+
+Most of the Connect work in four point two is about running a server in production.
+
+Get-status now has a server-side implementation, so health checks have a defined call to make.
+
+The Connect tab works in the History Server again. That's a bug fix, and it was also backported to four point one and four point oh.
+
+And an environment variable on the client now releases the server-side session when the client process exits. That's useful in notebooks and CI jobs.
+
+The JIRA numbers are on screen.
+
+One recommendation. Set the user agent in your connection strings from the start, as the pipeline in chapter seven does. It's how a client identifies itself to the server.
+
+
+-- DECIDING WHETHER TO MIGRATE --
+
+[SHOW DECISION TABLE]
+
+So, should you migrate?
+
+If you run notebooks against shared clusters, you're a strong candidate.
+
+If you embed Spark in a service or an agent, you're a strong candidate too. A client without a JVM is the reason.
+
+If credentials are mounted on every worker, layer six alone may justify it.
+
+If you depend on RDDs, keep those jobs on Spark Classic.
+
+And if you're also upgrading from four point one to four point two, make those two changes separately.
+
+
+-- WHERE TO START --
+
+Here's a reasonable first step.
+
+Stand up a Connect server beside your existing cluster.
+
+Point one job at it with spark dot api dot mode, so you can move it back.
+
+And run an audit across your repository.
+
+That takes a morning, and it tells you how large your migration really is.
+
+[END CARD]

@@ -1,0 +1,164 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"
+     font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+
+  <defs>
+    <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="#1a1a2e"/>
+  <rect width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#e25a1c" stroke-width="2" fill="none" opacity="0.35">
+    <line x1="56" y1="56" x2="156" y2="56"/>
+    <line x1="56" y1="56" x2="56" y2="156"/>
+    <line x1="1864" y1="56" x2="1764" y2="56"/>
+    <line x1="1864" y1="56" x2="1864" y2="156"/>
+    <line x1="56" y1="1024" x2="156" y2="1024"/>
+    <line x1="56" y1="1024" x2="56" y2="924"/>
+    <line x1="1864" y1="1024" x2="1764" y2="1024"/>
+    <line x1="1864" y1="1024" x2="1864" y2="924"/>
+  </g>
+
+  <!-- Title and subtitle -->
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">Spark Connect in Spark 4.2</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">Selected changes with fix version 4.2.0</text>
+
+  <!-- Column 1: API (blue) -->
+  <g>
+    <text x="80" y="240" font-size="32" font-weight="700" fill="#79c0ff">API</text>
+    <line x1="80" y1="256" x2="480" y2="256" stroke="#30363d" stroke-width="2"/>
+
+    <rect x="80" y="280" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="300" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55227</text>
+    <text x="96" y="328" font-size="24" fill="#e6edf3">RDD API compatibility</text>
+    <text x="96" y="356" font-size="24" fill="#e6edf3">(umbrella)</text>
+
+    <rect x="80" y="378" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="398" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55229</text>
+    <text x="96" y="426" font-size="24" fill="#e6edf3">DataFrame.zipWithIndex</text>
+
+    <rect x="80" y="448" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="468" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55090</text>
+    <text x="96" y="496" font-size="24" fill="#e6edf3">DataFrame.toJSON (Python)</text>
+
+    <rect x="80" y="518" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="538" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-56253</text>
+    <text x="96" y="566" font-size="24" fill="#e6edf3">read.json accepts</text>
+    <text x="96" y="594" font-size="24" fill="#e6edf3">a DataFrame</text>
+
+    <rect x="80" y="616" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="636" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-56254</text>
+    <text x="96" y="664" font-size="24" fill="#e6edf3">read.xml accepts a DataFrame</text>
+
+    <rect x="80" y="686" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="706" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-56255</text>
+    <text x="96" y="734" font-size="24" fill="#e6edf3">read.csv accepts a DataFrame</text>
+
+    <rect x="80" y="756" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="776" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-56256</text>
+    <text x="96" y="804" font-size="24" fill="#e6edf3">emptyDataFrame(schema)</text>
+
+    <rect x="80" y="826" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="96" y="846" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55887</text>
+    <text x="96" y="874" font-size="24" fill="#e6edf3">head, take, tail</text>
+    <text x="96" y="902" font-size="24" fill="#e6edf3">avoid full scans</text>
+  </g>
+
+  <!-- Column 2: Operations (green) -->
+  <g id="operations">
+    <text x="520" y="240" font-size="32" font-weight="700" fill="#7ee787">Operations</text>
+    <line x1="520" y1="256" x2="920" y2="256" stroke="#30363d" stroke-width="2"/>
+
+    <rect x="520" y="280" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="536" y="300" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55606</text>
+    <text x="536" y="328" font-size="24" fill="#e6edf3">GetStatus: server</text>
+
+    <rect x="520" y="350" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="536" y="370" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55691</text>
+    <text x="536" y="398" font-size="24" fill="#e6edf3">GetStatus: client</text>
+
+    <rect x="520" y="420" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="536" y="440" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55326</text>
+    <text x="536" y="468" font-size="24" fill="#e6edf3">Release the session on</text>
+    <text x="536" y="496" font-size="24" fill="#e6edf3">client exit</text>
+
+    <rect x="520" y="518" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="536" y="538" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-57601</text>
+    <text x="536" y="566" font-size="24" fill="#e6edf3">Connect tab in the History</text>
+    <text x="536" y="594" font-size="24" fill="#e6edf3">Server (also 4.1.3, 4.0.4)</text>
+
+    <rect x="520" y="616" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="536" y="636" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55239</text>
+    <text x="536" y="664" font-size="24" fill="#e6edf3">Connect server in YARN</text>
+    <text x="536" y="692" font-size="24" fill="#e6edf3">cluster mode</text>
+  </g>
+
+  <!-- Column 3: Reliability and Errors (amber) -->
+  <g>
+    <text x="960" y="240" font-size="32" font-weight="700" fill="#e3b341">Reliability and Errors</text>
+    <line x1="960" y1="256" x2="1360" y2="256" stroke="#30363d" stroke-width="2"/>
+
+    <rect x="960" y="280" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="300" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55406</text>
+    <text x="976" y="328" font-size="24" fill="#e6edf3">Reattach iterator</text>
+    <text x="976" y="356" font-size="24" fill="#e6edf3">race conditions</text>
+
+    <rect x="960" y="378" width="400" height="56" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="398" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55362</text>
+    <text x="976" y="426" font-size="24" fill="#e6edf3">Client shutdown deadlock</text>
+
+    <rect x="960" y="448" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="468" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55448</text>
+    <text x="976" y="496" font-size="24" fill="#e6edf3">Query events dropped on</text>
+    <text x="976" y="524" font-size="24" fill="#e6edf3">session close</text>
+
+    <rect x="960" y="546" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="566" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-54887</text>
+    <text x="976" y="594" font-size="24" fill="#e6edf3">SQL state on Connect</text>
+    <text x="976" y="622" font-size="24" fill="#e6edf3">exceptions</text>
+
+    <rect x="960" y="644" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="664" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55314</text>
+    <text x="976" y="692" font-size="24" fill="#e6edf3">Observed-metrics errors</text>
+    <text x="976" y="720" font-size="24" fill="#e6edf3">propagate</text>
+
+    <rect x="960" y="742" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="762" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-56007</text>
+    <text x="976" y="790" font-size="24" fill="#e6edf3">Duplicate column names in</text>
+    <text x="976" y="818" font-size="24" fill="#e6edf3">Arrow results</text>
+
+    <rect x="960" y="840" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="976" y="860" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-57336</text>
+    <text x="976" y="888" font-size="24" fill="#e6edf3">Scala client bearer token</text>
+    <text x="976" y="916" font-size="24" fill="#e6edf3">header (also 4.1.3, 4.0.4)</text>
+  </g>
+
+  <!-- Column 4: Defaults and Limits (orange-text) -->
+  <g>
+    <text x="1400" y="240" font-size="32" font-weight="700" fill="#ff8a4c">Defaults and Limits</text>
+    <line x1="1400" y1="256" x2="1800" y2="256" stroke="#30363d" stroke-width="2"/>
+
+    <rect x="1400" y="280" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="1416" y="300" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-54555</text>
+    <text x="1416" y="328" font-size="24" fill="#e6edf3">Arrow-optimized Python</text>
+    <text x="1416" y="356" font-size="24" fill="#e6edf3">UDFs by default</text>
+
+    <rect x="1400" y="378" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="1416" y="398" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-55047</text>
+    <text x="1416" y="426" font-size="24" fill="#e6edf3">Client-side local relation</text>
+    <text x="1416" y="454" font-size="24" fill="#e6edf3">size limit</text>
+
+    <rect x="1400" y="476" width="400" height="84" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+    <text x="1416" y="496" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">SPARK-56955</text>
+    <text x="1416" y="524" font-size="24" fill="#e6edf3">Arrow and Netty allocator</text>
+    <text x="1416" y="552" font-size="24" fill="#e6edf3">on JDK 25</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#xa7;15, JIRA issues</text>
+</svg>

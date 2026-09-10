@@ -1,0 +1,39 @@
+# Expose a Spark Connect server outside the cluster through an NGINX ingress.
+#
+# Untested here. gRPC needs HTTP/2 to the backend, which the backend-protocol annotation sets.
+# Spark Connect has no built-in authentication, so callers must be authenticated here or by a
+# proxy behind the ingress. A token in the sc:// connection string turns on TLS in the client, but
+# the server does not validate the token (companion guide §5).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spark-connect
+  namespace: spark
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Request body limit. Artifacts uploaded with AddArtifacts can be large.
+    nginx.ingress.kubernetes.io/proxy-body-size: "128m"
+    # Authentication goes here, for example an oauth2-proxy, a JWT validator or mTLS in a service
+    # mesh, so that an unauthenticated caller never reaches port 15002.
+    # nginx.ingress.kubernetes.io/auth-url: "https://auth.example.com/validate"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: ["connect.example.com"]
+      secretName: spark-connect-tls
+  rules:
+    - host: connect.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: spark-connect
+                port:
+                  number: 15002
+# Clients connect with:  sc://connect.example.com:443/;use_ssl=true;token=<jwt>
+#
+# A connection string has no path component, so Spark Connect needs its own host name or port
+# rather than a path such as https://host/spark-connect/.

@@ -1,0 +1,77 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dotgrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+    <marker id="arrow-muted" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8b949e"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotgrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <g stroke="#e25a1c" stroke-width="3" opacity="0.35" fill="none">
+    <path d="M 30 90 L 30 30 L 90 30"/>
+    <path d="M 1830 30 L 1890 30 L 1890 90"/>
+    <path d="M 30 990 L 30 1062 L 64 1062"/>
+    <path d="M 1890 990 L 1890 1062 L 1856 1062"/>
+  </g>
+
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">Four Distributions, One Client Without a JVM</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">PySpark 4.2.0 on PyPI, drawn to scale by artifact size</text>
+
+  <!-- Card 1: pyspark -->
+  <g>
+    <rect x="80" y="210" width="410" height="750" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="110" y="262" font-family="Consolas, 'Courier New', monospace" font-size="32" font-weight="700" fill="#e6edf3">pyspark</text>
+    <text x="110" y="302" font-size="26" fill="#8b949e">429 MB sdist</text>
+    <rect x="105" y="352" width="360" height="360" rx="6" fill="#e25a1c" opacity="0.85"/>
+    <text x="110" y="754" font-size="24" fill="#8b949e">pyspark/ installed: 481 MB</text>
+    <text x="110" y="788" font-size="24" fill="#8b949e">JARs: 456 MB, 276 files</text>
+    <text x="110" y="822" font-size="24" fill="#8b949e">Py4J: yes</text>
+    <text x="110" y="856" font-size="24" fill="#8b949e">Local server: no</text>
+  </g>
+
+  <!-- Card 2: pyspark[connect] -->
+  <g>
+    <rect x="530" y="210" width="410" height="750" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="560" y="262" font-family="Consolas, 'Courier New', monospace" font-size="32" font-weight="700" fill="#e6edf3">pyspark[connect]</text>
+    <text x="560" y="302" font-size="26" fill="#8b949e">429 MB plus extras</text>
+    <rect x="555" y="352" width="360" height="360" rx="6" fill="#e25a1c" opacity="0.85"/>
+    <text x="560" y="754" font-size="24" fill="#8b949e">pyspark/ installed: 481 MB</text>
+    <text x="560" y="788" font-size="24" fill="#8b949e">JARs: 456 MB</text>
+    <text x="560" y="822" font-size="24" fill="#8b949e">Py4J: yes</text>
+    <text x="560" y="856" font-size="24" fill="#8b949e">Local server: yes</text>
+  </g>
+
+  <!-- Card 3: pyspark-connect -->
+  <g>
+    <rect x="980" y="210" width="410" height="750" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="1010" y="262" font-family="Consolas, 'Courier New', monospace" font-size="32" font-weight="700" fill="#e6edf3">pyspark-connect</text>
+    <text x="1010" y="302" font-size="26" fill="#8b949e">10 KB metapackage</text>
+    <circle cx="1185" cy="660" r="24" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="6,6" opacity="0.8"/>
+    <rect x="1184" y="659" width="2" height="2" fill="#e25a1c"/>
+    <text x="1010" y="754" font-size="24" fill="#8b949e">Requires pyspark==4.2.0</text>
+    <text x="1010" y="788" font-size="24" fill="#8b949e">and the Connect client's</text>
+    <text x="1010" y="822" font-size="24" fill="#8b949e">dependencies</text>
+  </g>
+
+  <!-- Card 4: pyspark-client (highlighted) -->
+  <g>
+    <rect x="1430" y="210" width="410" height="750" rx="12" fill="#1f1a33" stroke="#8957e5" stroke-width="3"/>
+    <text x="1460" y="262" font-family="Consolas, 'Courier New', monospace" font-size="32" font-weight="700" fill="#e6edf3">pyspark-client</text>
+    <text x="1460" y="302" font-size="26" fill="#8b949e">1.60 MB wheel</text>
+    <rect x="1624" y="690" width="22" height="22" rx="3" fill="#8957e5" opacity="0.9"/>
+    <text x="1460" y="754" font-size="24" fill="#8b949e">pyspark/ installed: 19 MB</text>
+    <text x="1460" y="788" font-size="24" fill="#8b949e">JARs: none</text>
+    <text x="1460" y="822" font-size="24" fill="#8b949e">Py4J: no</text>
+    <text x="1460" y="856" font-size="24" fill="#8b949e">Needs an sc:// server</text>
+  </g>
+
+  <!-- Dashed arrow: pyspark-connect installs pyspark -->
+  <path d="M 1185 960 L 1185 975 L 285 975 L 285 960" fill="none" stroke="#8b949e" stroke-width="3"
+        stroke-dasharray="10,8" marker-end="url(#arrow-muted)"/>
+  <text x="735" y="999" font-size="24" fill="#8b949e" text-anchor="middle">installs</text>
+
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide Table 3-1; installed sizes measured with du on CPython 3.10.20</text>
+</svg>

@@ -1,6 +1,7 @@
 {
-  "//": "Lets VSCode/Pylance & PyCharm resolve `spark_connect_demo` from src/ without an editable install.",
-  "extraPaths": ["src"],
   "venvPath": ".",
-  "venv": ".venv"
+  "venv": ".venv",
+  "pythonVersion": "3.10",
+  "extraPaths": ["pipeline", "pipeline/lib", "tools"],
+  "ignore": ["case_study"]
 }

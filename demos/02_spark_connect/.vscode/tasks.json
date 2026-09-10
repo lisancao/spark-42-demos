@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: create the Python environments (make setup)",
+      "type": "shell",
+      "command": "make setup",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Cluster: start (make up)",
+      "type": "shell",
+      "command": "make up",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Cluster: stop (make down)",
+      "type": "shell",
+      "command": "make down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Pipeline: run on Spark Classic in the container",
+      "type": "shell",
+      "command": "docker compose exec -T spark-connect /opt/spark/bin/spark-submit --master spark://spark-master:7077 --conf spark.cores.max=1 --conf spark.driver.host=spark-connect /demo/pipeline/pipeline_before.py --output /opt/spark/work-dir/out/classic",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Pipeline: compare pipeline_before.py and pipeline_after.py",
+      "type": "shell",
+      "command": "git diff --no-index pipeline/pipeline_before.py pipeline/pipeline_after.py || true",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Video: export the teleprompter script (make teleprompter)",
+      "type": "shell",
+      "command": "make teleprompter",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}

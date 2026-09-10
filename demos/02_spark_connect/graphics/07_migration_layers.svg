@@ -1,0 +1,138 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"
+     font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+
+  <defs>
+    <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+    <marker id="arrowMuted" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <polygon points="0,0 7,4 0,8" fill="#8b949e"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="#1a1a2e"/>
+  <rect width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#e25a1c" stroke-width="2" fill="none" opacity="0.35">
+    <line x1="56" y1="56" x2="156" y2="56"/>
+    <line x1="56" y1="56" x2="56" y2="156"/>
+    <line x1="1864" y1="56" x2="1764" y2="56"/>
+    <line x1="1864" y1="56" x2="1864" y2="156"/>
+    <line x1="56" y1="1024" x2="156" y2="1024"/>
+    <line x1="56" y1="1024" x2="56" y2="924"/>
+    <line x1="1864" y1="1024" x2="1764" y2="1024"/>
+    <line x1="1864" y1="1024" x2="1864" y2="924"/>
+  </g>
+
+  <!-- Title and subtitle -->
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">The Seven Layers of a Spark Connect Migration</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">Only layer 0 is mandatory</text>
+
+  <!-- Left: seven layer bands -->
+  <!-- Row 0: Session Creation (blue), mandatory -->
+  <rect x="80" y="210" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="224" width="64" height="64" rx="8" fill="#161b22" stroke="#79c0ff" stroke-width="3"/>
+  <text x="136" y="268" font-size="26" font-weight="700" fill="#79c0ff" text-anchor="middle">L0</text>
+  <text x="200" y="268" font-size="32" font-weight="700" fill="#e6edf3">Session Creation</text>
+  <text x="680" y="268" font-size="26" fill="#8b949e">One call</text>
+  <rect x="1080" y="238" width="160" height="36" rx="18" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1160" y="262" font-size="20" font-weight="700" fill="#ff8a4c" text-anchor="middle">mandatory</text>
+
+  <!-- Row 1: Pipeline Logic (green) -->
+  <rect x="80" y="318" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="332" width="64" height="64" rx="8" fill="#161b22" stroke="#7ee787" stroke-width="3"/>
+  <text x="136" y="376" font-size="26" font-weight="700" fill="#7ee787" text-anchor="middle">L1</text>
+  <text x="200" y="376" font-size="32" font-weight="700" fill="#e6edf3">Pipeline Logic</text>
+  <text x="680" y="376" font-size="26" fill="#8b949e">Audit; few changes</text>
+
+  <!-- Row 2: Data Sources and Catalogs (amber) -->
+  <rect x="80" y="426" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="440" width="64" height="64" rx="8" fill="#161b22" stroke="#e3b341" stroke-width="3"/>
+  <text x="136" y="484" font-size="26" font-weight="700" fill="#e3b341" text-anchor="middle">L2</text>
+  <text x="200" y="484" font-size="32" font-weight="700" fill="#e6edf3">Data Sources and Catalogs</text>
+  <text x="680" y="484" font-size="26" fill="#8b949e">Configuration relocates to the server</text>
+
+  <!-- Row 3: Configuration (orange-text) -->
+  <rect x="80" y="534" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="548" width="64" height="64" rx="8" fill="#161b22" stroke="#ff8a4c" stroke-width="3"/>
+  <text x="136" y="592" font-size="26" font-weight="700" fill="#ff8a4c" text-anchor="middle">L3</text>
+  <text x="200" y="592" font-size="32" font-weight="700" fill="#e6edf3">Configuration</text>
+  <text x="680" y="592" font-size="26" fill="#8b949e">Divides between client and server</text>
+
+  <!-- Row 4: Dependencies (purple-text) -->
+  <rect x="80" y="642" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="656" width="64" height="64" rx="8" fill="#161b22" stroke="#b392f0" stroke-width="3"/>
+  <text x="136" y="700" font-size="26" font-weight="700" fill="#b392f0" text-anchor="middle">L4</text>
+  <text x="200" y="700" font-size="32" font-weight="700" fill="#e6edf3">Dependencies</text>
+  <text x="680" y="700" font-size="26" fill="#8b949e">Replaced by addArtifact</text>
+
+  <!-- Row 5: Execution and Operations (red) -->
+  <rect x="80" y="750" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="764" width="64" height="64" rx="8" fill="#161b22" stroke="#ff7b72" stroke-width="3"/>
+  <text x="136" y="808" font-size="26" font-weight="700" fill="#ff7b72" text-anchor="middle">L5</text>
+  <text x="200" y="808" font-size="32" font-weight="700" fill="#e6edf3">Execution and Operations</text>
+  <text x="680" y="808" font-size="26" fill="#8b949e">Submission, logging and lifecycle change</text>
+
+  <!-- Row 6: Security and Identity (teal) -->
+  <rect x="80" y="858" width="1220" height="92" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <rect x="104" y="872" width="64" height="64" rx="8" fill="#161b22" stroke="#56d4dd" stroke-width="3"/>
+  <text x="136" y="916" font-size="26" font-weight="700" fill="#56d4dd" text-anchor="middle">L6</text>
+  <text x="200" y="916" font-size="32" font-weight="700" fill="#e6edf3">Security and Identity</text>
+  <text x="680" y="916" font-size="26" fill="#8b949e">Credentials leave the client</text>
+
+  <!-- Right: order of work -->
+  <rect x="1330" y="200" width="500" height="800" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="1362" y="250" font-size="34" font-weight="700" fill="#e6edf3">Order of Work</text>
+  <line x1="1362" y1="270" x2="1798" y2="270" stroke="#30363d" stroke-width="1"/>
+
+  <!-- connectors -->
+  <g stroke="#8b949e" stroke-width="2" stroke-dasharray="4,4" opacity="0.6">
+    <line x1="1394" y1="350" x2="1394" y2="403"/>
+    <line x1="1394" y1="463" x2="1394" y2="516"/>
+    <line x1="1394" y1="576" x2="1394" y2="629"/>
+    <line x1="1394" y1="689" x2="1394" y2="742"/>
+    <line x1="1394" y1="802" x2="1394" y2="855"/>
+  </g>
+
+  <!-- Step 1 -->
+  <circle cx="1394" cy="330" r="20" fill="#161b22" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1394" y="338" font-size="22" fill="#ff8a4c" text-anchor="middle">1</text>
+  <text x="1430" y="324" font-size="24" font-weight="700" fill="#e6edf3">Layers 2 and 3</text>
+  <text x="1430" y="354" font-size="22" fill="#8b949e">Stand up the server</text>
+
+  <!-- Step 2 -->
+  <circle cx="1394" cy="443" r="20" fill="#161b22" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1394" y="451" font-size="22" fill="#ff8a4c" text-anchor="middle">2</text>
+  <text x="1430" y="437" font-size="24" font-weight="700" fill="#e6edf3">Layer 0</text>
+  <text x="1430" y="467" font-size="22" fill="#8b949e">Point one job at it</text>
+
+  <!-- Step 3 -->
+  <circle cx="1394" cy="556" r="20" fill="#161b22" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1394" y="564" font-size="22" fill="#ff8a4c" text-anchor="middle">3</text>
+  <text x="1430" y="550" font-size="24" font-weight="700" fill="#e6edf3">Layer 1</text>
+  <text x="1430" y="580" font-size="22" fill="#8b949e">Run the audit</text>
+
+  <!-- Step 4 -->
+  <circle cx="1394" cy="669" r="20" fill="#161b22" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1394" y="677" font-size="22" fill="#ff8a4c" text-anchor="middle">4</text>
+  <text x="1430" y="663" font-size="24" font-weight="700" fill="#e6edf3">Layer 4</text>
+  <text x="1430" y="693" font-size="22" fill="#8b949e">Move dependencies</text>
+
+  <!-- Step 5 -->
+  <circle cx="1394" cy="782" r="20" fill="#161b22" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1394" y="790" font-size="22" fill="#ff8a4c" text-anchor="middle">5</text>
+  <text x="1430" y="776" font-size="24" font-weight="700" fill="#e6edf3">Layer 5</text>
+  <text x="1430" y="806" font-size="22" fill="#8b949e">Update operations</text>
+
+  <!-- Step 6 -->
+  <circle cx="1394" cy="895" r="20" fill="#161b22" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1394" y="903" font-size="22" fill="#ff8a4c" text-anchor="middle">6</text>
+  <text x="1430" y="889" font-size="24" font-weight="700" fill="#e6edf3">Layer 6</text>
+  <text x="1430" y="919" font-size="22" fill="#8b949e">Remove client credentials last</text>
+
+  <!-- Footer -->
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#xa7;9, Table 9-1</text>
+</svg>

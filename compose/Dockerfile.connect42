@@ -1,0 +1,32 @@
+# Spark 4.2.0 Connect server with a Python that matches a modern client.
+#
+# Why this exists: the official apache/spark:4.2.0-*-python3-ubuntu images ship Python 3.10, and
+# PySpark refuses to run a Python UDF when the client and executor minor versions differ:
+#
+#     [PYTHON_VERSION_MISMATCH] Python in worker has different version: 3.10 than that in driver: 3.12
+#
+# Spark Connect removes the client's JVM but not this coupling, because a UDF is pickled on the
+# client and unpickled on an executor. Either match the client's Python to the server's or, as
+# here, install the client's Python version in the server image.
+ARG SPARK_BASE=apache/spark:4.2.0-scala2.13-java21-python3-ubuntu
+FROM ${SPARK_BASE}
+
+USER root
+# python3.12-distutils is not installed: distutils left the standard library in 3.12, and
+# deadsnakes does not publish that package for it. get-pip.py installs what pip needs.
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends software-properties-common gnupg ca-certificates curl; \
+    add-apt-repository -y ppa:deadsnakes/ppa; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends python3.12 python3.12-venv; \
+    curl -fsSL https://bootstrap.pypa.io/get-pip.py | python3.12; \
+    python3.12 -m pip install --no-cache-dir "pyarrow>=18.0.0" "pandas<3" numpy; \
+    apt-get purge -y software-properties-common gnupg; \
+    apt-get autoremove -y; \
+    rm -rf /var/lib/apt/lists/*
+USER spark
+
+# Both must be set: the driver side runs inside the Connect server, the worker side on executors.
+ENV PYSPARK_PYTHON=/usr/bin/python3.12 \
+    PYSPARK_DRIVER_PYTHON=/usr/bin/python3.12
