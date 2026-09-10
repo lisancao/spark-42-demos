@@ -1,0 +1,71 @@
+{
+  "environment": {
+    "client_pyspark": "4.2.0",
+    "client_python": "3.10.20",
+    "server_version": "4.1.2",
+    "recorded_at": "2026-09-10T21:46:15+00:00"
+  },
+  "operations": {
+    "connect": {
+      "status": "ok",
+      "detail": "4.1.2"
+    },
+    "sql": {
+      "status": "ok",
+      "detail": "1"
+    },
+    "createDataFrame (local data)": {
+      "status": "fails",
+      "detail": "ValueError: invalid literal for int() with base 10: '3221225472b'"
+    },
+    "group by": {
+      "status": "ok",
+      "detail": "[Row(k=0, s=20), Row(k=1, s=25)]"
+    },
+    "toPandas": {
+      "status": "ok",
+      "detail": "100000"
+    },
+    "observe": {
+      "status": "ok",
+      "detail": "25"
+    },
+    "python udf": {
+      "status": "ok",
+      "detail": "3.10.12"
+    },
+    "addArtifact": {
+      "status": "ok",
+      "detail": "fails before addArtifact, 111.2 km after"
+    },
+    "zipWithIndex": {
+      "status": "ok",
+      "detail": "3"
+    },
+    "read.json(DataFrame)": {
+      "status": "ok",
+      "detail": "1"
+    },
+    "emptyDataFrame(schema)": {
+      "status": "ok",
+      "detail": "0"
+    },
+    "GetStatus (private API)": {
+      "status": "fails",
+      "detail": "SparkConnectGrpcException: status = StatusCode.UNIMPLEMENTED"
+    },
+    "analysis error": {
+      "status": "ok",
+      "detail": "AnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION], SQL state 42703"
+    },
+    "interruptAll": {
+      "status": "ok",
+      "detail": "0 operations interrupted"
+    }
+  },
+  "cell": {
+    "id": "B",
+    "description": "client 4.2.0, server 4.1.2",
+    "remote": "sc://localhost:15096"
+  }
+}

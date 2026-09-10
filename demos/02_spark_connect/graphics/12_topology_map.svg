@@ -1,0 +1,169 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+    <marker id="arrowPurple" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8957e5"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dots)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <g stroke="#e25a1c" stroke-width="3" fill="none" opacity="0.35">
+    <path d="M 40 100 L 40 40 L 100 40"/>
+    <path d="M 1820 40 L 1880 40 L 1880 100"/>
+    <path d="M 40 980 L 40 1062 L 64 1062"/>
+    <path d="M 1880 980 L 1880 1062 L 1856 1062"/>
+  </g>
+
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">Six Topologies, One Line of Client Code</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">Where the Connect server runs</text>
+
+  <!-- Panel 1: In-process -->
+  <g transform="translate(80,200)">
+    <rect x="0" y="0" width="560" height="310" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="24" y="44" font-size="30" font-weight="700" fill="#e6edf3">In-Process</text>
+
+    <rect x="24" y="70" width="488" height="165" rx="8" fill="none" stroke="#30363d" stroke-width="2"/>
+    <text x="40" y="95" font-size="20" fill="#e6edf3">Python process</text>
+
+    <rect x="50" y="120" width="170" height="60" rx="6" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="135" y="157" font-size="22" fill="#e6edf3" text-anchor="middle">client</text>
+
+    <rect x="260" y="120" width="220" height="60" rx="6" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="370" y="157" font-size="22" fill="#e6edf3" text-anchor="middle">Connect server</text>
+
+    <text x="40" y="214" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">spark.remote=local[*]</text>
+
+    <text x="24" y="270" font-size="24" fill="#8b949e">Suited to: tests, CI, a workstation</text>
+    <text x="24" y="296" font-size="24" fill="#8b949e">with no cluster</text>
+  </g>
+
+  <!-- Panel 2: Same host -->
+  <g transform="translate(680,200)">
+    <rect x="0" y="0" width="560" height="310" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="24" y="44" font-size="30" font-weight="700" fill="#e6edf3">Same Host</text>
+
+    <rect x="24" y="75" width="488" height="140" rx="8" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="8,6"/>
+    <text x="40" y="100" font-size="20" fill="#8b949e">Host</text>
+
+    <rect x="50" y="125" width="170" height="60" rx="6" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="135" y="162" font-size="22" fill="#e6edf3" text-anchor="middle">client</text>
+
+    <rect x="260" y="125" width="220" height="60" rx="6" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="370" y="162" font-size="22" fill="#e6edf3" text-anchor="middle">Connect server</text>
+
+    <text x="24" y="270" font-size="24" fill="#8b949e">Suited to: development against a</text>
+    <text x="24" y="296" font-size="24" fill="#8b949e">persistent session</text>
+  </g>
+
+  <!-- Panel 3: Remote standalone cluster -->
+  <g transform="translate(1280,200)">
+    <rect x="0" y="0" width="560" height="310" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="24" y="44" font-size="30" font-weight="700" fill="#e6edf3">Remote Standalone Cluster</text>
+
+    <rect x="24" y="130" width="180" height="60" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="114" y="166" font-size="20" fill="#e6edf3" text-anchor="middle">client host</text>
+
+    <line x1="212" y1="160" x2="223" y2="160" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="232" y="110" width="140" height="90" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="302" y="148" font-size="20" fill="#e6edf3" text-anchor="middle">Connect</text>
+    <text x="302" y="176" font-size="20" fill="#e6edf3" text-anchor="middle">server</text>
+
+    <line x1="380" y1="160" x2="391" y2="160" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="400" y="85" width="136" height="160" rx="8" fill="none" stroke="#8957e5" stroke-width="2"/>
+    <text x="413" y="108" font-size="20" fill="#8b949e">cluster</text>
+    <rect x="413" y="125" width="110" height="45" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="468" y="153" font-size="20" fill="#e6edf3" text-anchor="middle">master</text>
+    <rect x="413" y="185" width="110" height="45" rx="6" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="468" y="213" font-size="20" fill="#e6edf3" text-anchor="middle">workers</text>
+
+    <text x="24" y="270" font-size="24" fill="#8b949e">Suited to: a shared team cluster</text>
+  </g>
+
+  <!-- Panel 4: Kubernetes -->
+  <g transform="translate(80,550)">
+    <rect x="0" y="0" width="560" height="310" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="24" y="44" font-size="30" font-weight="700" fill="#e6edf3">Kubernetes</text>
+
+    <rect x="24" y="95" width="88" height="90" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="68" y="147" font-size="22" fill="#e6edf3" text-anchor="middle">client</text>
+
+    <line x1="120" y1="140" x2="123" y2="140" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="132" y="95" width="98" height="90" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="181" y="147" font-size="22" fill="#e6edf3" text-anchor="middle">Service</text>
+
+    <line x1="238" y1="140" x2="241" y2="140" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="250" y="95" width="155" height="90" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="327" y="131" font-size="20" fill="#e6edf3" text-anchor="middle">Deployment</text>
+    <text x="327" y="159" font-size="20" fill="#e6edf3" text-anchor="middle">(1 replica)</text>
+
+    <line x1="413" y1="140" x2="416" y2="140" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="425" y="95" width="111" height="90" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="480" y="131" font-size="20" fill="#e6edf3" text-anchor="middle">executor</text>
+    <text x="480" y="159" font-size="20" fill="#e6edf3" text-anchor="middle">pods</text>
+
+    <text x="24" y="230" font-size="24" fill="#8b949e">Suited to: multi-tenant platforms</text>
+  </g>
+
+  <!-- Panel 5: YARN cluster mode -->
+  <g transform="translate(680,550)">
+    <rect x="0" y="0" width="560" height="310" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="24" y="44" font-size="30" font-weight="700" fill="#e6edf3">YARN Cluster Mode</text>
+
+    <rect x="374" y="44" width="150" height="30" rx="15" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="449" y="65" font-size="20" fill="#b392f0" text-anchor="middle">new in 4.2</text>
+
+    <rect x="24" y="140" width="130" height="60" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="89" y="176" font-size="22" fill="#e6edf3" text-anchor="middle">client</text>
+
+    <line x1="162" y1="170" x2="181" y2="170" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="190" y="95" width="280" height="135" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="204" y="118" font-size="20" fill="#e6edf3">YARN application master</text>
+
+    <rect x="210" y="150" width="240" height="60" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="330" y="186" font-size="22" fill="#e6edf3" text-anchor="middle">Connect server</text>
+
+    <text x="24" y="270" font-size="24" fill="#8b949e">Suited to: an existing Hadoop</text>
+    <text x="24" y="296" font-size="24" fill="#8b949e">deployment</text>
+  </g>
+
+  <!-- Panel 6: Multiple clusters -->
+  <g transform="translate(1280,550)">
+    <rect x="0" y="0" width="560" height="310" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <text x="24" y="44" font-size="30" font-weight="700" fill="#e6edf3">Multiple Clusters</text>
+
+    <rect x="24" y="115" width="110" height="60" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="79" y="151" font-size="22" fill="#e6edf3" text-anchor="middle">client</text>
+
+    <line x1="141" y1="141" x2="193" y2="105" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+    <line x1="141" y1="150" x2="193" y2="185" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+    <rect x="200" y="65" width="320" height="70" rx="10" fill="none" stroke="#8957e5" stroke-width="2"/>
+    <rect x="225" y="78" width="180" height="44" rx="6" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="315" y="106" font-size="20" fill="#e6edf3" text-anchor="middle">Connect server</text>
+    <text x="415" y="104" font-size="20" fill="#8b949e">cluster</text>
+
+    <rect x="200" y="155" width="320" height="70" rx="10" fill="none" stroke="#8957e5" stroke-width="2"/>
+    <rect x="225" y="168" width="180" height="44" rx="6" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+    <text x="315" y="196" font-size="20" fill="#e6edf3" text-anchor="middle">Connect server</text>
+    <text x="415" y="194" font-size="20" fill="#8b949e">cluster</text>
+
+    <text x="24" y="270" font-size="24" fill="#8b949e">Suited to: routing by size, cost</text>
+    <text x="24" y="296" font-size="24" fill="#8b949e">or region</text>
+  </g>
+
+  <!-- Bottom code band -->
+  <rect x="80" y="890" width="1760" height="70" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="960" y="933" font-size="26" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3" text-anchor="middle">spark = SparkSession.builder.remote(URL).getOrCreate()</text>
+  <text x="960" y="990" font-size="24" fill="#8b949e" text-anchor="middle">the same in all six</text>
+
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: setup/TOPOLOGIES.md, Table 2</text>
+</svg>

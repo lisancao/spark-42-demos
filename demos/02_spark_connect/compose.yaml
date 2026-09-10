@@ -1,0 +1,93 @@
+# A standalone Spark 4.2.0 cluster (one master, one worker) and a Spark Connect server that runs its
+# applications on that cluster. Start it with `make up`. Ports are listed in README.md and can be
+# changed in .env.
+name: spark-connect-demo
+
+x-spark: &spark
+  image: spark-connect-demo/spark:4.2.0
+  build: .
+  networks: [spark]
+
+services:
+  spark-master:
+    <<: *spark
+    hostname: spark-master
+    entrypoint:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.master.Master
+      - --host
+      - spark-master
+    ports:
+      - "127.0.0.1:${MASTER_UI_PORT:-8080}:8080"
+
+  spark-worker:
+    <<: *spark
+    hostname: spark-worker
+    entrypoint:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.worker.Worker
+      - --cores
+      - "2"
+      - --memory
+      - 2g
+      - spark://spark-master:7077
+    depends_on: [spark-master]
+    volumes:
+      - work:/opt/spark/work-dir
+      - ./pipeline:/demo/pipeline:ro
+
+  spark-connect:
+    <<: *spark
+    hostname: spark-connect
+    entrypoint:
+      - /opt/spark/sbin/start-connect-server.sh
+      - --wait
+      - --master
+      - ${CONNECT_MASTER:-spark://spark-master:7077}
+      - --conf
+      - spark.connect.grpc.binding.host=0.0.0.0
+      - --conf
+      - spark.driver.host=spark-connect
+      - --conf
+      - spark.cores.max=1
+      - --conf
+      - spark.executor.memory=1g
+    depends_on: [spark-master, spark-worker]
+    ports:
+      - "127.0.0.1:${CONNECT_PORT:-15002}:15002"
+      - "127.0.0.1:${CONNECT_UI_PORT:-4040}:4040"
+    volumes:
+      - work:/opt/spark/work-dir
+      - ./pipeline:/demo/pipeline:ro
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/127.0.0.1/15002"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 10s
+
+  # A Spark 4.1.2 Connect server for client and server version tests (make matrix). Spark 4.1 does
+  # not enable Arrow-optimized Python UDFs by default, so the official image runs them unmodified.
+  spark-connect-41:
+    image: apache/spark:4.1.2-scala2.13-java17-python3-ubuntu
+    profiles: [versions]
+    networks: [spark]
+    entrypoint:
+      - /opt/spark/sbin/start-connect-server.sh
+      - --wait
+      - --conf
+      - spark.connect.grpc.binding.host=0.0.0.0
+    ports:
+      - "127.0.0.1:${CONNECT_41_PORT:-15096}:15002"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/127.0.0.1/15002"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 10s
+
+networks:
+  spark: {}
+
+volumes:
+  work: {}

@@ -1,0 +1,58 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#d8dee4" opacity="0.6"/>
+    </pattern>
+    <marker id="arrowPurple" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8250df"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#f6f8fa"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dots)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#d9531a"/>
+
+  <g stroke="#d9531a" stroke-width="3" fill="none" opacity="0.35">
+    <path d="M 40 100 L 40 40 L 100 40"/>
+    <path d="M 1820 40 L 1880 40 L 1880 100"/>
+    <path d="M 40 980 L 40 1062 L 64 1062"/>
+    <path d="M 1880 980 L 1880 1062 L 1856 1062"/>
+  </g>
+
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#1f2328">Plan In, Arrow Out</text>
+  <text x="80" y="150" font-size="26" fill="#57606a">The path of one query through Spark Connect</text>
+
+  <!-- Client panel -->
+  <rect x="110" y="230" width="680" height="420" rx="12" fill="#ffffff" stroke="#8250df" stroke-width="2"/>
+  <text x="140" y="280" font-size="34" font-weight="700" fill="#1f2328">Client</text>
+  <text x="140" y="312" font-size="26" fill="#57606a">Python, no JVM</text>
+
+  <rect x="140" y="340" width="620" height="60" rx="8" fill="#eef1f4" stroke="#d0d7de" stroke-width="2"/>
+  <text x="160" y="378" font-size="24" font-family="Consolas, 'Courier New', monospace" fill="#1f2328">df = spark.table(&quot;iceberg.silver.orders&quot;)</text>
+
+  <text x="140" y="450" font-size="26" fill="#1f2328">1  Build an unresolved logical plan</text>
+  <text x="140" y="490" font-size="26" fill="#1f2328">2  Serialize it as Protocol Buffers</text>
+
+  <text x="140" y="580" font-size="24" fill="#57606a">The client sends names, not metadata.</text>
+  <text x="140" y="608" font-size="24" fill="#57606a">The server resolves iceberg.silver.orders.</text>
+
+  <!-- Server panel -->
+  <rect x="1130" y="230" width="680" height="420" rx="12" fill="#ffffff" stroke="#8250df" stroke-width="2"/>
+  <text x="1160" y="280" font-size="34" font-weight="700" fill="#1f2328">Server</text>
+  <text x="1160" y="312" font-size="26" fill="#57606a">JVM</text>
+
+  <text x="1160" y="380" font-size="26" fill="#1f2328">3  Resolve names against the catalog</text>
+  <text x="1160" y="420" font-size="26" fill="#1f2328">4  Optimize with Catalyst</text>
+  <text x="1160" y="460" font-size="26" fill="#1f2328">5  Execute</text>
+  <text x="1160" y="500" font-size="26" fill="#1f2328">6  Encode results as Arrow record batches</text>
+
+  <!-- Upper arrow: client to server -->
+  <line x1="200" y1="740" x2="1720" y2="740" stroke="#8250df" stroke-width="3" marker-end="url(#arrowPurple)"/>
+  <text x="960" y="715" font-size="26" fill="#1f2328" text-anchor="middle">ExecutePlan over gRPC (HTTP/2)</text>
+  <text x="960" y="803" font-size="24" fill="#57606a" text-anchor="middle">Large plans can be compressed: the threshold and algorithm come from the server,</text>
+  <text x="960" y="831" font-size="24" fill="#57606a" text-anchor="middle">and zstandard is used only if it is installed on the client.</text>
+
+  <!-- Lower arrow: server to client -->
+  <text x="960" y="895" font-size="26" fill="#1f2328" text-anchor="middle">Arrow IPC stream</text>
+  <line x1="1720" y1="920" x2="200" y2="920" stroke="#8250df" stroke-width="3" marker-end="url(#arrowPurple)"/>
+
+  <text x="80" y="1046" font-size="20" fill="#57606a">Source: companion guide &#xa7;2, Figure 2-1</text>
+</svg>

@@ -1,0 +1,78 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dotgrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotgrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <g stroke="#e25a1c" stroke-width="3" opacity="0.35" fill="none">
+    <path d="M 30 90 L 30 30 L 90 30"/>
+    <path d="M 1830 30 L 1890 30 L 1890 90"/>
+    <path d="M 30 990 L 30 1062 L 64 1062"/>
+    <path d="M 1890 990 L 1890 1062 L 1856 1062"/>
+  </g>
+
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">Anatomy of a Connection String</text>
+  <text x="80" y="150" font-size="26" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">sc://host:port/;name=value;name=value</text>
+
+  <!-- Connection string band -->
+  <rect x="100" y="200" width="1720" height="240" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="430" y="270" font-family="Consolas, 'Courier New', monospace" font-size="26" fill="#e6edf3">sc://connect.example.com:15002/;user_agent=myapp-setup;token=&lt;token&gt;</text>
+
+  <!-- Anchor points on the string -->
+  <circle cx="469" cy="280" r="3" fill="#8b949e"/>
+  <circle cx="656" cy="280" r="3" fill="#8b949e"/>
+  <circle cx="859" cy="280" r="3" fill="#8b949e"/>
+  <circle cx="906" cy="280" r="3" fill="#8b949e"/>
+  <circle cx="1202" cy="280" r="3" fill="#8b949e"/>
+
+  <!-- Leader lines to labels -->
+  <path d="M 469 284 L 256 322 L 256 336" fill="none" stroke="#8b949e" stroke-width="2"/>
+  <path d="M 656 284 L 608 322 L 608 336" fill="none" stroke="#8b949e" stroke-width="2"/>
+  <path d="M 859 284 L 960 322 L 960 336" fill="none" stroke="#8b949e" stroke-width="2"/>
+  <path d="M 906 284 L 1312 322 L 1312 336" fill="none" stroke="#8b949e" stroke-width="2"/>
+  <path d="M 1202 284 L 1664 322 L 1664 336" fill="none" stroke="#8b949e" stroke-width="2"/>
+
+  <text x="256" y="366" font-size="24" fill="#8b949e" text-anchor="middle">scheme (fixed)</text>
+  <text x="608" y="366" font-size="24" fill="#8b949e" text-anchor="middle">host</text>
+  <text x="960" y="366" font-size="24" fill="#8b949e" text-anchor="middle">port (default 15002)</text>
+  <text x="1312" y="366" font-size="24" fill="#8b949e" text-anchor="middle">path (must be empty)</text>
+  <text x="1664" y="366" font-size="24" fill="#8b949e" text-anchor="middle">parameters:</text>
+  <text x="1664" y="394" font-size="24" fill="#8b949e" text-anchor="middle">name=value,</text>
+  <text x="1664" y="422" font-size="24" fill="#8b949e" text-anchor="middle">separated by ;</text>
+
+  <!-- Three constraint cards -->
+  <rect x="80" y="480" width="560" height="280" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="110" y="536" font-size="32" font-weight="700" fill="#e6edf3">The path must be empty</text>
+  <text x="110" y="580" font-size="26" fill="#8b949e">gRPC uses the path itself.</text>
+  <text x="110" y="612" font-size="26" fill="#8b949e">Put a path prefix on a proxy.</text>
+
+  <rect x="680" y="480" width="560" height="280" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="710" y="536" font-size="32" font-weight="700" fill="#e6edf3">A token enables TLS</text>
+  <text x="710" y="580" font-size="26" fill="#8b949e">A bearer token is never sent</text>
+  <text x="710" y="612" font-size="26" fill="#8b949e">over an unencrypted connection.</text>
+
+  <rect x="1280" y="480" width="560" height="280" rx="12" fill="#2a1618" stroke="#ff7b72" stroke-width="2"/>
+  <text x="1310" y="536" font-size="32" font-weight="700" fill="#ff7b72">Values cannot contain /</text>
+  <text x="1310" y="580" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#ff7b72">user_agent=myapp/setup</text>
+  <text x="1310" y="612" font-size="24" fill="#8b949e">fails with [INVALID_CONNECT_URL],</text>
+  <text x="1310" y="644" font-size="24" fill="#8b949e">and the error names the path.</text>
+  <text x="1310" y="676" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#7ee787">user_agent=myapp-setup</text>
+  <text x="1310" y="708" font-size="24" fill="#8b949e">works.</text>
+
+  <!-- Parameter reference list -->
+  <line x1="100" y1="800" x2="1820" y2="800" stroke="#30363d" stroke-width="2"/>
+  <text x="100" y="840" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">port: 15002</text>
+  <text x="100" y="884" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">token: none</text>
+  <text x="100" y="928" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">use_ssl: false</text>
+  <text x="100" y="972" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">user_id: none</text>
+  <text x="1010" y="840" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">user_agent: _SPARK_CONNECT_PYTHON</text>
+  <text x="1010" y="884" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">session_id: random UUID</text>
+  <text x="1010" y="928" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">grpc_max_message_size: 134217728</text>
+
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#x00A7;5, Table 5-1</text>
+</svg>

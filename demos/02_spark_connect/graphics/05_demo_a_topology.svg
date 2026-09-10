@@ -1,0 +1,95 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+    <marker id="arrow-orange" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#e25a1c"/></marker>
+    <marker id="arrow-purple" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8957e5"/></marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="6" width="1920" height="1074" fill="url(#dots)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#e25a1c" stroke-width="4" opacity="0.35">
+    <line x1="30" y1="30" x2="30" y2="80"/>
+    <line x1="30" y1="30" x2="80" y2="30"/>
+    <line x1="1890" y1="30" x2="1890" y2="80"/>
+    <line x1="1890" y1="30" x2="1840" y2="30"/>
+    <line x1="30" y1="1062" x2="30" y2="1012"/>
+    <line x1="30" y1="1062" x2="64" y2="1062"/>
+    <line x1="1890" y1="1062" x2="1890" y2="1012"/>
+    <line x1="1890" y1="1062" x2="1856" y2="1062"/>
+  </g>
+
+  <!-- Title -->
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">The Demo Cluster</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">compose.yaml: a Spark 4.2.0 standalone cluster and a Connect server</text>
+
+  <!-- Left box: Your Machine -->
+  <rect x="80" y="215" width="560" height="650" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="115" y="270" font-size="32" font-weight="700" fill="#e6edf3">Your Machine</text>
+
+  <rect x="110" y="305" width="500" height="175" rx="10" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="140" y="352" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#b392f0">.venv</text>
+  <text x="140" y="392" font-size="22" fill="#e6edf3">pyspark-client 4.2.0,</text>
+  <text x="140" y="420" font-size="22" fill="#e6edf3">Python 3.10</text>
+
+  <rect x="110" y="495" width="500" height="175" rx="10" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="140" y="542" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#ff8a4c">.venv-full</text>
+  <text x="140" y="582" font-size="22" fill="#e6edf3">pyspark[connect] 4.2.0,</text>
+  <text x="140" y="610" font-size="22" fill="#e6edf3">for the Spark Classic runs</text>
+
+  <rect x="110" y="690" width="500" height="80" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="135" y="738" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">SPARK_REMOTE=sc://localhost:15002</text>
+
+  <!-- Right box: Docker Network -->
+  <rect x="680" y="215" width="1160" height="650" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="715" y="270" font-size="32" font-weight="700" fill="#e6edf3">Docker Network</text>
+  <text x="715" y="300" font-size="20" fill="#8b949e">image spark-connect-demo/spark:4.2.0:</text>
+  <text x="715" y="326" font-size="20" fill="#8b949e">apache/spark:4.2.0 plus pyarrow 25.0.1 and pandas 2.3.3</text>
+
+  <!-- Service row -->
+  <rect x="715" y="360" width="280" height="180" rx="10" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="730" y="405" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#ff8a4c">spark-master</text>
+  <text x="730" y="442" font-size="20" fill="#e6edf3">Web UI on 127.0.0.1:8080</text>
+
+  <rect x="1085" y="360" width="280" height="180" rx="10" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="1100" y="405" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#ff8a4c">spark-worker</text>
+  <text x="1100" y="442" font-size="20" fill="#e6edf3">2 cores, 2 GB</text>
+
+  <rect x="1495" y="360" width="280" height="180" rx="10" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1510" y="405" font-size="28" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#b392f0">spark-connect</text>
+  <text x="1510" y="438" font-size="20" fill="#e6edf3">gRPC on 127.0.0.1:15002</text>
+  <text x="1510" y="464" font-size="20" fill="#e6edf3">UI on 4040</text>
+  <text x="1510" y="490" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">spark.cores.max=1</text>
+
+  <!-- Inline arrows within the row (8 px clear of every box) -->
+  <line x1="1003" y1="450" x2="1070" y2="450" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <line x1="1373" y1="450" x2="1480" y2="450" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <text x="1430" y="424" font-size="20" fill="#ff8a4c" text-anchor="middle">executors</text>
+
+  <!-- Volume -->
+  <line x1="1225" y1="540" x2="1225" y2="555" stroke="#30363d" stroke-width="2"/>
+  <line x1="1635" y1="540" x2="1635" y2="555" stroke="#30363d" stroke-width="2"/>
+  <rect x="1140" y="555" width="560" height="60" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="1420" y="592" font-size="22" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3" text-anchor="middle">work: /opt/spark/work-dir</text>
+
+  <!-- spark-connect back to spark-master -->
+  <line x1="1750" y1="548" x2="1750" y2="660" stroke="#e25a1c" stroke-width="3"/>
+  <line x1="1750" y1="660" x2="855" y2="660" stroke="#e25a1c" stroke-width="3"/>
+  <line x1="855" y1="660" x2="855" y2="555" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <text x="1302" y="636" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#ff8a4c" text-anchor="middle">spark://spark-master:7077</text>
+
+  <!-- Client to spark-connect over gRPC -->
+  <line x1="618" y1="730" x2="1765" y2="730" stroke="#8957e5" stroke-width="3"/>
+  <line x1="1765" y1="730" x2="1765" y2="555" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+  <text x="900" y="706" font-size="22" fill="#b392f0" text-anchor="middle">gRPC</text>
+
+  <text x="715" y="830" font-size="20" font-family="Consolas, 'Courier New', monospace" fill="#8b949e">./pipeline mounted read-only at /demo/pipeline</text>
+
+  <!-- Footer -->
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: compose.yaml, Dockerfile</text>
+</svg>

@@ -1,0 +1,70 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"
+     font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+
+  <defs>
+    <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="#1a1a2e"/>
+  <rect width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#e25a1c" stroke-width="2" fill="none" opacity="0.35">
+    <line x1="56" y1="56" x2="156" y2="56"/>
+    <line x1="56" y1="56" x2="56" y2="156"/>
+    <line x1="1864" y1="56" x2="1764" y2="56"/>
+    <line x1="1864" y1="56" x2="1864" y2="156"/>
+    <line x1="56" y1="1024" x2="156" y2="1024"/>
+    <line x1="56" y1="1024" x2="56" y2="924"/>
+    <line x1="1864" y1="1024" x2="1764" y2="1024"/>
+    <line x1="1864" y1="1024" x2="1864" y2="924"/>
+  </g>
+
+  <!-- Title and subtitle -->
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">Values, Not Class Names</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">What a Spark Connect client can configure</text>
+
+  <!-- Mechanism banner -->
+  <rect x="80" y="200" width="1760" height="60" rx="12" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="960" y="238" font-size="28" fill="#e6edf3" text-anchor="middle">A client has no JVM, so it has no class loader for a class name.</text>
+
+  <!-- Side labels and gRPC boundary label -->
+  <text x="510" y="300" font-size="28" font-weight="700" fill="#8b949e" text-anchor="middle">Client (no JVM)</text>
+  <text x="960" y="300" font-size="26" fill="#8b949e" text-anchor="middle">gRPC</text>
+  <text x="1360" y="300" font-size="28" font-weight="700" fill="#8b949e" text-anchor="middle">Server (JVM)</text>
+
+  <!-- Boundary line -->
+  <line x1="960" y1="320" x2="960" y2="810" stroke="#30363d" stroke-width="2" stroke-dasharray="10,6"/>
+
+  <!-- Left card: green -->
+  <rect x="140" y="380" width="740" height="410" rx="12" fill="#12261a" stroke="#7ee787" stroke-width="2"/>
+  <text x="170" y="470" font-size="34" font-weight="700" fill="#7ee787">The Client Can Set</text>
+  <circle cx="176" cy="552" r="6" fill="#7ee787"/>
+  <text x="190" y="560" font-size="28" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">spark.sql.shuffle.partitions</text>
+  <text x="170" y="610" font-size="26" fill="#8b949e">a value the server reads at run time</text>
+
+  <!-- Right card: red -->
+  <rect x="980" y="380" width="760" height="410" rx="12" fill="#2a1618" stroke="#ff7b72" stroke-width="2"/>
+  <text x="1010" y="430" font-size="32" font-weight="700" fill="#ff7b72">Set Where the Server Starts</text>
+
+  <text x="1010" y="478" font-size="26" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">spark.sql.extensions</text>
+  <text x="1010" y="508" font-size="24" fill="#8b949e">read when the session is created;</text>
+  <text x="1010" y="534" font-size="24" fill="#8b949e">a client setting produces a UserWarning</text>
+  <text x="1010" y="562" font-size="24" font-family="Consolas, 'Courier New', monospace" fill="#ff7b72">[CANNOT_MODIFY_STATIC_CONFIG]</text>
+  <line x1="1010" y1="580" x2="1710" y2="580" stroke="#30363d" stroke-width="1"/>
+
+  <text x="1010" y="612" font-size="26" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">spark.jars</text>
+  <text x="1010" y="640" font-size="24" fill="#8b949e">the class path is fixed when the server starts</text>
+  <line x1="1010" y1="660" x2="1710" y2="660" stroke="#30363d" stroke-width="1"/>
+
+  <text x="1010" y="694" font-size="26" font-family="Consolas, 'Courier New', monospace" fill="#e6edf3">spark.sql.catalog.iceberg</text>
+  <text x="1010" y="722" font-size="24" fill="#8b949e">accepted from the client without an error;</text>
+  <text x="1010" y="748" font-size="24" fill="#8b949e">fails when the catalog is first used</text>
+
+  <!-- Footer -->
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#xa7;9, Layer 3; VERIFIED_FACTS.md &#xa7;2</text>
+</svg>

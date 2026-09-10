@@ -1,0 +1,89 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+  <defs>
+    <pattern id="dotgrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#2a2a4a" opacity="0.6"/>
+    </pattern>
+    <marker id="arrow-orange" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#e25a1c"/></marker>
+    <marker id="arrow-purple" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#8957e5"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotgrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+
+  <g stroke="#e25a1c" stroke-width="3" opacity="0.35" fill="none">
+    <path d="M 30 90 L 30 30 L 90 30"/>
+    <path d="M 1830 30 L 1890 30 L 1890 90"/>
+    <path d="M 30 990 L 30 1062 L 64 1062"/>
+    <path d="M 1890 990 L 1890 1062 L 1856 1062"/>
+  </g>
+
+  <text x="80" y="104" font-size="48" font-weight="700" fill="#e6edf3">spark.api.mode: One Job, Two Execution Paths</text>
+  <text x="80" y="150" font-size="26" fill="#8b949e">Introduced in Spark 4.0</text>
+
+  <!-- job.py file card and submit command -->
+  <rect x="80" y="210" width="220" height="80" rx="10" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+  <text x="190" y="260" font-family="Consolas, 'Courier New', monospace" font-size="28" font-weight="700" fill="#e6edf3" text-anchor="middle">job.py</text>
+
+  <rect x="330" y="210" width="1510" height="80" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+  <text x="360" y="258" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3">spark-submit --master spark://host:7077 --conf spark.api.mode=connect job.py</text>
+
+  <!-- switch -->
+  <line x1="960" y1="290" x2="960" y2="320" stroke="#8b949e" stroke-width="3"/>
+  <circle cx="960" cy="320" r="5" fill="#8b949e"/>
+  <path d="M 960 320 L 500 320 L 500 360" fill="none" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <path d="M 960 320 L 1420 320 L 1420 360" fill="none" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <!-- classic column -->
+  <text x="500" y="400" font-size="34" font-weight="700" fill="#ff8a4c" text-anchor="middle">classic</text>
+  <text x="500" y="428" font-size="26" fill="#8b949e" text-anchor="middle">the behavior when the key is unset</text>
+
+  <rect x="160" y="454" width="680" height="50" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="500" y="486" font-size="28" fill="#e6edf3" text-anchor="middle">Python process</text>
+  <line x1="500" y1="508" x2="500" y2="526" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="160" y="530" width="680" height="50" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="500" y="562" font-size="28" fill="#e6edf3" text-anchor="middle">Py4J</text>
+  <line x1="500" y1="584" x2="500" y2="602" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="160" y="606" width="680" height="50" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="500" y="638" font-size="28" fill="#e6edf3" text-anchor="middle">Driver JVM</text>
+  <line x1="500" y1="660" x2="500" y2="678" stroke="#e25a1c" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="160" y="682" width="680" height="50" rx="8" fill="#2a1a12" stroke="#e25a1c" stroke-width="2"/>
+  <text x="500" y="714" font-size="28" fill="#e6edf3" text-anchor="middle">Cluster</text>
+
+  <!-- connect column -->
+  <text x="1420" y="400" font-size="34" font-weight="700" fill="#b392f0" text-anchor="middle">connect</text>
+
+  <rect x="1080" y="454" width="680" height="50" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1420" y="486" font-size="28" fill="#e6edf3" text-anchor="middle">Spark starts a Connect server</text>
+  <line x1="1420" y1="508" x2="1420" y2="526" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <rect x="1080" y="530" width="680" height="50" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1420" y="562" font-size="28" fill="#e6edf3" text-anchor="middle">Client sends plans over gRPC</text>
+  <line x1="1420" y1="584" x2="1420" y2="602" stroke="#8957e5" stroke-width="3" marker-end="url(#arrow-purple)"/>
+
+  <rect x="1080" y="606" width="680" height="50" rx="8" fill="#1f1a33" stroke="#8957e5" stroke-width="2"/>
+  <text x="1420" y="638" font-size="28" fill="#e6edf3" text-anchor="middle">Cluster</text>
+
+  <!-- Selecting a Connect Server table -->
+  <text x="80" y="782" font-size="32" font-weight="700" fill="#e6edf3">Selecting a Connect Server</text>
+
+  <rect x="80" y="800" width="1760" height="40" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="110" y="826" font-size="26" fill="#e6edf3">Connect to a server that is already running</text>
+  <text x="1100" y="826" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">spark.remote=sc://host:15002</text>
+
+  <rect x="80" y="848" width="1760" height="40" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="110" y="874" font-size="26" fill="#e6edf3">Have Spark start a local server</text>
+  <text x="1100" y="874" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">spark.remote=local[*]</text>
+
+  <rect x="80" y="896" width="1760" height="54" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="110" y="925" font-size="26" fill="#e6edf3">Run against an existing cluster master</text>
+  <text x="1100" y="918" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">spark.api.mode=connect</text>
+  <text x="1100" y="942" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">with --master spark://host:7077</text>
+
+  <text x="80" y="997" font-size="26" fill="#8b949e">The submit command keeps its --master. One setting moves the job to Connect, and back.</text>
+
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#x00A7;6, Table 6-1</text>
+</svg>

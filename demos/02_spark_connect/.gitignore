@@ -1,7 +1,9 @@
-# python
-__pycache__/
-*.pyc
 .venv/
+.venv-full/
+.venv-41/
 .env
-.ipynb_checkpoints/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
 spark-warehouse/
+case_study/lakehouse_stack/.warehouse/

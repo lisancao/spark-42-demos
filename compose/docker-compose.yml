@@ -1,36 +1,74 @@
-# Spark 4.2 Demos — CONTAINED sandbox.
+# Spark 4.2 demos: shared sandbox. The Spark Connect demo (demos/02_spark_connect) has its own
+# compose.yaml and does not use this file.
 #
-# Isolation contract (do not weaken without a reason):
-#   * project name .......... spark42demos      (docker compose -p, own namespace)
-#   * network ............... bridge, spark42demos_net  (NOT host — lakehouse-stack uses host net)
-#   * ports ................. fresh 15099 / 7999 / 819x band, verified free 2026-07-20
-#   * volumes ............... spark42demos_* prefix, never shared with lakehouse-stack
-#   * touches ............... nothing in ~/lakehouse-stack, nothing in ~/repos/safe-spark-agents
+# Isolated from ~/lakehouse-stack: its own bridge network, volumes and compose project name, with
+# every port bound to 127.0.0.1.
 #
-# This stack is PARKED. It is not started as part of setup. Bring it up only when you
-# actively want to run a demo:
+# Setup does not start this stack. Start and stop it with:
 #     docker compose -p spark42demos -f compose/docker-compose.yml up -d
-#     docker compose -p spark42demos -f compose/docker-compose.yml down -v   # full teardown
+#     docker compose -p spark42demos -f compose/docker-compose.yml down -v   # also removes volumes
 #
-# Image note: no stable Apache Spark 4.2 image exists yet (2026-07-20). The closest local
-# artifact is the source-built master snapshot that already carries the 4.2/5.0 features
-# (metric views, NEAREST BY, RTM). Swap SPARK_IMAGE in .env when an official 4.2 image ships.
+# Image (updated 2026-09-09): Apache Spark 4.2.0 was released on 2026-07-14, so the default is the
+# official `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu`. Java 21 matches the lakehouse-stack
+# images, and the variant without `-r` omits SparkR.
+#
+# The previous default, the source-built snapshot `lakehouse/spark:5.0.0-snapshot-cdc`, reports
+# `5.0.0-SNAPSHOT` rather than 4.2. It remains as the `snapshot` profile because Demo 1 (metric
+# views) and the AUTO CDC work were verified against it:
+#     docker compose -p spark42demos -f compose/docker-compose.yml --profile snapshot up -d
+#
+# `spark.connect.grpc.port.maxRetries` defaults to 0, so a port clash stops the server instead of
+# moving it to the next port.
 
 services:
+  # ---------------------------------------------------------------------------------------------
+  # Spark Connect server on Apache Spark 4.2.0, without Iceberg, so nothing is downloaded with
+  # --packages at startup.
+  # ---------------------------------------------------------------------------------------------
   spark:
-    image: ${SPARK_IMAGE:-lakehouse/spark:5.0.0-snapshot-cdc}
+    image: ${SPARK_IMAGE:-apache/spark:4.2.0-scala2.13-java21-python3-ubuntu}
     container_name: spark42demos-connect
     networks: [spark42demos_net]
     env_file: .env
     ports:
-      - "127.0.0.1:${CONNECT_PORT:-15099}:15002"   # Spark Connect (gRPC) — localhost only
-      - "127.0.0.1:${MASTER_UI_PORT:-8190}:8190"    # Spark UI
+      - "127.0.0.1:${CONNECT_PORT:-15099}:15002"   # Spark Connect (gRPC), localhost only
+      - "127.0.0.1:${MASTER_UI_PORT:-8190}:8190"   # Spark UI
     volumes:
       - spark42demos_data:/opt/spark-data
       - ../demos:/demos:ro
       - ../data:/data
-      # Mount the project at its REAL host path so parquet paths a Connect client sends
-      # (host-absolute) resolve identically on the server. Local-dev convenience.
+      # The project is mounted at its host path, so an absolute path sent by a client on this
+      # machine names the same file on the server, where Spark Connect resolves file paths.
+      - ${PROJECT_HOST_DIR:-/home/lnc/Documents/spark_content/spark_42_demos}:${PROJECT_HOST_DIR:-/home/lnc/Documents/spark_content/spark_42_demos}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    command:
+      - bash
+      - -c
+      - >-
+        /opt/spark/sbin/start-connect-server.sh --wait
+        --conf spark.connect.grpc.binding.host=0.0.0.0
+        --conf spark.connect.grpc.binding.port=15002
+        --conf spark.ui.port=8190
+
+  # ---------------------------------------------------------------------------------------------
+  # Source-built snapshot server, kept for Demo 1 (metric views) and the AUTO CDC work, which were
+  # verified against it. Start it with --profile snapshot. It reports 5.0.0-SNAPSHOT, so it is not
+  # suitable for material labeled Spark 4.2.
+  # ---------------------------------------------------------------------------------------------
+  spark-snapshot:
+    profiles: ["snapshot"]
+    image: lakehouse/spark:5.0.0-snapshot-cdc
+    container_name: spark42demos-connect-snapshot
+    networks: [spark42demos_net]
+    env_file: .env
+    ports:
+      - "127.0.0.1:${CONNECT_PORT_SNAPSHOT:-15097}:15002"
+      - "127.0.0.1:${UI_PORT_SNAPSHOT:-8186}:8186"
+    volumes:
+      - spark42demos_data:/opt/spark-data
+      - ../demos:/demos:ro
+      - ../data:/data
       - ${PROJECT_HOST_DIR:-/home/lnc/Documents/spark_content/spark_42_demos}:${PROJECT_HOST_DIR:-/home/lnc/Documents/spark_content/spark_42_demos}
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -41,7 +79,7 @@ services:
         /opt/spark/sbin/start-connect-server.sh
         --packages org.apache.iceberg:iceberg-spark-runtime-4.1_2.13:1.11.0
         --conf spark.connect.grpc.binding.port=15002
-        --conf spark.ui.port=8190
+        --conf spark.ui.port=8186
         && sleep 5 && tail -f /opt/spark/logs/*.out
 
 networks:
