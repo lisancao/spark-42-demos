@@ -10,7 +10,7 @@ unchanged.
 The pipeline is small so that it runs in seconds on the cluster in `compose.yaml`. The same layers
 applied to a 357-line production pipeline are described in the
 [case study](../case_study/lakehouse_stack/README.md). Results were recorded on 2026-09-10 against
-Apache Spark 4.2.0 (`VERIFIED_FACTS.md` §9).
+Apache Spark 4.2.0.
 
 ## Running the Migration
 
@@ -111,7 +111,7 @@ server cannot be determined from the source.
 it; `pipeline_after.py` sets it with `spark.conf.set()` once the session exists.
 `enableHiveSupport()` is removed. Under Spark Connect it does not raise, but it has no effect:
 `spark.sql.catalogImplementation` is a static setting of the server and remains `in-memory`
-(`VERIFIED_FACTS.md` §2).
+(companion guide §7).
 
 ### Layer 4: Dependencies
 

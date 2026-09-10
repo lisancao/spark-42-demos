@@ -107,5 +107,5 @@
   <text x="1393" y="995" font-size="20" font-weight="700" font-family="Consolas, 'Courier New', monospace" fill="#7ee787">7/7 tables identical</text>
 
   <!-- Footer -->
-  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: make pipeline; VERIFIED_FACTS.md &#xa7;9</text>
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: make pipeline</text>
 </svg>

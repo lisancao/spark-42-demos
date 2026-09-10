@@ -5,7 +5,7 @@
 
 Apache Iceberg publishes no runtime for Spark 4.2; BUILDING_ICEBERG_FOR_SPARK_4_2.md describes the
 build. Exits with status 0 when every check passes. View checks are skipped on a HadoopCatalog,
-which does not support views (VERIFIED_FACTS.md §4).
+which does not support views (BUILDING_ICEBERG_FOR_SPARK_4_2.md).
 """
 import argparse
 import sys

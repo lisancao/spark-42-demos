@@ -17,7 +17,6 @@ THIS = Path(__file__).resolve()
 DOCS = (
     "README.md",
     "companion_guide.md",
-    "VERIFIED_FACTS.md",
     "video_spark_connect.md",
     "setup/TOPOLOGIES.md",
     "pipeline/MIGRATION.md",
@@ -48,7 +47,7 @@ CUE_CONFIG = re.compile(r"LAUNCH CONFIGURATION (\d+) \(([^)]+)\)")
 GRAPHIC = re.compile(r"\b(\d\d_[a-z0-9_]+\.svg)\b")
 REMOVED = re.compile(
     r"(?<![\w./-])(src|migration|bench|verify)/|spark_connect_demo|\.venv-thin|\.venv-fat"
-    r"|ConnectSessionFactory|which_package\(|build_remote_url"
+    r"|ConnectSessionFactory|which_package\(|build_remote_url|VERIFIED_FACTS"
 )
 # Built from parts so that this file contains none of the characters it checks for.
 EM_DASH = re.compile("|".join((chr(0x2014), "\\\\" + "u2014", "&" + "mdash;")))

@@ -103,7 +103,7 @@ spec:
             - "spark.sql.catalog.iceberg.type=rest"
             - "--conf"
             - "spark.sql.catalog.iceberg.uri=http://iceberg-rest.spark.svc:8181"
-            # --jars alone is enough for spark.sql.extensions (VERIFIED_FACTS.md §4). Expect a
+            # --jars alone is enough for spark.sql.extensions (setup/TOPOLOGIES.md). Expect a
             # ClassNotFoundException at WARN during startup; see standalone/start-connect-server.sh.
             - "--jars"
             - "/opt/extra-jars/iceberg-spark-runtime.jar"

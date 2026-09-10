@@ -7,8 +7,7 @@ cited.
 
 > Verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-09: an official
 > `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` Connect server driven by
-> `pyspark-client==4.2.0`. Measurements and their method are in
-> [`VERIFIED_FACTS.md`](VERIFIED_FACTS.md).
+> `pyspark-client==4.2.0`.
 
 Claims in this guide carry one of three levels of provenance:
 
@@ -207,7 +206,8 @@ The rest of this guide uses 4.2.0 on both sides. To show what a version differen
 practice, `make matrix` runs fourteen operations in each direction between Spark 4.1.2 and 4.2.0.
 Table 2-1 summarizes the two mixed pairings. It is a sample, not a compatibility matrix: an operation
 that works here can still fail on a feature or setting the sample does not exercise.
-`VERIFIED_FACTS.md` §8 records the method, the images and the exact errors.
+`make matrix` reruns it, and `extras/version_matrix/results/` holds each run's output, including the
+first line of every error.
 
 *Table 2-1. A sample of operations across Spark 4.1.2 and 4.2.0*
 
@@ -1443,7 +1443,7 @@ trials per point, so its shape should not be interpreted. And the difference bet
 - **Python UDF throughput.** Not measured.
 - **Structured Streaming.** Not measured.
 
-**Citations:** measured with this project's harness: [`extras/bench/protocol_overhead.py`](extras/bench/protocol_overhead.py), [`extras/bench/shuffle_partitions.py`](extras/bench/shuffle_partitions.py); results in [`VERIFIED_FACTS.md`](VERIFIED_FACTS.md). Arrow-optimized Python UDFs by default: [SPARK-54555](https://issues.apache.org/jira/browse/SPARK-54555).
+**Citations:** measured with this project's harness: [`extras/bench/protocol_overhead.py`](extras/bench/protocol_overhead.py), [`extras/bench/shuffle_partitions.py`](extras/bench/shuffle_partitions.py); recorded runs in `extras/bench/`. Arrow-optimized Python UDFs by default: [SPARK-54555](https://issues.apache.org/jira/browse/SPARK-54555).
 
 ---
 
@@ -1548,9 +1548,8 @@ some secondary sources state that it does. A scan of every JAR in
 [29] [Companion Guide: Spark on Kubernetes](../../../companion_guide_spark_kubernetes.md) §12: Connect on Kubernetes
 [30] [Companion Guide: Spark Libraries](../../../spark_41_libraries/companion_guide_spark_libraries.md): ML on Connect and the client ecosystem
 [31] [Demo 1: Metric Views](../01_metrics_views/companion_guide.md): the first demo in this series
-[32] [`VERIFIED_FACTS.md`](VERIFIED_FACTS.md): every measurement in this guide, with its method
-[33] [`case_study/lakehouse_stack/README.md`](case_study/lakehouse_stack/README.md): the lakehouse-stack migration, as a written case study
-[34] [`pipeline/MIGRATION.md`](pipeline/MIGRATION.md): the demonstration pipeline's migration, layer by layer
+[32] [`case_study/lakehouse_stack/README.md`](case_study/lakehouse_stack/README.md): the lakehouse-stack migration, as a written case study
+[33] [`pipeline/MIGRATION.md`](pipeline/MIGRATION.md): the demonstration pipeline's migration, layer by layer
 
 ### JIRA Issues
 
@@ -1597,4 +1596,4 @@ some secondary sources state that it does. A scan of every JAR in
 ---
 
 *Verified against Apache Spark 4.2.0 (git revision `32f72996011`) with `pyspark-client==4.2.0`,
-2026-09-09 and 2026-09-10. `VERIFIED_FACTS.md` records each measurement and how it was made.*
+2026-09-09 and 2026-09-10.*

@@ -10,7 +10,7 @@ set -euo pipefail
 
 SPARK_HOME="${SPARK_HOME:-/opt/spark}"
 CONNECT_PORT="${CONNECT_PORT:-15002}"
-# With no binding setting, a 4.2.0 server listens on all interfaces (VERIFIED_FACTS.md §2). This
+# With no binding setting, a 4.2.0 server listens on all interfaces (companion guide §4). This
 # script defaults to loopback; set BIND_HOST=0.0.0.0 to accept connections from other hosts.
 BIND_HOST="${BIND_HOST:-127.0.0.1}"
 SPARK_MASTER="${SPARK_MASTER:-}"      # empty: local[*] inside the server process
@@ -43,7 +43,7 @@ fi
 
 if [ -n "$EXTRA_JARS" ]; then
   # --jars is enough for spark.sql.extensions: against 4.2.0, client sessions ran MERGE INTO and
-  # CALL <catalog>.system.* with --jars alone (VERIFIED_FACTS.md §4). The server still logs a
+  # CALL <catalog>.system.* with --jars alone (setup/TOPOLOGIES.md, topology 3). The server logs a
   # ClassNotFoundException for the extension class at WARN during startup. It concerns the
   # server's bootstrap session, created before the jars are added; client sessions are not
   # affected. Check extensions by using them, not by reading the log.

@@ -6,7 +6,7 @@
         --out connect.json
     python extras/bench/protocol_overhead.py --compare classic.json connect.json
 
-Scope, method and results: VERIFIED_FACTS.md §3 (single node, loopback, one client).
+Scope, method and results: companion guide §13 (single node, loopback, one client).
 """
 
 from __future__ import annotations
