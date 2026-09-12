@@ -24,4 +24,5 @@ derby.log
 .DS_Store
 .idea/
 .vscode/
+!demos/01_metrics_views/.vscode/
 !demos/02_spark_connect/.vscode/

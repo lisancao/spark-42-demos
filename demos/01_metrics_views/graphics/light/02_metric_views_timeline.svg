@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+<defs>
+  <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="#d8dee4" opacity="0.6"/>
+  </pattern>
+  
+</defs>
+<rect x="0" y="0" width="1920" height="1080" fill="#f6f8fa"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#d9531a"/>
+  <line x1="40" y1="100" x2="40" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="40" x2="100" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="100" x2="1880" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="40" x2="1820" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="980" x2="40" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="1040" x2="100" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="980" x2="1880" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="1040" x2="1820" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+<text x="80" y="104" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="48" fill="#1f2328" text-anchor="start" font-weight="700">From Proposal to Release</text>
+  <text x="80" y="150" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#57606a" text-anchor="start">Metric views in Apache Spark, October 2025 to July 2026</text>
+  <line x1="140" y1="440" x2="1740" y2="440" stroke="#d0d7de" stroke-width="3"/>
+  <text x="186" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="middle">Oct 31, 2025</text>
+  <circle cx="186" cy="440" r="10" fill="#57606a"/>
+  <text x="186" y="488" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">SPIP proposed on</text><text x="186" y="514" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">dev@spark.apache.org</text>
+  <text x="186" y="548" font-family="Consolas, 'Courier New', monospace" font-size="20" fill="#57606a" text-anchor="middle">SPARK-54119</text>
+  <text x="469" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="middle">Nov 13, 2025</text>
+  <circle cx="469" cy="440" r="10" fill="#57606a"/>
+  <text x="469" y="488" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">Vote passes: 19 +1 votes,</text><text x="469" y="514" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">5 binding, no -1 votes</text>
+  <text x="763" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="middle">Dec 10, 2025</text>
+  <circle cx="763" cy="440" r="10" fill="#57606a"/>
+  <text x="763" y="488" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">YAML parsing for</text><text x="763" y="514" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">metric views committed</text>
+  <text x="763" y="548" font-family="Consolas, 'Courier New', monospace" font-size="20" fill="#57606a" text-anchor="middle">SPARK-54403</text>
+  <text x="1072" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="middle">Dec 17, 2025</text>
+  <circle cx="1072" cy="440" r="10" fill="#57606a"/>
+  <text x="1072" y="488" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">CREATE VIEW ... WITH METRICS</text><text x="1072" y="514" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">and MEASURE() committed</text>
+  <text x="1072" y="548" font-family="Consolas, 'Courier New', monospace" font-size="20" fill="#57606a" text-anchor="middle">SPARK-54405</text>
+  <text x="1387" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="middle">May 7, 2026</text>
+  <circle cx="1387" cy="440" r="10" fill="#57606a"/>
+  <text x="1387" y="488" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">Creation on Data Source</text><text x="1387" y="514" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">V2 catalogs committed</text>
+  <text x="1387" y="548" font-family="Consolas, 'Courier New', monospace" font-size="20" fill="#57606a" text-anchor="middle">SPARK-56920</text>
+  <text x="1697" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="middle">Jul 14, 2026</text>
+  <circle cx="1697" cy="440" r="16" fill="#d9531a"/>
+  <text x="1697" y="488" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#1f2328" text-anchor="middle">Apache Spark 4.2.0 released</text>
+  <rect x="80" y="700" width="1760" height="200" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="120" y="760" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="32" fill="#875c00" text-anchor="start" font-weight="700">Still Open</text>
+  <text x="120" y="810" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="start">SPARK-54408, metric view composability: a metric view as the source of another,</text><text x="120" y="848" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#1f2328" text-anchor="start">and measures that refer to other measures</text>
+  <text x="80" y="1046" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#57606a" text-anchor="start">Source: blog post §1, Table 1-1</text>
+</svg>

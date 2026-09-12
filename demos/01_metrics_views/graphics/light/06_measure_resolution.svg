@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+<defs>
+  <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="#d8dee4" opacity="0.6"/>
+  </pattern>
+  
+</defs>
+<rect x="0" y="0" width="1920" height="1080" fill="#f6f8fa"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#d9531a"/>
+  <line x1="40" y1="100" x2="40" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="40" x2="100" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="100" x2="1880" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="40" x2="1820" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="980" x2="40" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="1040" x2="100" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="980" x2="1880" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="1040" x2="1820" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+<text x="80" y="104" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="48" fill="#1f2328" text-anchor="start" font-weight="700">One Definition, Evaluated at Each Query's Grain</text>
+  <text x="80" y="150" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#57606a" text-anchor="start">How Spark resolves MEASURE()</text>
+  <rect x="80" y="200" width="1760" height="140" rx="12" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="110" y="240" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="30" fill="#1f2328" text-anchor="start" font-weight="700">Definition</text>
+  <text x="110" y="280" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">conversion_rate: SUM(CAST(converted AS INT)) / COUNT(1)</text>
+  <text x="110" y="310" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">active_users: COUNT(DISTINCT user_id)</text>
+  <text x="80" y="400" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#57606a" text-anchor="start">The analyzer replaces MEASURE(x) with the measure's expression, then aggregates at the query's GROUP BY.</text>
+  <defs><marker id="m6arrow" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" viewBox="0 0 10 10" refX="9" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="#177a33"/></marker></defs>
+  <rect x="80" y="440" width="880" height="140" rx="10" fill="#eef1f4" stroke="#d0d7de" stroke-width="2"/>
+  <text x="104" y="498" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#1f2328" text-anchor="start">SELECT MEASURE(conversion_rate), MEASURE(active_users) FROM</text><text x="104" y="526" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#1f2328" text-anchor="start">delivery_metrics</text>
+  <line x1="960" y1="510.0" x2="1020" y2="510.0" stroke="#177a33" stroke-width="3" marker-end="url(#m6arrow)"/>
+  <rect x="1020" y="440" width="800" height="140" rx="10" fill="#e9f7ee" stroke="#177a33" stroke-width="2"/>
+  <text x="1048" y="498" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="28" fill="#1f2328" text-anchor="start" font-weight="700">Whole month</text>
+  <text x="1048" y="535" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#177a33" text-anchor="start">0.0923 conversion rate, 9,994 users</text>
+  <rect x="80" y="604" width="880" height="140" rx="10" fill="#eef1f4" stroke="#d0d7de" stroke-width="2"/>
+  <text x="104" y="662" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#1f2328" text-anchor="start">SELECT MEASURE(conversion_rate), MEASURE(active_users) FROM</text><text x="104" y="690" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#1f2328" text-anchor="start">delivery_metrics GROUP BY region</text>
+  <line x1="960" y1="674.0" x2="1020" y2="674.0" stroke="#177a33" stroke-width="3" marker-end="url(#m6arrow)"/>
+  <rect x="1020" y="604" width="800" height="140" rx="10" fill="#e9f7ee" stroke="#177a33" stroke-width="2"/>
+  <text x="1048" y="646" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="28" fill="#1f2328" text-anchor="start" font-weight="700">By region</text>
+  <text x="1048" y="680" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#177a33" text-anchor="start">metro 0.0787, urban 0.0990, suburban 0.1218</text><text x="1048" y="708" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#177a33" text-anchor="start">rural 0.3775, remote 0.5150</text>
+  <rect x="80" y="768" width="880" height="140" rx="10" fill="#eef1f4" stroke="#d0d7de" stroke-width="2"/>
+  <text x="104" y="826" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#1f2328" text-anchor="start">SELECT MEASURE(conversion_rate), MEASURE(active_users) FROM</text><text x="104" y="854" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#1f2328" text-anchor="start">delivery_metrics GROUP BY session_date</text>
+  <line x1="960" y1="838.0" x2="1020" y2="838.0" stroke="#177a33" stroke-width="3" marker-end="url(#m6arrow)"/>
+  <rect x="1020" y="768" width="800" height="140" rx="10" fill="#e9f7ee" stroke="#177a33" stroke-width="2"/>
+  <text x="1048" y="810" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="28" fill="#1f2328" text-anchor="start" font-weight="700">By day</text>
+  <text x="1048" y="844" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#177a33" text-anchor="start">June 1: 0.0952, 2,301 users</text><text x="1048" y="872" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#177a33" text-anchor="start">June 2: 0.0889, 2,328 users</text>
+  <rect x="80" y="928" width="1760" height="70" fill="#ffeef0" stroke="#c5202c" stroke-width="2" stroke-opacity="0.6"/>
+  <text x="120" y="973" font-size="24" fill="#1f2328"><tspan fill="#1f2328">A query that sums or averages these results is ordinary SQL. The sum of the daily active users is still </tspan><tspan fill="#c5202c" font-family="Consolas, 'Courier New', monospace">69,420</tspan><tspan fill="#1f2328">.</tspan></text>
+  <text x="80" y="1046" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#57606a" text-anchor="start">Source: blog post §5 and §6; ResolveMetricView.scala at tag v4.2.0</text>
+</svg>

@@ -1,0 +1,32 @@
+# A Spark Connect server on the official Apache Spark 4.2.0 image, with the generated dataset
+# mounted read-only. Start it with `make up`. Ports are listed in README.md and can be changed in
+# .env.
+name: metric-views-demo
+
+services:
+  spark-connect:
+    image: apache/spark:4.2.0-scala2.13-java21-python3-ubuntu
+    hostname: spark-connect
+    entrypoint:
+      - /opt/spark/sbin/start-connect-server.sh
+      - --wait
+      - --conf
+      - spark.connect.grpc.binding.host=0.0.0.0
+      - --conf
+      - spark.sql.warehouse.dir=file:/tmp/warehouse
+    ports:
+      - "127.0.0.1:${CONNECT_PORT:-15002}:15002"
+      - "127.0.0.1:${CONNECT_UI_PORT:-4040}:4040"
+    volumes:
+      # The examples register the Parquet files as external tables, so the server reads them in
+      # place and never writes to this directory.
+      - ./data:/demo/data:ro
+    tmpfs:
+      # Anything a query writes to the warehouse is removed when the container stops.
+      - /tmp/warehouse:uid=185,gid=185
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/127.0.0.1/15002"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 10s

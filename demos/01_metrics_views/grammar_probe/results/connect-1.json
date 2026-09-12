@@ -1,0 +1,1890 @@
+{
+ "meta": {
+  "run": "connect-1",
+  "mode": "connect",
+  "spark_version": "4.2.0",
+  "catalog": "in-memory",
+  "client": "pyspark-client 4.2.0",
+  "python": "3.10.20",
+  "recorded": "2026-09-11",
+  "objects_dropped_at_start": 0
+ },
+ "setup": [
+  {
+   "statement": "CREATE TABLE IF NOT EXISTS sessions USING parquet LOCATION '/demo/data/sessions.parquet'",
+   "ok": true,
+   "row_count": 0,
+   "rows": []
+  },
+  {
+   "statement": "CREATE TABLE IF NOT EXISTS orders USING parquet LOCATION '/demo/data/orders.parquet'",
+   "ok": true,
+   "row_count": 0,
+   "rows": []
+  },
+  {
+   "statement": "CREATE TABLE IF NOT EXISTS users USING parquet LOCATION '/demo/data/users.parquet'",
+   "ok": true,
+   "row_count": 0,
+   "rows": []
+  },
+  {
+   "statement": "CREATE VIEW mv_base WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+   "ok": true,
+   "row_count": 0,
+   "rows": []
+  }
+ ],
+ "cases": [
+  {
+   "id": "version_0_1",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_version_0_1 WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    }
+   ]
+  },
+  {
+   "id": "version_1_0",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_version_1_0 WITH METRICS LANGUAGE YAML AS $$\nversion: 1.0\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Invalid YAML version: 1.0 SQLSTATE: 42K0L",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "version_1_1",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_version_1_1 WITH METRICS LANGUAGE YAML AS $$\nversion: 1.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Invalid YAML version: 1.1 SQLSTATE: 42K0L",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "version_missing",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_version_missing WITH METRICS LANGUAGE YAML AS $$\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Invalid YAML version: null SQLSTATE: 42K0L",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "source_missing",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_missing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Missing required creator property 'source' (index 1)",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "dimensions_missing",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_dimensions_missing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_dimensions_missing",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "measures_missing",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_measures_missing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    }
+   ]
+  },
+  {
+   "id": "yaml_malformed",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_yaml_malformed WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: [sessions\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: while parsing a flow sequence",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "key_fields",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_key_fields WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\nfields:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"fields\" (class org.apache.spark.sql.metricview.serde.MetricViewV01), not marked as ignorable (5 known properties: \"version\", \"source\", \"dimensions\", \"filter\", \"measures\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "key_joins",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_key_joins WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\njoins:\n  - name: users\n    source: users\n    on: source.user_id = users.user_id\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"joins\" (class org.apache.spark.sql.metricview.serde.MetricViewV01), not marked as ignorable (5 known properties: \"version\", \"source\", \"dimensions\", \"filter\", \"measures\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "key_filter",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_key_filter WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\nfilter: region <> 'remote'\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_key_filter",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "78800"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "key_comment",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_key_comment WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\ncomment: Delivery metrics\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"comment\" (class org.apache.spark.sql.metricview.serde.MetricViewV01), not marked as ignorable (5 known properties: \"version\", \"source\", \"dimensions\", \"filter\", \"measures\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "key_materialization",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_key_materialization WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\nmaterialization:\n  schedule: every 6 hours\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"materialization\" (class org.apache.spark.sql.metricview.serde.MetricViewV01), not marked as ignorable (5 known properties: \"version\", \"source\", \"dimensions\", \"filter\", \"measures\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "column_display_name",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_column_display_name WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n    display_name: Region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"display_name\" (class org.apache.spark.sql.metricview.serde.ColumnV01), not marked as ignorable (2 known properties: \"name\", \"expr\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "column_comment",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_column_comment WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n    comment: Delivery region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"comment\" (class org.apache.spark.sql.metricview.serde.ColumnV01), not marked as ignorable (2 known properties: \"name\", \"expr\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "column_synonyms",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_column_synonyms WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n    synonyms: [area]\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"synonyms\" (class org.apache.spark.sql.metricview.serde.ColumnV01), not marked as ignorable (2 known properties: \"name\", \"expr\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "column_format",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_column_format WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n    format:\n      type: number\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"format\" (class org.apache.spark.sql.metricview.serde.ColumnV01), not marked as ignorable (2 known properties: \"name\", \"expr\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "column_window",
+   "group": "yaml",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_column_window WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n    window:\n      - order: session_date\n        range: trailing 7 day\n        semiadditive: last\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Unrecognized field \"window\" (class org.apache.spark.sql.metricview.serde.ColumnV01), not marked as ignorable (2 known properties: \"name\", \"expr\")",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "source_temp_view",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_temp_view WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions_temp\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INVALID_TEMP_OBJ_REFERENCE",
+     "sqlstate": "42K0F",
+     "message": "[INVALID_TEMP_OBJ_REFERENCE] Cannot create the persistent object `default`.`probe_source_temp_view` of the type VIEW because it references to the temporary object `sessions_temp` of the type VIEW. Please make the temporary object `sessions_temp` persistent, or make the persistent object `default`.`p",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "source_qualified_name",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_qualified_name WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: spark_catalog.default.sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_source_qualified_name",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "source_query",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_query WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: SELECT * FROM sessions WHERE region <> 'remote'\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_source_query",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "78800"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "source_query_join",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_query_join WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: SELECT s.session_id, s.user_id, s.region, s.converted, o.order_total FROM sessions s LEFT JOIN orders o ON s.session_id = o.session_id\ndimensions:\n  - name: region\n    expr: region\nmeasures:\n  - name: orders\n    expr: COUNT(order_total)\n  - name: revenue\n    expr: SUM(order_total)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(orders), ROUND(MEASURE(revenue), 2) FROM probe_source_query_join",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "7295",
+       "233978.74"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "source_metric_view",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_metric_view WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: mv_base\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `converted` cannot be resolved. Did you mean one of the following? [`conversion_rate`, `region`, `active_users`, `session_date`, `total_sessions`]. SQLSTATE: 42703; line 1 pos 9;",
+     "type": "AnalysisException"
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_source_metric_view",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_NOT_FOUND",
+     "sqlstate": "42P01",
+     "message": "[TABLE_OR_VIEW_NOT_FOUND] The table or view `probe_source_metric_view` cannot be found. Verify the spelling and correctness of the schema and catalog.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "source_metric_view_count",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_source_metric_view_count WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: mv_base\ndimensions:\n  - name: region\n    expr: region\nmeasures:\n  - name: row_count\n    expr: COUNT(1)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(row_count) FROM probe_source_metric_view_count",
+     "ok": false,
+     "condition": "INTERNAL_ERROR",
+     "sqlstate": "XX000",
+     "message": "[INTERNAL_ERROR] The Spark SQL phase planning failed with an internal error. You hit a bug in Spark or the Spark plugins you use. Please, report this bug to the corresponding communities or vendors, and provide the full stack trace. SQLSTATE: XX000",
+     "type": "SparkException"
+    }
+   ]
+  },
+  {
+   "id": "source_ctas",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE TABLE probe_facts AS SELECT s.session_id, s.user_id, s.region, s.converted, o.order_total FROM sessions s LEFT JOIN orders o ON s.session_id = o.session_id",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "CREATE VIEW probe_source_ctas WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: probe_facts\ndimensions:\n  - name: region\n    expr: region\nmeasures:\n  - name: orders\n    expr: COUNT(order_total)\n  - name: revenue\n    expr: SUM(order_total)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(orders), ROUND(MEASURE(revenue), 2) FROM probe_source_ctas",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "7295",
+       "233978.74"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "source_dropped",
+   "group": "source",
+   "steps": [
+    {
+     "statement": "CREATE TABLE probe_src USING parquet LOCATION '/demo/data/sessions.parquet'",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "CREATE VIEW probe_source_dropped WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: probe_src\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_source_dropped",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    },
+    {
+     "statement": "DROP TABLE probe_src",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_source_dropped",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_NOT_FOUND",
+     "sqlstate": "42P01",
+     "message": "[TABLE_OR_VIEW_NOT_FOUND] The table or view `probe_src` cannot be found. Verify the spelling and correctness of the schema and catalog.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "measure_without_aggregate",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_measure_without_aggregate WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: converted_flag\n    expr: CAST(converted AS INT)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "MISSING_AGGREGATION",
+     "sqlstate": "42803",
+     "message": "[MISSING_AGGREGATION] The non-aggregating expression \"converted\" is based on columns which are not participating in the GROUP BY clause.",
+     "type": "AnalysisException"
+    },
+    {
+     "statement": "SELECT MEASURE(converted_flag) FROM probe_measure_without_aggregate",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_NOT_FOUND",
+     "sqlstate": "42P01",
+     "message": "[TABLE_OR_VIEW_NOT_FOUND] The table or view `probe_measure_without_aggregate` cannot be found. Verify the spelling and correctness of the schema and catalog.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "measure_window_function",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_measure_window_function WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: running\n    expr: SUM(COUNT(1)) OVER ()\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(running) FROM probe_measure_window_function",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "measure_references_measure",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_measure_references_measure WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: doubled\n    expr: total_sessions * 2\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(doubled) FROM probe_measure_references_measure",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `total_sessions` cannot be resolved. Did you mean one of the following? [`region`, `session_id`, `user_id`, `session_date`, `converted`]. SQLSTATE: 42703; line 1 pos 0;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "measure_calls_measure",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_measure_calls_measure WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: doubled\n    expr: MEASURE(total_sessions) * 2\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "UNSUPPORTED_FEATURE.LATERAL_COLUMN_ALIAS_IN_AGGREGATE_FUNC",
+     "sqlstate": "0A000",
+     "message": "[UNSUPPORTED_FEATURE.LATERAL_COLUMN_ALIAS_IN_AGGREGATE_FUNC] The feature is not supported: Referencing a lateral column alias `total_sessions` in the aggregate function \"measure(lateralAliasReference(total_sessions))\". SQLSTATE: 0A000",
+     "type": "AnalysisException"
+    },
+    {
+     "statement": "SELECT MEASURE(doubled) FROM probe_measure_calls_measure",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_NOT_FOUND",
+     "sqlstate": "42P01",
+     "message": "[TABLE_OR_VIEW_NOT_FOUND] The table or view `probe_measure_calls_measure` cannot be found. Verify the spelling and correctness of the schema and catalog.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "dimension_aggregate",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_dimension_aggregate WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: n\n    expr: COUNT(1)\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "GROUP_BY_AGGREGATE",
+     "sqlstate": "42903",
+     "message": "[GROUP_BY_AGGREGATE] Aggregate functions are not allowed in GROUP BY, but found count(1). SQLSTATE: 42903; line 1 pos 0;",
+     "type": "AnalysisException"
+    },
+    {
+     "statement": "SELECT n, MEASURE(total_sessions) FROM probe_dimension_aggregate GROUP BY n",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_NOT_FOUND",
+     "sqlstate": "42P01",
+     "message": "[TABLE_OR_VIEW_NOT_FOUND] The table or view `probe_dimension_aggregate` cannot be found. Verify the spelling and correctness of the schema and catalog.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "dimension_derived",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_dimension_derived WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: day_type\n    expr: CASE WHEN dayofweek(to_date(session_date)) IN (1, 7) THEN 'weekend' ELSE 'weekday' END\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT day_type, MEASURE(total_sessions) FROM probe_dimension_derived GROUP BY day_type ORDER BY day_type",
+     "ok": true,
+     "row_count": 2,
+     "rows": [
+      [
+       "weekday",
+       "58020"
+      ],
+      [
+       "weekend",
+       "20980"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "duplicate_name",
+   "group": "expression",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_duplicate_name WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: total_sessions\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "COLUMN_ALREADY_EXISTS",
+     "sqlstate": "42711",
+     "message": "[COLUMN_ALREADY_EXISTS] The column `total_sessions` already exists. Choose another name or rename the existing column. SQLSTATE: 42711",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "clause_comment",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_clause_comment WITH METRICS LANGUAGE YAML COMMENT 'Delivery metrics' AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    }
+   ]
+  },
+  {
+   "id": "clause_no_language",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_clause_no_language WITH METRICS AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "INTERNAL_ERROR",
+     "sqlstate": "XX000",
+     "message": "[INTERNAL_ERROR] Cannot find main error class 'MISSING_CLAUSES_FOR_OPERATION' SQLSTATE: XX000",
+     "type": "SparkException"
+    }
+   ]
+  },
+  {
+   "id": "clause_column_list",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_clause_column_list (region, total_sessions) WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "CREATE_VIEW_COLUMN_ARITY_MISMATCH.TOO_MANY_DATA_COLUMNS",
+     "sqlstate": "21S01",
+     "message": "[CREATE_VIEW_COLUMN_ARITY_MISMATCH.TOO_MANY_DATA_COLUMNS] Cannot create view `default`.`probe_clause_column_list`, the reason is too many data columns:",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "clause_tblproperties",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_clause_tblproperties WITH METRICS LANGUAGE YAML TBLPROPERTIES ('team' = 'growth') AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    }
+   ]
+  },
+  {
+   "id": "clause_string_body",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_clause_string_body WITH METRICS LANGUAGE YAML AS 'version: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n'",
+     "ok": false,
+     "condition": "PARSE_SYNTAX_ERROR",
+     "sqlstate": "42601",
+     "message": "[PARSE_SYNTAX_ERROR] Syntax error at or near ''version: 0.1\\nsource: sessions\\ndimensions:\\n  - name: region\\n    expr: region\\n  - name: session_date\\n    expr: session_date\\nmeasures:\\n  - name: total_sessions\\n    expr: COUNT(1)\\n  - name: conversion_rate\\n    expr: SUM(CAST(converted AS INT)) / ",
+     "type": "ParseException"
+    }
+   ]
+  },
+  {
+   "id": "clause_temporary",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE TEMPORARY VIEW probe_clause_temporary WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "PARSE_SYNTAX_ERROR",
+     "sqlstate": "42601",
+     "message": "[PARSE_SYNTAX_ERROR] Syntax error at or near 'METRICS'. SQLSTATE: 42601 (line 1, pos 50)",
+     "type": "ParseException"
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_clause_temporary",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_NOT_FOUND",
+     "sqlstate": "42P01",
+     "message": "[TABLE_OR_VIEW_NOT_FOUND] The table or view `probe_clause_temporary` cannot be found. Verify the spelling and correctness of the schema and catalog.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "clause_or_replace_new",
+   "group": "statement",
+   "steps": [
+    {
+     "statement": "CREATE OR REPLACE VIEW probe_clause_or_replace_new WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_clause_or_replace_new",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "select_measures",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT ROUND(MEASURE(conversion_rate), 4) AS conversion_rate, MEASURE(active_users) AS active_users, MEASURE(total_sessions) AS sessions FROM mv_base",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "0.0923",
+       "9994",
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "select_star",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT * FROM mv_base",
+     "ok": false,
+     "condition": "INTERNAL_ERROR",
+     "sqlstate": "XX000",
+     "message": "[INTERNAL_ERROR] The Spark SQL phase planning failed with an internal error. You hit a bug in Spark or the Spark plugins you use. Please, report this bug to the corresponding communities or vendors, and provide the full stack trace. SQLSTATE: XX000",
+     "type": "SparkException"
+    }
+   ]
+  },
+  {
+   "id": "measure_without_measure_fn",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT total_sessions FROM mv_base",
+     "ok": false,
+     "condition": "INTERNAL_ERROR",
+     "sqlstate": "XX000",
+     "message": "[INTERNAL_ERROR] The Spark SQL phase planning failed with an internal error. You hit a bug in Spark or the Spark plugins you use. Please, report this bug to the corresponding communities or vendors, and provide the full stack trace. SQLSTATE: XX000",
+     "type": "SparkException"
+    }
+   ]
+  },
+  {
+   "id": "dimension_without_group_by",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) FROM mv_base",
+     "ok": false,
+     "condition": "MISSING_GROUP_BY",
+     "sqlstate": "42803",
+     "message": "[MISSING_GROUP_BY] The query does not include a GROUP BY clause. Add GROUP BY or turn it into the window functions using OVER clauses. SQLSTATE: 42803; line 1 pos 0;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "dimension_only",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region FROM mv_base GROUP BY region ORDER BY region",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "metro"
+      ],
+      [
+       "remote"
+      ],
+      [
+       "rural"
+      ],
+      [
+       "suburban"
+      ],
+      [
+       "urban"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "source_column_not_dimension",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT user_id, MEASURE(total_sessions) FROM mv_base GROUP BY user_id",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `user_id` cannot be resolved. Did you mean one of the following? [`region`, `session_date`, `active_users`, `total_sessions`, `conversion_rate`]. SQLSTATE: 42703; line 1 pos 7;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "where_dimension",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM mv_base WHERE region = 'metro'",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "50000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "where_source_column",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM mv_base WHERE converted",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "7295"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "where_measure",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region FROM mv_base WHERE MEASURE(total_sessions) > 1000 GROUP BY region",
+     "ok": false,
+     "condition": "MISSING_ATTRIBUTES.RESOLVED_ATTRIBUTE_MISSING_FROM_INPUT",
+     "sqlstate": "XX000",
+     "message": "[MISSING_ATTRIBUTES.RESOLVED_ATTRIBUTE_MISSING_FROM_INPUT] Resolved attribute(s) \"total_sessions\" missing from \"session_id\", \"user_id\", \"converted\", \"region\", \"session_date\" in operator !Filter (measure(total_sessions#<id>) > cast(1000 as bigint)).  SQLSTATE: XX000; line 1 pos 0;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "having_measure",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) AS sessions FROM mv_base GROUP BY region HAVING MEASURE(total_sessions) > 1000 ORDER BY region",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `total_sessions` cannot be resolved. Did you mean one of the following? [`sessions`, `region`]. SQLSTATE: 42703; line 1 pos 95;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "having_alias",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) AS sessions FROM mv_base GROUP BY region HAVING sessions > 1000 ORDER BY region",
+     "ok": true,
+     "row_count": 3,
+     "rows": [
+      [
+       "metro",
+       "50000"
+      ],
+      [
+       "suburban",
+       "8000"
+      ],
+      [
+       "urban",
+       "20000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "order_by_alias",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) AS sessions FROM mv_base GROUP BY region ORDER BY sessions DESC",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "metro",
+       "50000"
+      ],
+      [
+       "urban",
+       "20000"
+      ],
+      [
+       "suburban",
+       "8000"
+      ],
+      [
+       "rural",
+       "800"
+      ],
+      [
+       "remote",
+       "200"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "order_by_selected_measure",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) FROM mv_base GROUP BY region ORDER BY MEASURE(total_sessions) DESC",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `total_sessions` cannot be resolved. Did you mean one of the following? [`region`, `measure(total_sessions)`]. SQLSTATE: 42703; line 1 pos 85;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "order_by_unselected_measure",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(conversion_rate) FROM mv_base GROUP BY region ORDER BY MEASURE(total_sessions) DESC",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `total_sessions` cannot be resolved. Did you mean one of the following? [`region`, `measure(conversion_rate)`]. SQLSTATE: 42703; line 1 pos 86;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "order_by_ordinal",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) FROM mv_base GROUP BY region ORDER BY 2 DESC",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "metro",
+       "50000"
+      ],
+      [
+       "urban",
+       "20000"
+      ],
+      [
+       "suburban",
+       "8000"
+      ],
+      [
+       "rural",
+       "800"
+      ],
+      [
+       "remote",
+       "200"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "order_by_unselected_dimension",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM mv_base GROUP BY region ORDER BY region",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "50000"
+      ],
+      [
+       "200"
+      ],
+      [
+       "800"
+      ],
+      [
+       "8000"
+      ],
+      [
+       "20000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "group_by_all",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT region, MEASURE(total_sessions) FROM mv_base GROUP BY ALL ORDER BY region",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "metro",
+       "50000"
+      ],
+      [
+       "remote",
+       "200"
+      ],
+      [
+       "rural",
+       "800"
+      ],
+      [
+       "suburban",
+       "8000"
+      ],
+      [
+       "urban",
+       "20000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "limit",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT session_date, MEASURE(active_users) FROM mv_base GROUP BY session_date ORDER BY session_date LIMIT 3",
+     "ok": true,
+     "row_count": 3,
+     "rows": [
+      [
+       "2026-06-01",
+       "2301"
+      ],
+      [
+       "2026-06-02",
+       "2328"
+      ],
+      [
+       "2026-06-03",
+       "2308"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "measure_in_expression",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT ROUND(MEASURE(conversion_rate) * 100, 1) AS percent FROM mv_base",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "9.2"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sum_of_daily_measure",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT SUM(active_users) FROM (SELECT session_date, MEASURE(active_users) AS active_users FROM mv_base GROUP BY session_date)",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "69420"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "average_of_region_measure",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT ROUND(AVG(rate), 4) FROM (SELECT region, MEASURE(conversion_rate) AS rate FROM mv_base GROUP BY region)",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "0.2384"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cte",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "WITH by_region AS (SELECT region, MEASURE(total_sessions) AS sessions FROM mv_base GROUP BY region) SELECT SUM(sessions) FROM by_region",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "join_on_dimension",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT m.region, MEASURE(m.total_sessions) FROM mv_base m JOIN (SELECT 'metro' AS region) r ON m.region = r.region GROUP BY m.region",
+     "ok": false,
+     "condition": "INTERNAL_ERROR",
+     "sqlstate": "XX000",
+     "message": "[INTERNAL_ERROR] UnevaluableAggregateFunc.aggBufferAttributes should not be called. SQLSTATE: XX000",
+     "type": "SparkException"
+    }
+   ]
+  },
+  {
+   "id": "aggregate_on_view",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT COUNT(*) FROM mv_base",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "measure_on_table",
+   "group": "query",
+   "steps": [
+    {
+     "statement": "SELECT MEASURE(converted) FROM sessions",
+     "ok": false,
+     "condition": "INTERNAL_ERROR",
+     "sqlstate": "XX000",
+     "message": "[INTERNAL_ERROR] UnevaluableAggregateFunc.aggBufferAttributes should not be called. SQLSTATE: XX000",
+     "type": "SparkException"
+    }
+   ]
+  },
+  {
+   "id": "dataframe_columns",
+   "group": "dataframe",
+   "steps": [
+    {
+     "statement": "spark.table('mv_base').columns",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "region"
+      ],
+      [
+       "session_date"
+      ],
+      [
+       "total_sessions"
+      ],
+      [
+       "conversion_rate"
+      ],
+      [
+       "active_users"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dataframe_group_by",
+   "group": "dataframe",
+   "steps": [
+    {
+     "statement": "groupBy('region').agg(F.expr('measure(total_sessions)'))",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "metro",
+       "50000"
+      ],
+      [
+       "remote",
+       "200"
+      ],
+      [
+       "rural",
+       "800"
+      ],
+      [
+       "suburban",
+       "8000"
+      ],
+      [
+       "urban",
+       "20000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dataframe_select_expr",
+   "group": "dataframe",
+   "steps": [
+    {
+     "statement": "selectExpr('round(measure(conversion_rate), 4)')",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "0.0923"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dataframe_where",
+   "group": "dataframe",
+   "steps": [
+    {
+     "statement": "where(\"region = 'metro'\").selectExpr('measure(total_sessions)')",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "50000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "dataframe_count",
+   "group": "dataframe",
+   "steps": [
+    {
+     "statement": "spark.table('mv_base').count()",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "create_existing",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_create_existing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "CREATE VIEW probe_create_existing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_ALREADY_EXISTS",
+     "sqlstate": "42P07",
+     "message": "[TABLE_OR_VIEW_ALREADY_EXISTS] Cannot create table or view `default`.`probe_create_existing` because it already exists.",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "or_replace_existing",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_or_replace_existing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "CREATE OR REPLACE VIEW probe_or_replace_existing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: unique_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "TABLE_OR_VIEW_ALREADY_EXISTS",
+     "sqlstate": "42P07",
+     "message": "[TABLE_OR_VIEW_ALREADY_EXISTS] Cannot create table or view `default`.`probe_or_replace_existing` because it already exists.",
+     "type": "AnalysisException"
+    },
+    {
+     "statement": "SELECT MEASURE(unique_users) FROM probe_or_replace_existing",
+     "ok": false,
+     "condition": "UNRESOLVED_COLUMN.WITH_SUGGESTION",
+     "sqlstate": "42703",
+     "message": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `unique_users` cannot be resolved. Did you mean one of the following? [`active_users`, `region`, `session_date`, `total_sessions`, `conversion_rate`]. SQLSTATE: 42703; line 1 pos 15;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "if_not_exists_existing",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_if_not_exists_existing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "CREATE VIEW IF NOT EXISTS probe_if_not_exists_existing WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: unique_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(active_users) FROM probe_if_not_exists_existing",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "9994"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "drop_view",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_drop_view WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "DROP VIEW probe_drop_view",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SHOW VIEWS LIKE 'probe_drop_view'",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    }
+   ]
+  },
+  {
+   "id": "drop_table",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_drop_table WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "DROP TABLE probe_drop_table",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SHOW VIEWS LIKE 'probe_drop_table'",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    }
+   ]
+  },
+  {
+   "id": "alter_as_select",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_alter_as_select WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "ALTER VIEW probe_alter_as_select AS SELECT region FROM sessions",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_alter_as_select",
+     "ok": false,
+     "condition": "INVALID_METRIC_VIEW_YAML",
+     "sqlstate": "42K0L",
+     "message": "[INVALID_METRIC_VIEW_YAML] Failed to parse metric view YAML: Failed to parse YAML: Cannot construct instance of `org.apache.spark.sql.metricview.serde.YAMLVersion` (although at least one Creator exists): no String-argument constructor/factory method to deserialize from String value ('SELECT region F",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "alter_with_metrics",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_alter_with_metrics WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "ALTER VIEW probe_alter_with_metrics WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: unique_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": false,
+     "condition": "PARSE_SYNTAX_ERROR",
+     "sqlstate": "42601",
+     "message": "[PARSE_SYNTAX_ERROR] Syntax error at or near 'LANGUAGE'. SQLSTATE: 42601 (line 1, pos 49)",
+     "type": "ParseException"
+    }
+   ]
+  },
+  {
+   "id": "rename",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_rename WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "ALTER VIEW probe_rename RENAME TO probe_renamed",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SELECT MEASURE(total_sessions) FROM probe_renamed",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "79000"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "set_tblproperties",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_set_tblproperties WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "ALTER VIEW probe_set_tblproperties SET TBLPROPERTIES ('team' = 'growth')",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SHOW TBLPROPERTIES probe_set_tblproperties",
+     "ok": true,
+     "row_count": 3,
+     "rows": [
+      [
+       "metric_view.from.name",
+       "sessions"
+      ],
+      [
+       "metric_view.from.type",
+       "ASSET"
+      ],
+      [
+       "team",
+       "growth"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "show_create_table",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_show_create_table WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SHOW CREATE TABLE probe_show_create_table",
+     "ok": false,
+     "condition": "UNSUPPORTED_SHOW_CREATE_TABLE.ON_METRIC_VIEW",
+     "sqlstate": "0A000",
+     "message": "[UNSUPPORTED_SHOW_CREATE_TABLE.ON_METRIC_VIEW] Unsupported a SHOW CREATE TABLE command. The command is not supported on a metric view `probe_show_create_table`. SQLSTATE: 0A000",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "show_views_and_tables",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_show_views_and_tables WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SHOW VIEWS LIKE 'probe_show_views*'",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "default",
+       "probe_show_views_and_tables",
+       "False"
+      ]
+     ]
+    },
+    {
+     "statement": "SHOW TABLES LIKE 'probe_show_views*'",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "default",
+       "probe_show_views_and_tables",
+       "False"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "show_columns",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_show_columns WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "SHOW COLUMNS IN probe_show_columns",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "region"
+      ],
+      [
+       "session_date"
+      ],
+      [
+       "total_sessions"
+      ],
+      [
+       "conversion_rate"
+      ],
+      [
+       "active_users"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "describe",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_describe WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "DESCRIBE TABLE probe_describe",
+     "ok": true,
+     "row_count": 5,
+     "rows": [
+      [
+       "region",
+       "string",
+       "None"
+      ],
+      [
+       "session_date",
+       "string",
+       "None"
+      ],
+      [
+       "total_sessions",
+       "bigint",
+       "None"
+      ],
+      [
+       "conversion_rate",
+       "double",
+       "None"
+      ],
+      [
+       "active_users",
+       "bigint",
+       "None"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "describe_extended",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_describe_extended WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "DESCRIBE TABLE EXTENDED probe_describe_extended",
+     "ok": true,
+     "row_count": 17,
+     "rows": [
+      [
+       "region",
+       "string",
+       "None"
+      ],
+      [
+       "session_date",
+       "string",
+       "None"
+      ],
+      [
+       "total_sessions",
+       "bigint",
+       "None"
+      ],
+      [
+       "conversion_rate",
+       "double",
+       "None"
+      ],
+      [
+       "active_users",
+       "bigint",
+       "None"
+      ],
+      [
+       "",
+       "",
+       ""
+      ],
+      [
+       "# Detailed Table Information",
+       "",
+       ""
+      ],
+      [
+       "Catalog",
+       "spark_catalog",
+       ""
+      ],
+      [
+       "Database",
+       "default",
+       ""
+      ],
+      [
+       "Table",
+       "probe_describe_extended",
+       ""
+      ],
+      [
+       "Created Time",
+       "<time>",
+       ""
+      ],
+      [
+       "Last Access",
+       "UNKNOWN",
+       ""
+      ],
+      [
+       "Created By",
+       "Spark 4.2.0",
+       ""
+      ],
+      [
+       "Type",
+       "METRIC_VIEW",
+       ""
+      ],
+      [
+       "View Text",
+       "\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n",
+       ""
+      ],
+      [
+       "Language",
+       "YAML",
+       ""
+      ],
+      [
+       "Table Properties",
+       "[metric_view.from.name=sessions, metric_view.from.type=ASSET]",
+       ""
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "describe_json",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_describe_json WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "DESCRIBE TABLE EXTENDED probe_describe_json AS JSON",
+     "ok": true,
+     "row_count": 1,
+     "rows": [
+      [
+       "{\"table_name\":\"probe_describe_json\",\"catalog_name\":\"spark_catalog\",\"namespace\":[\"default\"],\"schema_name\":\"default\",\"columns\":[{\"name\":\"region\",\"type\":{\"name\":\"string\",\"collation\":\"UTF8_BINARY\"},\"nullable\":true},{\"name\":\"session_date\",\"type\":{\"name\":\"string\",\"collation\":\"UTF8_BINARY\"},\"nullable\":true},{\"name\":\"total_sessions\",\"type\":{\"name\":\"bigint\"},\"nullable\":false},{\"name\":\"conversion_rate\",\"type\":{\"name\":\"double\"},\"nullable\":true},{\"name\":\"active_users\",\"type\":{\"name\":\"bigint\"},\"nullable\":false}],\"created_time\":\"<time>\",\"last_access\":\"UNKNOWN\",\"created_by\":\"Spark 4.2.0\",\"type\":\"METRIC_VIEW\",\"view_text\":\"\\nversion: 0.1\\nsource: sessions\\ndimensions:\\n  - name: region\\n    expr: region\\n  - name: session_date\\n    expr: session_date\\nmeasures:\\n  - name: total_sessions\\n    expr: COUNT(1)\\n  - name: conversion_rate\\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\\n  - name: active_users\\n    expr: COUNT(DISTINCT user_id)\\n\",\"language\":\"YAML\",\"table_properties\":{\"metric_view.from.name\":\"sessions\",\"metric_view.from.type\":\"ASSET\"},\"view_creation_spark_configuration\":{\"spark.sql.artifact.isolation.enabled\":\"true\",\"spark.sql.session.timeZone\":\"Etc/UTC\",\"spark.sql.ansi.enabled\":\"true\",\"spark.sql.artifact.isolation.alwaysApplyClassloader\":\"true\"},\"collation\":\"UTF8_BINARY\"}"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "insert_into",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_insert_into WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "INSERT INTO probe_insert_into VALUES ('metro', '2026-06-01')",
+     "ok": false,
+     "condition": "UNSUPPORTED_INSERT.RDD_BASED",
+     "sqlstate": "42809",
+     "message": "[UNSUPPORTED_INSERT.RDD_BASED] Can't insert into the target. An RDD-based table is not allowed. SQLSTATE: 42809;",
+     "type": "AnalysisException"
+    }
+   ]
+  },
+  {
+   "id": "catalog_list_tables",
+   "group": "lifecycle",
+   "steps": [
+    {
+     "statement": "CREATE VIEW probe_catalog_list_tables WITH METRICS LANGUAGE YAML AS $$\nversion: 0.1\nsource: sessions\ndimensions:\n  - name: region\n    expr: region\n  - name: session_date\n    expr: session_date\nmeasures:\n  - name: total_sessions\n    expr: COUNT(1)\n  - name: conversion_rate\n    expr: SUM(CAST(converted AS INT)) / COUNT(1)\n  - name: active_users\n    expr: COUNT(DISTINCT user_id)\n$$",
+     "ok": true,
+     "row_count": 0,
+     "rows": []
+    },
+    {
+     "statement": "spark.catalog.listTables()",
+     "ok": true,
+     "row_count": 3,
+     "rows": [
+      [
+       "mv_base",
+       "VIEW",
+       "False"
+      ],
+      [
+       "probe_catalog_list_tables",
+       "VIEW",
+       "False"
+      ],
+      [
+       "sessions",
+       "EXTERNAL",
+       "False"
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

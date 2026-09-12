@@ -1,0 +1,54 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup: create the Python environments (make setup)",
+      "type": "shell",
+      "command": "make setup",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Data: generate the dataset (make data)",
+      "type": "shell",
+      "command": "make data",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Server: start (make up)",
+      "type": "shell",
+      "command": "make up",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Server: stop (make down)",
+      "type": "shell",
+      "command": "make down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Probe: record metric view behavior (make probe)",
+      "type": "shell",
+      "command": "make probe",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Video: export the teleprompter scripts (make teleprompter)",
+      "type": "shell",
+      "command": "make teleprompter",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Documents: check references and style (make check)",
+      "type": "shell",
+      "command": "make check",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}

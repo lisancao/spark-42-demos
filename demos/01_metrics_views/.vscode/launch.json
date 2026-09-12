@@ -1,0 +1,146 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "1. Generate the dataset",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/generate_data.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "2. Doctor",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/doctor.py",
+      "args": ["--expect-version", "4.2"],
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "3. Example 01, average of ratios",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01_average_of_ratios.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "4. Example 02, summing distinct counts",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/02_summing_distinct_counts.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "5. Example 03, create a metric view",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/03_create_metric_view.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "6. Example 04, measures at every grain",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/04_measure_at_every_grain.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "7. Example 05, what it does not prevent",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/05_what_it_does_not_prevent.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "8. Example 06, definition rules",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/06_definition_rules.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "9. Example 07, view lifecycle",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/07_view_lifecycle.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "10. Example 08, modeled source",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/08_modeled_source.py",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Probe: compare the recorded runs",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/grammar_probe/probe.py",
+      "args": ["--report"],
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Tests: unit",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/unit"],
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Tests: Spark on Classic",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/spark"],
+      "python": "${workspaceFolder}/.venv-full/bin/python",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Tests: Spark and Connect on Spark Connect",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/spark", "tests/connect"],
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+<defs>
+  <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="#d8dee4" opacity="0.6"/>
+  </pattern>
+  
+</defs>
+<rect x="0" y="0" width="1920" height="1080" fill="#f6f8fa"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#d9531a"/>
+  <line x1="40" y1="100" x2="40" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="40" x2="100" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="100" x2="1880" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="40" x2="1820" y2="40" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="980" x2="40" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="1040" x2="100" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="980" x2="1880" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="1040" x2="1820" y2="1040" stroke="#d9531a" stroke-width="3" opacity="0.35"/>
+<text x="80" y="104" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="48" fill="#1f2328" text-anchor="start" font-weight="700">Anatomy of a Metric View</text>
+  <text x="80" y="150" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#57606a" text-anchor="start">CREATE VIEW ... WITH METRICS in Apache Spark 4.2.0</text>
+  <rect x="80" y="220" width="940" height="560" rx="12" fill="#eef1f4" stroke="#d0d7de" stroke-width="2"/>
+  <text x="110.0" y="260" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#b5400e">CREATE VIEW</tspan><tspan fill="#1f2328"> delivery_metrics</tspan></text>
+  <text x="138.8" y="290" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#b5400e">WITH METRICS</tspan></text>
+  <text x="138.8" y="320" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#b5400e">LANGUAGE YAML</tspan></text>
+  <text x="110.0" y="350" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#b5400e">AS</tspan><tspan fill="#1f2328"> $$</tspan></text>
+  <text x="110.0" y="380" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">version</tspan><tspan fill="#1f2328">: 0.1</tspan></text>
+  <text x="110.0" y="410" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">source</tspan><tspan fill="#1f2328">: sessions</tspan></text>
+  <text x="110.0" y="440" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">dimensions</tspan><tspan fill="#1f2328">:</tspan></text>
+  <text x="138.8" y="470" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#1f2328">- </tspan><tspan fill="#6639ba">name</tspan><tspan fill="#1f2328">: region</tspan></text>
+  <text x="167.6" y="500" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">expr</tspan><tspan fill="#1f2328">: region</tspan></text>
+  <text x="138.8" y="530" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#1f2328">- </tspan><tspan fill="#6639ba">name</tspan><tspan fill="#1f2328">: session_date</tspan></text>
+  <text x="167.6" y="560" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">expr</tspan><tspan fill="#1f2328">: session_date</tspan></text>
+  <text x="110.0" y="590" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">measures</tspan><tspan fill="#1f2328">:</tspan></text>
+  <text x="138.8" y="620" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#1f2328">- </tspan><tspan fill="#6639ba">name</tspan><tspan fill="#1f2328">: conversion_rate</tspan></text>
+  <text x="167.6" y="650" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">expr</tspan><tspan fill="#1f2328">: SUM(CAST(converted AS INT)) / COUNT(1)</tspan></text>
+  <text x="138.8" y="680" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#1f2328">- </tspan><tspan fill="#6639ba">name</tspan><tspan fill="#1f2328">: active_users</tspan></text>
+  <text x="167.6" y="710" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#6639ba">expr</tspan><tspan fill="#1f2328">: COUNT(DISTINCT user_id)</tspan></text>
+  <text x="110.0" y="740" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328"><tspan fill="#1f2328">$$</tspan></text>
+  <line x1="1020" y1="282" x2="1120" y2="258.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="220" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="250" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">WITH METRICS</text>
+  <text x="1144" y="278" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">Makes the view a metric view</text>
+  <line x1="1020" y1="312" x2="1120" y2="352.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="314" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="344" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">LANGUAGE YAML</text>
+  <text x="1144" y="372" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">Required; YAML is the only language</text>
+  <line x1="1020" y1="342" x2="1120" y2="446.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="408" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="438" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">$$ ... $$</text>
+  <text x="1144" y="466" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">The definition is a dollar-quoted string</text>
+  <line x1="1020" y1="372" x2="1120" y2="540.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="502" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="532" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">version</text>
+  <text x="1144" y="560" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">Only 0.1 is accepted in Spark 4.2.0</text>
+  <line x1="1020" y1="402" x2="1120" y2="634.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="596" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="626" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">source</text>
+  <text x="1144" y="654" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">A table, a view or a SQL query, but not a temporary view</text>
+  <line x1="1020" y1="432" x2="1120" y2="728.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="690" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="720" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">dimensions</text>
+  <text x="1144" y="748" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">Columns that a query groups or filters by</text>
+  <line x1="1020" y1="582" x2="1120" y2="822.0" stroke="#57606a" stroke-width="1"/>
+  <rect x="1120" y="784" width="720" height="76" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <text x="1144" y="814" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#1f2328" text-anchor="start">measures</text>
+  <text x="1144" y="842" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="22" fill="#57606a" text-anchor="start">Aggregate expressions, evaluated at each query's grain</text>
+  <rect x="80" y="900" width="1760" height="94" fill="#ffeef0" stroke="#c5202c" stroke-width="2" stroke-opacity="0.6"/>
+  <text x="120" y="935" font-size="24" fill="#1f2328"><tspan fill="#1f2328">Each dimension and measure has only </tspan><tspan fill="#1f2328" font-family="Consolas, 'Courier New', monospace">name</tspan><tspan fill="#1f2328"> and </tspan><tspan fill="#1f2328" font-family="Consolas, 'Courier New', monospace">expr</tspan><tspan fill="#1f2328">.</tspan></text>
+  <text x="120" y="969" font-size="24" fill="#1f2328"><tspan fill="#1f2328">Other keys, such as </tspan><tspan fill="#1f2328" font-family="Consolas, 'Courier New', monospace">joins</tspan><tspan fill="#1f2328">, </tspan><tspan fill="#1f2328" font-family="Consolas, 'Courier New', monospace">fields</tspan><tspan fill="#1f2328"> or </tspan><tspan fill="#1f2328" font-family="Consolas, 'Courier New', monospace">display_name</tspan><tspan fill="#1f2328">, fail with </tspan><tspan fill="#1f2328" font-family="Consolas, 'Courier New', monospace">INVALID_METRIC_VIEW_YAML</tspan><tspan fill="#1f2328">.</tspan></text>
+  <text x="80" y="1046" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#57606a" text-anchor="start">Source: blog post §4, Table 4-1; definition shortened from examples/03_create_metric_view.py</text>
+</svg>
