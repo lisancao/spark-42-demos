@@ -54,5 +54,5 @@
   <text x="960" y="895" font-size="26" fill="#e6edf3" text-anchor="middle">Arrow IPC stream</text>
   <line x1="1720" y1="920" x2="200" y2="920" stroke="#8957e5" stroke-width="3" marker-end="url(#arrowPurple)"/>
 
-  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#xa7;2, Figure 2-1</text>
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: blog post &#xa7;2, Figure 2-2</text>
 </svg>

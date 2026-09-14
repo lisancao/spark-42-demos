@@ -4,7 +4,7 @@ This document walks through the migration of a small pipeline from Spark Classic
 `pipeline_before.py` runs on Spark Classic and is submitted with `spark-submit`. `pipeline_after.py`
 runs the same pipeline over Spark Connect as an ordinary Python program. The two files differ in one
 place for each of the seven migration layers described in §9 of the
-[companion guide](../companion_guide.md), and both call the transformations in `lib/transforms.py`
+[blog post](../blog_spark_connect.md), and both call the transformations in `lib/transforms.py`
 unchanged.
 
 The pipeline is small so that it runs in seconds on the cluster in `compose.yaml`. The same layers
@@ -78,7 +78,7 @@ every call into `lib/transforms.py` and the loop that writes the tables, is iden
 
 ### Layer 0: Session Creation
 
-`build_session()` is the function shown for Layer 0 in the companion guide. When `SPARK_REMOTE` is
+`build_session()` is the function shown for Layer 0 in the blog post. When `SPARK_REMOTE` is
 set, it returns a Spark Connect session. When `SPARK_API_MODE=connect` is set instead, it sets
 `spark.api.mode`. With neither, it returns a Spark Classic session, so the migrated file can still
 run the way the original did.
@@ -111,7 +111,7 @@ server cannot be determined from the source.
 it; `pipeline_after.py` sets it with `spark.conf.set()` once the session exists.
 `enableHiveSupport()` is removed. Under Spark Connect it does not raise, but it has no effect:
 `spark.sql.catalogImplementation` is a static setting of the server and remains `in-memory`
-(companion guide §7).
+(blog post §7).
 
 ### Layer 4: Dependencies
 
@@ -147,7 +147,7 @@ in the volume that the worker and the Connect server share.
 ### Layer 6: Security and Identity
 
 This pipeline reads local files and holds no credentials, so the only change is that `make pipeline`
-adds `user_agent=orders-pipeline` to the connection string (companion guide §5). The case study
+adds `user_agent=orders-pipeline` to the connection string (blog post §5). The case study
 shows the Layer 6 change for a pipeline whose catalog credentials move from every node to the
 Connect server.
 
@@ -174,8 +174,8 @@ which this pipeline does not produce.
 
 ## Verifying Parity
 
-`parity.py` compares each table on its schema, its row count and an order-independent content hash
-(companion guide §12). The row counts alone would miss a table with the right number of rows and
+`parity.py` compares each table on its schema, its row count and an order-independent content hash.
+The row counts alone would miss a table with the right number of rows and
 different values. `make pipeline` reported `7/7 tables identical` on four runs, and
 `tests/spark/test_parity.py` constructs each difference the comparison must detect.
 

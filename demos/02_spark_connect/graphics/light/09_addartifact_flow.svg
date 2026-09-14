@@ -78,5 +78,5 @@
   <text x="110" y="940" font-size="26" fill="#1f2328">classes named in spark.sql.extensions</text>
   <text x="990" y="940" font-size="26" fill="#1f2328">transitive JAR dependencies are not resolved</text>
 
-  <text x="80" y="1046" font-size="20" fill="#57606a">Source: companion guide &#x00A7;9, Table 9-4; examples/08_add_artifact.py</text>
+  <text x="80" y="1046" font-size="20" fill="#57606a">Source: blog post &#x00A7;9, Table 9-4; examples/08_add_artifact.py</text>
 </svg>

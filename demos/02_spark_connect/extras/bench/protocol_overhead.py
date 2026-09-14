@@ -6,7 +6,8 @@
         --out connect.json
     python extras/bench/protocol_overhead.py --compare classic.json connect.json
 
-Scope, method and results: companion guide §13 (single node, loopback, one client).
+Scope: one machine, loopback networking and one client. The JSON files in this directory are the
+recorded runs.
 """
 
 from __future__ import annotations

@@ -2,7 +2,7 @@
 
     python examples/02_first_query.py
 
-Companion guide §2, "Observing the Division of Labor".
+Blog post §2, "Observing the Division of Labor".
 """
 import os
 

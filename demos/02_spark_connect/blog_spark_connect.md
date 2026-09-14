@@ -1,19 +1,21 @@
-# Companion Guide: Spark Connect in Apache Spark 4.2
+# Spark Connect in Apache Spark 4.2: How It Works and How to Adopt It
 
-**Purpose:** A reference on Spark Connect in Apache Spark 4.2: why it exists, how it works, and how
-to adopt it, including how to migrate an existing PySpark pipeline. Written for engineers who
-already run Spark and want to understand the architecture before they change it. Every claim is
-cited.
+Spark Connect separates a Spark application from the Spark driver. The application builds a
+DataFrame plan and sends it to a server, which runs it and streams the results back as Arrow. This
+post covers why Spark adopted that design, how it works, how to adopt it (including how to migrate
+an existing PySpark pipeline) and what it takes to build and use a Connect client. It is written for
+engineers who already run Spark and want to understand the architecture before they change it.
+Every claim is cited.
 
 > Verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-09: an official
 > `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` Connect server driven by
 > `pyspark-client==4.2.0`.
 
-Claims in this guide carry one of three levels of provenance:
+Claims in this post carry one of three levels of provenance:
 
 - **Unmarked**: reproduced against a live 4.2.0 server, or read from the shipped
-  `pyspark-client==4.2.0` source. Package sizes, error classes, configuration defaults, API behaviors
-  and the performance figures in §13 are in this category.
+  `pyspark-client==4.2.0` source. Package sizes, error classes, configuration defaults and API
+  behaviors are in this category.
 - **Per the documentation**: taken from the Spark documentation or a JIRA issue and cited, but not
   exercised here.
 - **Untested here**: an environment that was not available for testing (Kubernetes, YARN), or a
@@ -34,10 +36,7 @@ Claims in this guide carry one of three levels of provenance:
 9. [Migrating an Existing Pipeline](#9-migrating-an-existing-pipeline)
 10. [Upgrading from PySpark 4.1 to 4.2](#10-upgrading-from-pyspark-41-to-42)
 11. [Operating Spark Connect](#11-operating-spark-connect)
-12. [Auditing and Verifying a Migration](#12-auditing-and-verifying-a-migration)
-13. [Performance](#13-performance)
-14. [Scope of This Guide](#14-scope-of-this-guide)
-15. [References](#15-references)
+12. [Building and Using a Spark Connect Client](#12-building-and-using-a-spark-connect-client)
 
 ---
 
@@ -60,23 +59,7 @@ controls. Per the PySpark documentation, "on the driver side, PySpark communicat
 on JVM by using Py4J": a bridge that lets Python call methods on JVM objects directly over a local
 socket.
 
-```
-Spark Classic                                  Spark Connect
-
- Application host                               Application host
-┌───────────────────────────────┐              ┌──────────────────────┐
-│ Python process                │              │ Python process       │
-│   PySpark API                 │              │   PySpark API        │
-│        │ Py4J (local socket)  │              │   (no JVM)           │
-│        ▼                      │              └──────────┬───────────┘
-│ JVM: Spark driver             │                         │ gRPC
-│   SparkContext, scheduler,    │              ┌──────────▼───────────┐
-│   catalogs, JARs              │              │ Spark Connect server │
-└───────────────┬───────────────┘              │ (the Spark driver)   │
-                │                              └──────────┬───────────┘
-            executors                                     │
-                                                      executors
-```
+![Two panels. In Spark Classic, a Python process on the application host calls the Spark driver JVM on the same host through Py4J, and the driver schedules executors. In Spark Connect, the Python process has no JVM and reaches a Spark Connect server on a separate host over gRPC; the server is the driver and schedules executors.](graphics/blog/fig1-1_classic_vs_connect.png)
 
 *Figure 1-1. The application and the driver in Spark Classic and Spark Connect*
 
@@ -120,7 +103,7 @@ The server resolves it, optimizes it with Catalyst, and executes it exactly as i
 locally. The Spark documentation compares this to "parsing a SQL query, where attributes and
 relations are parsed and an initial parse plan is built."
 
-Using the plan as the protocol has three consequences that recur throughout this guide:
+Using the plan as the protocol has three consequences that recur throughout this post:
 
 - **The client needs no JVM.** Building a plan is pure data manipulation, so a client can be written
   in any language that can produce the protocol messages.
@@ -183,6 +166,10 @@ domains, or a different Spark version on the server) requires separate servers r
 sessions: every session on a server runs on that server's Spark build. The client library connecting
 to it is a separate matter, described in "Client and Server Versions" below.
 
+![Two notebook kernels and a CI job, each connected over gRPC to its own session on one Spark Connect server. Each session holds its own temporary views, session configuration, current catalog and artifacts. The JVM and its memory, the executors, the Spark version and the installed JARs are shared by every session.](graphics/blog/fig2-1_sessions_on_a_server.png)
+
+*Figure 2-1. One Connect server, with one isolated session for each client*
+
 ### Client and Server Versions
 
 Separating the client from the driver makes their versions separable. The Spark Connect overview
@@ -202,7 +189,7 @@ Three limits apply in practice:
 - **Python versions remain coupled.** Independently of the Spark version, Python UDFs require the
   client and executors to use the same Python minor version (§7).
 
-The rest of this guide uses 4.2.0 on both sides. To show what a version difference looks like in
+The rest of this post uses 4.2.0 on both sides. To show what a version difference looks like in
 practice, `make matrix` runs fourteen operations in each direction between Spark 4.1.2 and 4.2.0.
 Table 2-1 summarizes the two mixed pairings. It is a sample, not a compatibility matrix: an operation
 that works here can still fail on a feature or setting the sample does not exercise.
@@ -238,26 +225,11 @@ DataFrames built with `spark.sql()` or `spark.range()` work.
 
 ### Plan In, Arrow Out
 
-Figure 2-1 follows a single query from client to server and back.
+Figure 2-2 follows a single query from client to server and back.
 
-```
-Client (Python, no JVM)                   Server (JVM)
-────────────────────────                  ─────────────────────
-df = spark.table("iceberg.silver.orders")
-   │
-   ├─ build an unresolved logical plan
-   ├─ serialize it as Protocol Buffers
-   │
-   └─ ExecutePlan ───── gRPC/HTTP-2 ────▶ receive the plan
-                                           │
-                                           ├─ resolve names against the catalog
-                                           ├─ optimize with Catalyst
-                                           ├─ execute
-                                           └─ encode results as Arrow record batches
-   build the result  ◀──── Arrow IPC ───── stream batches back
-```
+![Sequence diagram. The client, a Python process with no JVM, builds an unresolved logical plan, serializes it as Protocol Buffers and sends it with ExecutePlan over gRPC. The server resolves names against the catalog, optimizes with Catalyst, executes the plan and streams Arrow record batches back, and the client assembles the result.](graphics/blog/fig2-2_plan_in_arrow_out.png)
 
-*Figure 2-1. The path of a query through Spark Connect*
+*Figure 2-2. The path of a query through Spark Connect*
 
 Because the plan is unresolved, the client does not know whether `iceberg.silver.orders` exists,
 what columns it has, or which catalog serves it. It sends the name, and the server resolves it. This
@@ -405,6 +377,10 @@ The reduction in the last row is smaller because `pyarrow` (154 MB), `pandas` (6
 client's own `pyspark/` directory. The accurate description of `pyspark-client` is that it requires
 no JVM, no JDK and no Spark JARs; it does not produce a small environment.
 
+![Stacked bars. The pyspark[connect] environment is 820 MB: 25 MB of pyspark/ without JARs, 456 MB of Spark JARs and 339 MB of required dependencies. The pyspark-client environment is 359 MB: 19 MB of pyspark/ and 340 MB of required dependencies.](graphics/blog/fig3-1_environment_size.png)
+
+*Figure 3-1. The two environments by component. The dependencies are the same size in both; the difference is the Spark JARs*
+
 Two notes apply when reproducing these figures. The environment sizes include runtime dependencies
 only. This project's environments also contain development tools (pytest and ruff): `.venv` measures
 396 MB and `.venv-full` 857 MB. Second, plain `pyspark` installs neither pandas nor PyArrow (483 MB),
@@ -483,7 +459,7 @@ command:
 | `spark.sql.connect.enrichError.enabled` | true | 4.0.0 |
 
 Both `binding.host` and `binding.address` are registered configurations; a live 4.2.0 server returns
-a value for each. `binding.host` is the one used in the Spark documentation and in this guide. With
+a value for each. `binding.host` is the one used in the Spark documentation and in this post. With
 neither setting, a 4.2.0 server listens on all interfaces: started from the official image with no
 binding configuration, it listened on `[::]:15002`. Set `binding.host` to `127.0.0.1` to accept only
 local connections, or to the address of a specific interface.
@@ -544,6 +520,10 @@ A Spark Connect connection string has the following form:
 ```
 sc://host:port/;param1=value1;param2=value2
 ```
+
+![The connection string sc://connect.example.com:443/;token=TOKEN;user_agent=orders-pipeline, divided into the scheme sc://, the host, the port (default 15002), a path that must be empty, and name=value parameters that each follow a semicolon.](graphics/blog/fig5-1_connection_string.png)
+
+*Figure 5-1. The parts of a connection string*
 
 The scheme is fixed, the path component must be empty, and parameter names are case-sensitive.
 Table 5-1 lists the parameters.
@@ -635,8 +615,13 @@ supports two practices:
 
 - **Reversible, per-job migration.** Move one job, observe it, and move it back if necessary, with no
   branch and no second copy of the code.
-- **Comparison in CI.** Run the same job in both modes and compare the outputs. §12 describes how to
-  make that comparison meaningful.
+- **Comparison in CI.** Run the same job in both modes and compare the outputs.
+  `pipeline/parity.py` compares each table's schema, row count and an order-independent content
+  hash, so a changed join that keeps the row count is still detected.
+
+![job.py, unchanged, passes through spark.api.mode. The classic value, the default, runs Spark Classic with Py4J to the driver JVM. The connect value makes Spark start a Connect server and run the job as its client. The command shown is spark-submit --master spark://host:7077 --conf spark.api.mode=connect job.py.](graphics/blog/fig6-1_api_mode.png)
+
+*Figure 6-1. One job, and one configuration value that selects its execution path*
 
 **Citations:** [Application Development with Spark Connect](https://spark.apache.org/docs/latest/app-dev-spark-connect.html), [Configuration](https://spark.apache.org/docs/latest/configuration.html), [SPARK-50411](https://issues.apache.org/jira/browse/SPARK-50411)
 
@@ -801,7 +786,9 @@ because Spark 4.1 does not enable that setting by default.
 ### Checking Compatibility
 
 Apache Spark does not ship a Connect compatibility checker. The official mechanism is the "Supports
-Spark Connect" label in the API reference. §12 describes a static audit included with this project.
+Spark Connect" label in the API reference. This project includes a static audit,
+`tools/compat_audit.py`, which parses Python source with the `ast` module and reports calls that
+raise under Connect, calls whose behavior differs from Classic, and schema access inside loops.
 
 **Citations:** [Spark Connect Overview](https://spark.apache.org/docs/latest/spark-connect-overview.html), [session.py @ v4.2.0](https://github.com/apache/spark/blob/v4.2.0/python/pyspark/sql/connect/session.py), [dataframe.py @ v4.2.0](https://github.com/apache/spark/blob/v4.2.0/python/pyspark/sql/connect/dataframe.py), [SPARK-55227](https://issues.apache.org/jira/browse/SPARK-55227), [SPARK-55239](https://issues.apache.org/jira/browse/SPARK-55239), [DataFrame.observe](https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.observe.html)
 
@@ -852,6 +839,10 @@ first = spark.table("brands")
 b.createOrReplaceTempView("brands")
 first.count()     # Classic: rows of a    Connect: rows of b
 ```
+
+![Four lines of code register a as the view brands, build first from brands, replace brands with b, and count first. In Spark Classic, first holds the plan of a, captured at line 2, so the count is of a. In Spark Connect, first holds only the name brands, which resolves to b when line 4 runs.](graphics/blog/fig8-1_temp_view_resolution.png)
+
+*Figure 8-1. What a DataFrame built on a temporary view holds in each mode*
 
 To avoid this, give each temporary view a unique name (appending a UUID is sufficient), or
 materialize the DataFrame before the view is replaced.
@@ -979,7 +970,7 @@ example, one line of 357 fails under Connect:
 self._spark.sparkContext.setLogLevel("WARN")   # raises under Connect
 ```
 
-Across the 24 files of the `lakehouse-stack/scripts/` tree, the audit described in §12 finds 21
+Across the 24 files of the `lakehouse-stack/scripts/` tree, the static audit from §7 finds 21
 blocking findings, all of them this same call, and no RDD operations, Py4J access or accumulators.
 
 Code that inspects itself is also unaffected. The framework in the worked example infers table
@@ -1000,8 +991,8 @@ calls, a text search is a starting point:
 grep -rn "sparkContext\|\.rdd\|_jvm\|_jsc\|_jdf\|enableHiveSupport" .
 ```
 
-A text search cannot detect a temporary view registered twice or schema access inside a loop; §12
-describes a static audit that can.
+A text search cannot detect a temporary view registered twice or schema access inside a loop;
+`tools/compat_audit.py` can, because it parses the source instead of matching text.
 
 ### Layer 2: Data Sources and Catalogs
 
@@ -1114,6 +1105,10 @@ that can fail: assert that the UDF fails before the artifact is added and succee
 same session. A test that checks only the successful case also passes on a server that already has
 the module installed.
 
+![Client on the left, server on the right. spark.sql.shuffle.partitions reaches the session configuration, and addArtifact reaches the executors' PYTHONPATH. spark.sql.extensions is refused with a CANNOT_MODIFY_STATIC_CONFIG warning, and spark.jars cannot change the class path. Catalog and extension JARs, classes named in spark.sql.extensions and native libraries are fixed when the server starts.](graphics/blog/fig9-1_client_server_boundary.png)
+
+*Figure 9-1. What a client can change on the server, and what must be installed on it (Layers 3 and 4)*
+
 ### Layer 5: Execution and Operations
 
 Job submission, log locations and server lifecycle change in this layer.
@@ -1180,6 +1175,10 @@ follows their dependencies instead:
 5. **Layer 5.** Relocate logging and checkpoints, and retire submission wrappers.
 6. **Layer 6.** Remove credentials from clients. This step is last because, unlike the others, it is
    not easily reversed.
+
+![Six steps in order. One: Layers 2 and 3, configure the server and run a preflight check. Two: Layer 0, point one job at it with spark.api.mode. Three: Layer 1, audit and fix. Four: Layer 4, addArtifact. Five: Layer 5, logging, checkpoints and submission wrappers. Six: Layer 6, remove credentials from clients. Steps one to five are easily reversed; step six is not, so it comes last.](graphics/blog/fig9-2_migration_order.png)
+
+*Figure 9-2. The order in which to carry out the layers*
 
 Keep any Spark version upgrade separate from the migration to Connect. The upgrade changes in §10
 are easier to diagnose when they are not combined with a change of architecture.
@@ -1272,195 +1271,273 @@ JDK 17 and 21 are not affected.
 
 ---
 
-## 12. Auditing and Verifying a Migration
+## 12. Building and Using a Spark Connect Client
 
-Apache Spark provides no Connect compatibility checker (§7), and a successful run does not show that
-a migration preserved behavior. This section describes the two tools this project uses for those
-purposes: a static audit, and a comparison of output data.
+Every example so far has used the Python client, but the client is not what makes Spark Connect
+work; the protocol is. Any program that can build the protocol's messages and call its gRPC service
+is a Spark client, in any language and with no JVM. This section describes what a client implements,
+lists the clients that exist, and works through one of them: the Rust client, handing its results to
+Polars.
 
-### A Static Audit
+### What a Client Implements
 
-`tools/compat_audit.py` parses Python source with the `ast` module and classifies
-each finding by severity (Table 12-1). Each finding also records its migration layer from §9, so the
-output maps onto a migration plan.
+The protocol is defined as Protocol Buffers files in the Spark source, under
+`sql/connect/common/src/main/protobuf/spark/connect/`. Table 12-1 lists the files a DataFrame client
+works with.
 
-*Table 12-1. Audit severities*
+*Table 12-1. Spark Connect protocol files at v4.2.0*
 
-| Severity | Meaning |
+| File | Defines |
 |---|---|
-| `BLOCKER` | Raises at run time under Connect |
-| `BEHAVIOR` | Runs, but differs from Classic in result or in when an error is raised |
-| `PERF` | Correct, but makes a remote call on each loop iteration |
+| `base.proto` | The `SparkConnectService` RPCs (Table 2-2), `Plan`, and every request and response message |
+| `relations.proto` | `Relation`, the logical plan tree: `Read`, `Project`, `Filter`, `Join`, `Aggregate`, `Sort`, `SQL`, `LocalRelation` and others |
+| `expressions.proto` | `Expression`: literals, unresolved attributes and functions, aliases, casts, sort orders, windows and UDFs |
+| `commands.proto` | `Command`: writes, SQL commands, streaming operations, UDF registration, checkpoints and others |
+| `types.proto` | `DataType` |
+| `catalog.proto` | Catalog operations, expressed as relations |
 
-Run against the `lakehouse-stack/scripts/` tree:
+The same directory holds `common.proto`, `ml.proto`, `ml_common.proto` and `pipelines.proto`.
 
-```
-$ python tools/compat_audit.py ~/lakehouse-stack/scripts --fail-on NONE
-...
-27 finding(s): 21 BLOCKER, 1 BEHAVIOR, 5 PERF
-```
+Running a query takes four steps, all defined in `base.proto`:
 
-The 21 blocking findings are all the `setLogLevel` call from §9. The remaining six depend on program
-structure, and a text search cannot detect them:
+1. **Build a `Plan`.** Its `op_type` is a `Relation` tree for a query, or a `Command` for an operation
+   with side effects.
+2. **Send an `ExecutePlanRequest`.** It carries the plan, a `session_id` that the client chooses, and
+   a `user_context`. An `operation_id` is optional: if the client does not provide one, the server
+   generates it. `client_type` identifies the client in server logs.
+3. **Read the `ExecutePlanResponse` stream.** Result rows arrive in `arrow_batch` responses, each
+   holding serialized Arrow data. The result `schema`, the `metrics` (typically in the last response)
+   and any `observed_metrics` arrive in the same stream.
+4. **Finish the execution.** A reattachable execution ends with a `result_complete` response. If the
+   stream closes before it arrives, the client calls `ReattachExecute` to continue from the last
+   response it received, and it calls `ReleaseExecute` once it has consumed the results.
 
-```
-spark_cluster_diagnostic.py:242  [BEHAVIOR/L1]  temp view 'brands' registered 2 times
-mlflow-agents/analyst.py:79      [PERF/L1]       .schema inside a loop
-mlflow-agents/autopilot.py:115   [PERF/L1]       .columns inside a loop
-mlflow-agents/guardian.py:139    [PERF/L1]       .columns inside a loop
-otf_portability.py:62            [PERF/L1]       .schema inside a loop
-iceberg-spark-quickstart.py:131  [PERF/L1]       .schema inside a loop
-```
+A usable client wraps that core with the other RPCs in Table 2-2: `AnalyzePlan` for schemas and
+`explain()`, `Config`, `FetchErrorDetails` for structured errors, `AddArtifacts`, `Interrupt` and
+`ReleaseSession`. Figure 12-1 shows the resulting structure, with the Rust client as the example.
 
-The first is a correctness issue that exists only under Connect (§8). The other five make an
-`AnalyzePlan` call on each loop iteration.
+![A program's DataFrame calls go to a plan builder, which produces Relation and Expression messages. A gRPC transport, which manages the session ID, retries, reattachment and error details, sends them to the Connect server with ExecutePlan. Arrow batches stream back through the transport to an Arrow decoder, which produces arrow-rs RecordBatches that the program hands to Polars.](graphics/blog/fig12-1_client_anatomy.png)
 
-An audit must also avoid reporting supported APIs. `functions.broadcast(df)` is a supported join
-hint, while `SparkContext.broadcast(value)` is not; the audit distinguishes them by the object the
-method is called on, and its test suite includes cases that must not produce findings.
+*Figure 12-1. The parts of a Spark Connect client, with the Rust client and Polars as the example*
 
-### Verifying Output Data
+A client without a JVM is still coupled to its server, through the protocol version. A client whose
+protocol files are newer than the server can build a plan the server cannot read; the Rust example
+below shows one.
 
-`pipeline/parity.py` compares the output of two runs of a pipeline, table by table, on three
-properties (the case study's `parity.py` applies the same method to Iceberg tables):
+### Clients Available Today
 
-1. **Schema**: column names, types and nullability, in order.
-2. **Row count.**
-3. **Content hash**: an order-independent digest of every row.
+*Table 12-2. Spark Connect clients*
 
-The digest applies `xxhash64` to each row, using a null-safe string form of every column, and combines
-the row hashes with `bit_xor`. Because the combination is commutative, row order and partitioning do
-not affect it. Fields are joined with a separator that cannot occur in the cast values, so that rows
-such as `('a', 'bc')` and `('ab', 'c')` produce different hashes.
-
-The content hash exists to detect a result with the same row count but different values: the
-outcome of an unintentionally changed join, which a row-count comparison does not detect.
-`tests/spark/test_parity.py` constructs that case, along with tests for order independence,
-partitioning independence, field-boundary collisions, and the distinction between null and an empty
-string. `make test` runs those tests on both Spark Classic and Spark Connect.
-
-Combined with `spark.api.mode` (§6), this supports running the same pipeline in both modes in CI and
-comparing the results.
-
-**Citations:** [Spark Connect Overview](https://spark.apache.org/docs/latest/spark-connect-overview.html), [Eager vs Lazy](https://spark.apache.org/docs/latest/spark-connect-gotchas.html), [xxhash64](https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.xxhash64.html)
-
----
-
-## 13. Performance
-
-Spark Connect places a process boundary between the application and the driver, and that boundary
-has a cost. The Spark documentation does not quantify it. This section reports measurements, with
-their scope and method stated first.
-
-### Scope and Method
-
-**Scope.** One machine, loopback networking, one client, a single node. Both modes ran in the same
-container, with the same 16 cores and the same Spark 4.2.0 build, which isolates the cost of
-separating client from server. The figures do not describe cluster scaling, network latency,
-concurrent clients, or a server under memory pressure, and they should not be used to characterize
-distributed deployments.
-
-**Method.** Each measurement discards 50 warmup iterations, then takes the median of 20 timed trials.
-The Connect server was restarted immediately before its run so that neither side had been running
-for an extended period. Warmup has a large effect at this timescale: with three warmup iterations,
-`trivial_query` measured 32.3 ms on a newly started classic JVM and 7.5 ms on a Connect server that
-had been running for hours. That was a comparison of an interpreted JVM with a JIT-compiled one rather than of
-the two modes. With 50 warmup iterations, the figures are 14.4 ms and 15.3 ms.
-
-The harness is `extras/bench/protocol_overhead.py`.
-
-### Results
-
-*Table 13-1. Spark Classic and Spark Connect on a single node (medians)*
-
-| Measurement | Classic | Connect | Difference | Dominant cost |
-|---|---|---|---|---|
-| `session_start` | 2,530 ms | 515 ms | −2,015 ms | JVM startup compared with a gRPC handshake |
-| `trivial_query` | 14.4 ms | 15.3 ms | +0.9 ms | One round trip |
-| `sql_select_1` | 9.7 ms | 11.3 ms | +1.6 ms | One round trip |
-| `schema_access` | 1.7 ms | 1.1 ms | −0.6 ms | Analysis (an `AnalyzePlan` call under Connect) |
-| `collect`, 1,000 rows | 14.5 ms | 16.8 ms | +2.3 ms | Transfer |
-| `collect`, 100,000 rows | 121 ms | 120 ms | about 0 | Transfer |
-| `collect`, 1,000,000 rows | 1,401 ms | 1,286 ms | −115 ms | Transfer |
-| `toPandas`, 100,000 rows | 12.3 ms | 14.6 ms | +2.3 ms | Arrow conversion, used by both modes in 4.2 |
-| `aggregate`, 1,000,000 rows | 146 ms | 220 ms | +74 ms | Execution and result assembly |
-| `aggregate`, 10,000,000 rows | 136 ms | 196 ms | +60 ms | Execution and result assembly |
-
-The table supports three observations.
-
-**Per-call overhead is one to two milliseconds.** For a workload of a few queries over substantial
-data, this is negligible. For a workload of many small calls in a loop, it can dominate run time,
-which is one reason §8 recommends reading a schema once rather than inside a loop.
-
-**Session startup is about five times faster under Connect.** A classic driver starts a JVM; a
-Connect client performs a handshake with a server that is already running. For short-lived clients
-(CI jobs, serverless functions, notebook kernel restarts), this removes a startup cost of about two
-seconds.
-
-**Transfer of large results is comparable.** Both modes use Arrow in 4.2. At one million rows Connect
-was 8% faster, a margin too small to treat as an advantage.
-
-### Aggregations and Partition Count
-
-The aggregation measurements are the exception: 40 to 50% slower under Connect, consistently. The
-workload aggregates 10 million rows into 1,000 groups across `spark.sql.shuffle.partitions`
-partitions. A plausible explanation is that Connect encodes and streams each partition's portion of
-the result as Arrow separately, incurring a per-batch cost for each partition, where a classic driver
-assembles the partitions within its own JVM.
-
-To test this, `extras/bench/shuffle_partitions.py` varies only the partition count (Table 13-2).
-
-*Table 13-2. Aggregation time by shuffle partition count (10 million rows, 1,000 groups)*
-
-| `spark.sql.shuffle.partitions` | Classic | Connect |
+| Client | Developed in | Latest release |
 |---|---|---|
-| 8 | 94 ms | 60 ms |
-| 32 | 70 ms | 71 ms |
-| 200 (default) | 140 ms | 169 ms |
-| 800 | 116 ms | 270 ms |
+| Python (`pyspark-client`) | `apache/spark` | 4.2.0 (2026-07-14) |
+| Scala and Java | `apache/spark` | 4.2.0 (2026-07-14) |
+| Go | [`apache/spark-connect-go`](https://github.com/apache/spark-connect-go) | v0.1.0 (2025-06-17) |
+| Swift | [`apache/spark-connect-swift`](https://github.com/apache/spark-connect-swift) | 0.7.0 (2026-07-25) |
+| Rust | [`apache/spark-connect-rust`](https://github.com/apache/spark-connect-rust) | 4.2.0 (2026-09-07) |
 
-Connect's time rises with each increase in partition count (60, 71, 169 and 270 ms), while
-Classic's does not follow a trend. At 8 partitions Connect was faster than Classic; at 800 it took
-more than twice as long. The data is consistent with the explanation above.
-
-The practical guidance is to reduce the partition count before collecting a small result from a
-wide shuffle under Connect, either with `coalesce()` before `collect()` or with a lower
-`spark.sql.shuffle.partitions` for that query. In this workload, 8 partitions made Connect faster
-than Classic.
-
-Two limits apply to Table 13-2. Classic's series is non-monotonic (94, 70, 140, 116 ms) at seven
-trials per point, so its shape should not be interpreted. And the difference between modes at 32 and
-200 partitions is small, so only the 8- and 800-partition results support a firm comparison.
-
-### What Was Not Measured
-
-- **Concurrency.** All measurements used one client. The behavior of a shared server under many
-  simultaneous sessions is not measured here.
-- **Network latency.** Loopback latency is negligible. On a real network, each per-call figure
-  increases by approximately the round-trip time, which strengthens the case for minimizing calls in
-  loops.
-- **Cluster execution.** All measurements ran on a single node.
-- **Python UDF throughput.** Not measured.
-- **Structured Streaming.** Not measured.
-
-**Citations:** measured with this project's harness: [`extras/bench/protocol_overhead.py`](extras/bench/protocol_overhead.py), [`extras/bench/shuffle_partitions.py`](extras/bench/shuffle_partitions.py); recorded runs in `extras/bench/`. Arrow-optimized Python UDFs by default: [SPARK-54555](https://issues.apache.org/jira/browse/SPARK-54555).
-
----
-
-## 14. Scope of This Guide
-
-The following topics are related to Spark Connect but are not covered in depth here.
-
-**Other language clients.** The Scala and Java clients are part of Apache Spark. Clients for Go,
-Swift and Rust are developed in separate ASF repositories: `apache/spark-connect-go` (v0.1.0),
-`apache/spark-connect-swift` (0.7.0) and `apache/spark-connect-rust` (no release yet). Spark 4.2 adds
-no new language clients.
+Spark 4.2 adds no language clients to Apache Spark itself. The Go, Swift and Rust clients are
+developed in separate ASF repositories and released on their own schedules. The Rust client's first
+release passed its vote and was announced on 2026-09-07. Its version "starts at 4.2.0 to track the
+Apache Spark / PySpark version it targets," in the words of the release vote. The release publishes
+Rust crates on crates.io and a Python package, `pyspark-client-rust`, on PyPI, which the
+announcement describes as "a drop-in replacement for pyspark-client, backed by a native Rust core."
+**Untested here**: this post exercises only the Rust crates.
 
 **The JDBC driver.** [SPARK-53484](https://issues.apache.org/jira/browse/SPARK-53484) ("SPIP: JDBC
 Driver for Spark Connect", Cheng Pan, resolved 2025-11-12) has fix version 4.1.0. The artifact
 `org.apache.spark:spark-connect-client-jdbc_2.13` is published on Maven Central. Its URL scheme,
 `jdbc:sc://`, and `jdbcCompliant = false` are taken from `sql/connect/client/jdbc/` in the Spark
 source and are not exercised here. The driver has no documentation page.
+
+### Example: The Rust Client with Polars
+
+This pairing divides the work by size. Spark aggregates data that does not fit on one machine; the
+result, which does, arrives as Arrow and becomes a Polars DataFrame for local work. The whole program
+is a single native binary, with no JVM and no Python. The complete project is in
+`extras/rust_polars/`.
+
+**The client.** The release publishes three crates, all at version 4.2.0: `apache-spark-connect`, the
+DataFrame API, whose library name is `spark_connect`; `apache-spark-connect-core`, the gRPC
+transport, with retries, reattachment and artifacts; and `apache-spark-connect-proto`, the generated
+protocol types. Its documentation states that version 4.2.x supports Spark 4.2.0 and later. The API
+is blocking: each action runs to completion on a Tokio runtime that the crate holds for the whole
+process. Calling it from inside an existing async runtime is **untested here**.
+
+Three methods return results. `collect()` returns rows, `collect_record_batches()` returns arrow-rs
+`RecordBatch`es, and `to_polars()`, behind the crate's `polars` feature, returns a Polars DataFrame.
+Unlike PySpark, the client does not read `SPARK_REMOTE`; the program below reads it and passes the
+URL to `remote()`.
+
+**Dependencies.** From `Cargo.toml`:
+
+```toml
+[dependencies]
+apache-spark-connect = "=4.2.0"
+# Must be the same arrow major as apache-spark-connect 4.2.0 (^58) so RecordBatch types match.
+arrow = { version = "58", default-features = false, features = ["ipc", "prettyprint"] }
+# ipc_streaming provides IpcStreamReader. parquet works around pola-rs/polars#27898.
+polars = { version = "0.55", features = ["ipc_streaming", "lazy", "parquet"] }
+```
+
+**The program.** `extras/rust_polars/src/main.rs` runs the aggregation on Spark, collects it as
+Arrow, and continues in Polars:
+
+```rust
+use std::io::Cursor;
+
+use arrow::ipc::writer::StreamWriter;
+use arrow::util::pretty::pretty_format_batches;
+use polars::prelude::{self as pl, IntoLazy, SerReader};
+use spark_connect::{col, functions as f, lit, Column, SparkSession};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let remote = std::env::var("SPARK_REMOTE").unwrap_or_else(|_| "sc://localhost:15002".into());
+    let spark = SparkSession::builder().remote(&remote).get_or_create()?;
+    println!("Spark {} at {remote}", spark.version()?);
+
+    // Runs on Spark: 5 million rows reduced to 7 groups.
+    let e = |c: Column| c.expression().clone();
+    let summary = spark
+        .range(5_000_000)?
+        .with_column("bucket", col("id") % lit(7))
+        .group_by([col("bucket")])
+        .agg(vec![
+            e(f::count(col("id")).alias("n")),
+            e(f::sum(col("id")).alias("sum_id")),
+            e(f::max(col("id")).alias("max_id")),
+        ])
+        .sort(vec![e(col("bucket"))]);
+
+    // Collect as arrow-rs RecordBatches.
+    let batches = summary.collect_record_batches()?;
+    println!("{}", pretty_format_batches(&batches)?);
+
+    // Hand the batches to Polars through an Arrow IPC stream.
+    let schema = batches.first().ok_or("empty result")?.schema();
+    let mut ipc = Vec::new();
+    {
+        let mut writer = StreamWriter::try_new(&mut ipc, &schema)?;
+        for batch in &batches {
+            writer.write(batch)?;
+        }
+        writer.finish()?;
+    }
+    let df = pl::IpcStreamReader::new(Cursor::new(ipc)).finish()?;
+
+    // Runs locally in Polars: join a small lookup table, derive a column, sort.
+    let days = polars::df!(
+        "bucket" => [0i64, 1, 2, 3, 4, 5, 6],
+        "day" => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    )?;
+    let out = df
+        .lazy()
+        .join(
+            days.lazy(),
+            [pl::col("bucket")],
+            [pl::col("bucket")],
+            pl::JoinArgs::new(pl::JoinType::Left),
+        )
+        .with_columns([(pl::col("n").cast(pl::DataType::Float64) * pl::lit(100.0)
+            / pl::col("n").sum())
+        .alias("pct")])
+        .sort(
+            ["pct", "day"],
+            pl::SortMultipleOptions::default().with_order_descending_multi([true, false]),
+        )
+        .collect()?;
+    println!("{out}");
+    Ok(())
+}
+```
+
+**Output.** With the project's cluster running (`make up`), from `extras/rust_polars/`:
+
+```bash
+SPARK_REMOTE=sc://localhost:15095 cargo run --release   # the test machine's CONNECT_PORT was 15095
+```
+
+```
+Spark 4.2.0 at sc://localhost:15095
++--------+--------+---------------+---------+
+| bucket | n      | sum_id        | max_id  |
++--------+--------+---------------+---------+
+| 0      | 714286 | 1785713214285 | 4999995 |
+| 1      | 714286 | 1785713928571 | 4999996 |
+| 2      | 714286 | 1785714642857 | 4999997 |
+| 3      | 714286 | 1785715357143 | 4999998 |
+| 4      | 714286 | 1785716071429 | 4999999 |
+| 5      | 714285 | 1785711785715 | 4999993 |
+| 6      | 714285 | 1785712500000 | 4999994 |
++--------+--------+---------------+---------+
+shape: (7, 6)
+┌────────┬────────┬───────────────┬─────────┬─────┬──────────┐
+│ bucket ┆ n      ┆ sum_id        ┆ max_id  ┆ day ┆ pct      │
+│ ---    ┆ ---    ┆ ---           ┆ ---     ┆ --- ┆ ---      │
+│ i64    ┆ i64    ┆ i64           ┆ i64     ┆ str ┆ f64      │
+╞════════╪════════╪═══════════════╪═════════╪═════╪══════════╡
+│ 1      ┆ 714286 ┆ 1785713928571 ┆ 4999996 ┆ Mon ┆ 14.28572 │
+│ 0      ┆ 714286 ┆ 1785713214285 ┆ 4999995 ┆ Sun ┆ 14.28572 │
+│ 4      ┆ 714286 ┆ 1785716071429 ┆ 4999999 ┆ Thu ┆ 14.28572 │
+│ 2      ┆ 714286 ┆ 1785714642857 ┆ 4999997 ┆ Tue ┆ 14.28572 │
+│ 3      ┆ 714286 ┆ 1785715357143 ┆ 4999998 ┆ Wed ┆ 14.28572 │
+│ 5      ┆ 714285 ┆ 1785711785715 ┆ 4999993 ┆ Fri ┆ 14.2857  │
+│ 6      ┆ 714285 ┆ 1785712500000 ┆ 4999994 ┆ Sat ┆ 14.2857  │
+└────────┴────────┴───────────────┴─────────┴─────┴──────────┘
+```
+
+The first table is the Spark result as arrow-rs prints it: seven rows, aggregated from five million
+on the server. For each run, the Spark UI's SQL tab recorded a `Range` of 5,000,000 output rows,
+followed by the aggregation and the sort, so only the seven result rows crossed the network. The
+second table is Polars, after the join, the derived `pct` column and the sort. The output was the
+same on four runs.
+
+**Why the handoff goes through IPC.** Arrow is a format, and arrow-rs and Polars are two
+implementations of it: Polars uses its own Arrow crate, `polars-arrow`, so an arrow-rs `RecordBatch`
+is not a Polars type. Writing the batches as an Arrow IPC stream and reading the stream in Polars
+converts between them without depending on either library's internals. The crate's `to_polars()`
+does the same internally, with the IPC file format, but it depends on Polars 0.54; the explicit
+handoff lets the application choose its Polars version. The Arrow C Data Interface, which is designed
+to share memory without a copy, was not tried.
+
+**Build requirements.** Table 12-3 lists what the build needed on the test machine. None of them is a
+Spark Connect problem, but each one stops a first build.
+
+*Table 12-3. Build requirements observed for the Rust example*
+
+| Requirement | Reason |
+|---|---|
+| `protoc` installed, or the `PROTOC` variable set | `apache-spark-connect-proto` compiles the protocol files in its build script. Without `protoc` the build fails with `Could not find 'protoc'` |
+| `arrow` 58 in the application | The client depends on arrow 58 and does not re-export it. A different major version is a different `RecordBatch` type |
+| Rust 1.95 or later | Required by Polars 0.55, through `sysinfo` 0.39. The client alone built with Rust 1.92.0. The project pins Rust 1.98.1 in `rust-toolchain.toml` |
+| Polars features `ipc_streaming` and `parquet` | `IpcStreamReader` requires `ipc_streaming`. `parquet` works around [pola-rs/polars#27898](https://github.com/pola-rs/polars/issues/27898), a compile error without it |
+
+The installation documentation states "Rust 1.70 or later"; the arrow version the client depends on
+declares 1.85. A clean release build took 111 seconds on 16 cores. Once built, the binary ran in 0.26
+to 0.34 seconds, including the connection to the server.
+
+**A protocol caveat.** The crate's protocol files are labeled v4.2.0, but they also contain messages
+added in Spark 4.3.0: the `Zip` relation ([SPARK-57247](https://issues.apache.org/jira/browse/SPARK-57247)) and nanosecond
+timestamp types ([SPARK-57160](https://issues.apache.org/jira/browse/SPARK-57160)). `DataFrame::zip` therefore compiles, and a
+4.2.0 server rejects its plan before executing it. `extras/rust_polars/examples/zip_check.rs`
+reproduces this:
+
+```
+server 4.2.0
+zip error: [CONNECT_INVALID_PLAN.INVALID_ONE_OF_FIELD_NOT_SET] [CONNECT_INVALID_PLAN.INVALID_ONE_OF_FIELD_NOT_SET] The Spark Connect plan is invalid. This oneOf field in spark.connect.Relation is not set: RELTYPE_NOT_SET SQLSTATE: 56K00
+```
+
+The server does not recognize the `Relation` field that holds `Zip`, so it sees a plan with no
+relation type. This is the hazard §2 describes for a client newer than its server, arriving through
+a client whose version number matches the server's. A successful build is therefore not evidence
+that a server supports a method; test each method against the server version in use. The nanosecond
+types, and 4.3.0 APIs other than `zip`, are **untested here**.
+
+The example ran against a local 4.2.0 server with no authentication. TLS and token authentication,
+UDFs, writes, streaming, the DataFusion integration and servers other than 4.2.0 are **untested
+here**.
+
+### Related Topics
 
 **ML on Spark Connect.** The 3.5.0 release notes list PyTorch-based distributed ML support for
 Connect ([SPARK-42471](https://issues.apache.org/jira/browse/SPARK-42471)), and the 4.0.0 release
@@ -1476,124 +1553,12 @@ affinity are covered in [`companion_guide_spark_kubernetes.md`](../../../compani
 
 **Structured Streaming over Connect.** **Untested here.** The 3.5.0 release notes list Structured
 Streaming support for Connect in Python and Scala
-([SPARK-42938](https://issues.apache.org/jira/browse/SPARK-42938)), but nothing in this guide exercises
+([SPARK-42938](https://issues.apache.org/jira/browse/SPARK-42938)), but nothing in this post exercises
 it. Validate streaming workloads independently.
 
-**Data Source V2 connectors.** Iceberg's Spark integration is a Data Source V2 implementation
-(`org.apache.iceberg.spark.SparkCatalog` implements `TableCatalog`), so a DSv2 connector is a catalog
-rather than an alternative to one. The point relevant to Connect is §9, Layer 3: a DSv2 catalog must
-be installed on the server, because its configuration value is a class name. The Python Data Source
-API is the exception; it is pure Python and can be shipped with `addArtifact`. Spark 4.2's other DSv2
-work is outside this guide's scope: transactions ([SPARK-55855](https://issues.apache.org/jira/browse/SPARK-55855)),
-`WITH SCHEMA EVOLUTION` ([SPARK-54971](https://issues.apache.org/jira/browse/SPARK-54971)),
-operation metrics, and partition-statistics filtering
-([SPARK-55596](https://issues.apache.org/jira/browse/SPARK-55596)).
-
-**Change data capture.** Spark 4.2 adds a DataFrame API and Connect support for CDC queries
-([SPARK-55949](https://issues.apache.org/jira/browse/SPARK-55949)) and Auto CDC APIs for Connect
-([SPARK-56650](https://issues.apache.org/jira/browse/SPARK-56650)).
-
-**Geospatial types.** Spark 4.2.0 does not include geospatial types or `ST_*` functions, although
-some secondary sources state that it does. A scan of every JAR in
-`apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` (git revision `32f72996011`) finds no
-`GeographyVal`, `GeometryVal`, `TimestampNanosVal` or `ST_*` function.
-
----
-
-## 15. References
-
-### Design and History
-
-[1] Grund, M. "SPIP: Spark Connect – A client and server interface for Apache Spark." SPARK-39375, June 2022. https://issues.apache.org/jira/browse/SPARK-39375
-[2] Leone, S., Grund, M., van Hövell, H., and Xin, R. "Introducing Spark Connect." Databricks, July 2022. https://www.databricks.com/blog/2022/07/07/introducing-spark-connect-the-power-of-apache-spark-everywhere.html
-[3] Apache Spark. "Spark Release 3.4.0." https://spark.apache.org/releases/spark-release-3-4-0.html
-[4] Apache Spark. "Spark Release 3.5.0." https://spark.apache.org/releases/spark-release-3-5-0.html
-[5] Apache Spark. "Spark Release 4.0.0." https://spark.apache.org/releases/spark-release-4-0-0.html
-[6] Apache Spark. "Spark Release 4.2.0." https://spark.apache.org/releases/spark-release-4-2-0.html
-
-### Official Documentation (Spark 4.2.0)
-
-[7] Apache Spark. "Spark Connect Overview." https://spark.apache.org/docs/latest/spark-connect-overview.html
-[8] Apache Spark. "Application Development with Spark Connect." https://spark.apache.org/docs/latest/app-dev-spark-connect.html
-[9] Apache Spark. "Eager vs Lazy: Spark Connect vs Spark Classic." https://spark.apache.org/docs/latest/spark-connect-gotchas.html
-[10] Apache Spark. "Configuration." https://spark.apache.org/docs/latest/configuration.html
-[11] Apache Spark. "Installation: PySpark." https://spark.apache.org/docs/latest/api/python/getting_started/install.html
-[12] Apache Spark. "Upgrading from PySpark 4.1 to 4.2." https://spark.apache.org/docs/latest/api/python/migration_guide/pyspark_upgrade.html
-[13] Apache Spark. "Python Package Management." https://spark.apache.org/docs/latest/api/python/tutorial/python_packaging.html
-[14] Apache Spark. "Debugging PySpark." https://spark.apache.org/docs/latest/api/python/development/debugging.html
-[15] Apache Spark. "Distributed SQL Engine." https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html
-
-### Source (apache/spark at tag v4.2.0)
-
-[16] `sql/connect/docs/client-connection-string.md`: the connection string specification
-[17] `python/pyspark/sql/connect/session.py`: unsupported session attributes
-[18] `python/pyspark/sql/connect/dataframe.py`: unsupported DataFrame attributes
-[19] `python/pyspark/sql/connect/client/core.py`: plan compression
-[20] `sbin/start-connect-server.sh`: `--wait` and `SPARK_NO_DAEMONIZE`
-[21] `sql/connect/client/jdbc/`: the JDBC driver
-
-### Packages
-
-[22] https://pypi.org/project/pyspark/ · [23] https://pypi.org/project/pyspark-client/ · [24] https://pypi.org/project/pyspark-connect/
-
-### Other Sources
-
-[25] Databricks. "Compare Spark Connect to Spark Classic." https://docs.databricks.com/aws/en/spark/connect-vs-classic
-[26] Databricks. "Python dependency management in Spark Connect." https://www.databricks.com/blog/python-dependency-management-spark-connect
-
-### Related Material in This Library
-
-[27] [Companion Guide: Apache Arrow and Apache Spark](../../../companion_guide_arrow_spark.md) §9: Arrow as the Connect result format
-[28] [Companion Guide: Apache Spark 4.1](../../../companion_guide_spark_41.md) §7: Spark Connect in 4.1
-[29] [Companion Guide: Spark on Kubernetes](../../../companion_guide_spark_kubernetes.md) §12: Connect on Kubernetes
-[30] [Companion Guide: Spark Libraries](../../../spark_41_libraries/companion_guide_spark_libraries.md): ML on Connect and the client ecosystem
-[31] [Demo 1: Metric Views](../01_metrics_views/companion_guide.md): the first demo in this series
-[32] [`case_study/lakehouse_stack/README.md`](case_study/lakehouse_stack/README.md): the lakehouse-stack migration, as a written case study
-[33] [`pipeline/MIGRATION.md`](pipeline/MIGRATION.md): the demonstration pipeline's migration, layer by layer
-
-### JIRA Issues
-
-| JIRA | Subject | Fix version |
-|---|---|---|
-| [SPARK-39375](https://issues.apache.org/jira/browse/SPARK-39375) | SPIP: Spark Connect | None set (Reopened); shipped in 3.4.0 |
-| [SPARK-42938](https://issues.apache.org/jira/browse/SPARK-42938) | Structured Streaming with Spark Connect | None set (Open); listed in the 3.5.0 release notes |
-| [SPARK-42471](https://issues.apache.org/jira/browse/SPARK-42471) | PyTorch Integration with Spark Connect | None set (Open); listed in the 3.5.0 release notes |
-| [SPARK-42497](https://issues.apache.org/jira/browse/SPARK-42497) | Support of pandas API on Spark for Spark Connect | None set (Resolved); listed in the 3.5.0 release notes |
-| [SPARK-43351](https://issues.apache.org/jira/browse/SPARK-43351) | Go support in Spark Connect | 3.5.0 |
-| [SPARK-47540](https://issues.apache.org/jira/browse/SPARK-47540) | SPIP: Pure Python Package (Spark Connect) | 4.0.0 |
-| [SPARK-51212](https://issues.apache.org/jira/browse/SPARK-51212) | Separate PySpark package for Spark Connect by default | 4.0.0 |
-| [SPARK-50411](https://issues.apache.org/jira/browse/SPARK-50411) | Spark Connect as the default API in Spark 4 | Open |
-| [SPARK-53484](https://issues.apache.org/jira/browse/SPARK-53484) | SPIP: JDBC Driver for Spark Connect | 4.1.0 |
-| [SPARK-55227](https://issues.apache.org/jira/browse/SPARK-55227) | RDD API compatibility (umbrella) | 4.2.0 |
-| [SPARK-55228](https://issues.apache.org/jira/browse/SPARK-55228) | `Dataset.zipWithIndex` | 4.2.0 |
-| [SPARK-55229](https://issues.apache.org/jira/browse/SPARK-55229) | `DataFrame.zipWithIndex` (PySpark) | 4.2.0 |
-| [SPARK-55090](https://issues.apache.org/jira/browse/SPARK-55090) | `DataFrame.toJSON` (Python client) | 4.2.0 |
-| [SPARK-56253](https://issues.apache.org/jira/browse/SPARK-56253) | `spark.read.json` accepts a DataFrame | 4.2.0 |
-| [SPARK-56254](https://issues.apache.org/jira/browse/SPARK-56254) | `spark.read.xml` accepts a DataFrame | 4.2.0 |
-| [SPARK-56255](https://issues.apache.org/jira/browse/SPARK-56255) | `spark.read.csv` accepts a DataFrame | 4.2.0 |
-| [SPARK-56256](https://issues.apache.org/jira/browse/SPARK-56256) | `SparkSession.emptyDataFrame` | 4.2.0 |
-| [SPARK-55887](https://issues.apache.org/jira/browse/SPARK-55887) | `head`, `take` and `tail` avoid full scans | 4.2.0 |
-| [SPARK-56007](https://issues.apache.org/jira/browse/SPARK-56007) | Row with duplicate column names throws error (described in the release notes as `ArrowDeserializer` positional binding) | 4.2.0 |
-| [SPARK-55239](https://issues.apache.org/jira/browse/SPARK-55239) | Connect server in YARN cluster mode | 4.2.0 |
-| [SPARK-53882](https://issues.apache.org/jira/browse/SPARK-53882) | Documentation of Connect and Classic behavior differences | 4.2.0 |
-| [SPARK-55606](https://issues.apache.org/jira/browse/SPARK-55606) | `GetStatus` server implementation | 4.2.0 |
-| [SPARK-55691](https://issues.apache.org/jira/browse/SPARK-55691) | `GetStatus` client support | 4.2.0 |
-| [SPARK-57601](https://issues.apache.org/jira/browse/SPARK-57601) | Connect tab in the History Server (bug fix) | 4.2.0; backported to 4.1.3 and 4.0.4 |
-| [SPARK-55326](https://issues.apache.org/jira/browse/SPARK-55326) | Release remote session on process exit | 4.2.0 |
-| [SPARK-55047](https://issues.apache.org/jira/browse/SPARK-55047) | Client-side local relation size limit | 4.2.0 |
-| [SPARK-54314](https://issues.apache.org/jira/browse/SPARK-54314) | Transmit client code locations for telemetry | None set (Resolved) |
-| [SPARK-54887](https://issues.apache.org/jira/browse/SPARK-54887) | SQL state on Connect exceptions | 4.2.0 |
-| [SPARK-55314](https://issues.apache.org/jira/browse/SPARK-55314) | Propagate observed-metrics errors | 4.2.0 |
-| [SPARK-54555](https://issues.apache.org/jira/browse/SPARK-54555) | Arrow-optimized Python UDFs and Arrow IPC by default | 4.2.0 |
-| [SPARK-55406](https://issues.apache.org/jira/browse/SPARK-55406) | Reattach iterator race conditions | 4.2.0 |
-| [SPARK-55362](https://issues.apache.org/jira/browse/SPARK-55362) | Client shutdown deadlock | 4.2.0 |
-| [SPARK-55448](https://issues.apache.org/jira/browse/SPARK-55448) | Query events dropped on session close | 4.2.0 |
-| [SPARK-56955](https://issues.apache.org/jira/browse/SPARK-56955) | Arrow/Netty allocator on JDK 25 | 4.2.0 |
-| [SPARK-57336](https://issues.apache.org/jira/browse/SPARK-57336) | Scala client bearer token header | 4.2.0; 4.1.3; 4.0.4 |
-| [SPARK-55949](https://issues.apache.org/jira/browse/SPARK-55949) | CDC DataFrame API and Connect support | 4.2.0 |
-| [SPARK-56650](https://issues.apache.org/jira/browse/SPARK-56650) | Auto CDC Connect APIs | 4.2.0 |
+**Citations:** [base.proto @ v4.2.0](https://github.com/apache/spark/blob/v4.2.0/sql/connect/common/src/main/protobuf/spark/connect/base.proto), [apache/spark-connect-rust](https://github.com/apache/spark-connect-rust), [Spark Connect Rust client documentation](https://apache.github.io/spark-connect-rust/installation/), [apache-spark-connect on crates.io](https://crates.io/crates/apache-spark-connect), [pyspark-client-rust on PyPI](https://pypi.org/project/pyspark-client-rust/), [Rust client 4.2.0 vote result](https://lists.apache.org/thread/lxjdg2f2drrz8hz29g7fgmc4t02rfmp2), [Rust client 4.2.0 announcement](https://lists.apache.org/thread/d4q3zl26vldm1pb95b7zr2pqbcx3q4lq), [spark-connect-go v0.1.0](https://github.com/apache/spark-connect-go/releases/tag/v0.1.0), [spark-connect-swift 0.7.0](https://github.com/apache/spark-connect-swift/releases/tag/0.7.0), [SPARK-57247](https://issues.apache.org/jira/browse/SPARK-57247), [SPARK-57160](https://issues.apache.org/jira/browse/SPARK-57160), [pola-rs/polars#27898](https://github.com/pola-rs/polars/issues/27898), [SPARK-53484](https://issues.apache.org/jira/browse/SPARK-53484), [SPARK-42471](https://issues.apache.org/jira/browse/SPARK-42471), [SPARK-42938](https://issues.apache.org/jira/browse/SPARK-42938)
 
 ---
 
 *Verified against Apache Spark 4.2.0 (git revision `32f72996011`) with `pyspark-client==4.2.0`,
-2026-09-09 and 2026-09-10.*
+2026-09-09 and 2026-09-10, and with the `apache-spark-connect` 4.2.0 crate on 2026-09-11.*

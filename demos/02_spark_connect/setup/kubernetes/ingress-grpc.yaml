@@ -3,7 +3,7 @@
 # Untested here. gRPC needs HTTP/2 to the backend, which the backend-protocol annotation sets.
 # Spark Connect has no built-in authentication, so callers must be authenticated here or by a
 # proxy behind the ingress. A token in the sc:// connection string turns on TLS in the client, but
-# the server does not validate the token (companion guide §5).
+# the server does not validate the token (blog post §5).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

@@ -2,7 +2,7 @@
 
     python examples/03_which_client.py
 
-Companion guide §3, "Identifying the Installed Distribution".
+Blog post §3, "Identifying the Installed Distribution".
 """
 import importlib.metadata
 import importlib.util

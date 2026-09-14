@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 THIS = Path(__file__).resolve()
 DOCS = (
     "README.md",
-    "companion_guide.md",
+    "blog_spark_connect.md",
     "video_spark_connect.md",
     "setup/TOPOLOGIES.md",
     "pipeline/MIGRATION.md",
@@ -32,7 +32,7 @@ ROOT_FILES = {
 }
 SKIP_DIRS = {
     ".venv", ".venv-full", ".venv-41", ".git", "results", "input", "graphics", "__pycache__",
-    ".pytest_cache", ".ruff_cache", ".warehouse",
+    ".pytest_cache", ".ruff_cache", ".warehouse", "target",
 }
 STYLE_SUFFIXES = {".py", ".md", ".sh", ".yaml", ".yml", ".json", ".toml"}
 
@@ -137,7 +137,7 @@ def check_doc(path: Path, guide_tables: set[str]) -> None:
                     report(path, number, f"graphic not found: {expected.relative_to(ROOT)}")
         if not CAPTION.match(line):
             for ref in TABLE_REF.findall(line):
-                if ref not in local_tables and not ("guide" in line and ref in guide_tables):
+                if ref not in local_tables and not ("blog post" in line and ref in guide_tables):
                     report(path, number, f"Table {ref} has no caption in this document")
 
     counts: dict[str, int] = {}
@@ -149,8 +149,8 @@ def check_doc(path: Path, guide_tables: set[str]) -> None:
 
 
 def check_layers() -> None:
-    """The seven layer names must match in the guide, the audit legend and pipeline/MIGRATION.md."""
-    guide = ROOT / "companion_guide.md"
+    """Layer names must match in the blog post, the audit legend and pipeline/MIGRATION.md."""
+    guide = ROOT / "blog_spark_connect.md"
     table = guide.read_text(encoding="utf-8").split("*Table 9-1.", 1)[1].split("\n\n", 2)[1]
     expected = {int(n): name.strip().lower() for n, name in re.findall(r"^\| (\d) \| ([^|]+)\|",
                                                                       table, re.M)}
@@ -167,7 +167,8 @@ def check_layers() -> None:
         found = {int(n): name.strip().lower() for n, name in pairs}
         for layer, name in expected.items():
             if found.get(layer) != name:
-                report(path, 0, f"layer {layer} is {found.get(layer)!r}; the guide says {name!r}")
+                report(path, 0,
+                       f"layer {layer} is {found.get(layer)!r}; the blog post says {name!r}")
 
 
 def check_launch() -> None:
@@ -208,7 +209,7 @@ def check_style() -> None:
 
 
 def main() -> int:
-    guide_tables = {table for _, table in captions(ROOT / "companion_guide.md")}
+    guide_tables = {table for _, table in captions(ROOT / "blog_spark_connect.md")}
     for doc in DOCS:
         check_doc(ROOT / doc, guide_tables)
     check_layers()

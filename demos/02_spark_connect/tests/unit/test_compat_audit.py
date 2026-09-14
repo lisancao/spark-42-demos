@@ -47,7 +47,7 @@ def test_sparkcontext_alone_is_a_blocker() -> None:
 
 
 def test_enable_hive_support_is_a_behavior_finding() -> None:
-    """Against 4.2.0 the call does not raise, so it is not a blocker (companion guide §7)."""
+    """Against 4.2.0 the call does not raise, so it is not a blocker (blog post §7)."""
     findings = audit_source("b = SparkSession.builder.enableHiveSupport().getOrCreate()")
     assert [f.symbol for f in findings] == ["enableHiveSupport()"]
     assert findings[0].severity == "BEHAVIOR"

@@ -21,7 +21,7 @@ reach over gRPC, so where the driver runs is decided once, when the server is de
 applications take no part in it. A *topology* is that decision: where the Connect server runs
 relative to the cluster, the data and the clients.
 
-Two properties of Connect determine what each topology can offer (companion guide §2). A single
+Two properties of Connect determine what each topology can offer (blog post §2). A single
 server hosts many sessions, isolated from one another but sharing the server's JVM, memory and
 executors; isolation stronger than that requires more servers. And session state lives only on the
 server that created it, so anything that places several servers behind one address must route each
@@ -193,7 +193,7 @@ clients.
 Four aspects of this command are significant:
 
 - **`binding.host=0.0.0.0`.** States the listening interface explicitly. A 4.2.0 server with no
-  binding setting already listens on all interfaces (companion guide §4); a specific address
+  binding setting already listens on all interfaces (blog post §4); a specific address
   restricts it.
 - **Catalog and extension configuration is set on the server.** These values are class names, and
   the client has no JVM in which to load them.
@@ -242,7 +242,7 @@ Table 4 lists ways to expose the server.
 **Each Connect server holds its own session state.** A Service that load-balances across several
 Connect pods can route a client's later requests to a pod that does not hold its session. Use session
 affinity, or run one replica per logical service. This follows from the session living on the server
-(companion guide §2) rather than from Kubernetes itself.
+(blog post §2) rather than from Kubernetes itself.
 
 **Spark Connect has no built-in authentication.** Per the overview documentation, it is intended to
 run behind an authenticating gRPC proxy. Do not expose port 15002 publicly. Setting `token` in the

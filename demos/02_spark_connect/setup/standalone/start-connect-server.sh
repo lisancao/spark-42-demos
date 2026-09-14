@@ -10,7 +10,7 @@ set -euo pipefail
 
 SPARK_HOME="${SPARK_HOME:-/opt/spark}"
 CONNECT_PORT="${CONNECT_PORT:-15002}"
-# With no binding setting, a 4.2.0 server listens on all interfaces (companion guide §4). This
+# With no binding setting, a 4.2.0 server listens on all interfaces (blog post §4). This
 # script defaults to loopback; set BIND_HOST=0.0.0.0 to accept connections from other hosts.
 BIND_HOST="${BIND_HOST:-127.0.0.1}"
 SPARK_MASTER="${SPARK_MASTER:-}"      # empty: local[*] inside the server process

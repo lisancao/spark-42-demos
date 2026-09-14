@@ -2,7 +2,7 @@
 
     python tools/compat_audit.py path/to/code [--json] [--fail-on BLOCKER] [--no-legend]
 
-Each finding has a severity and a migration layer (companion guide §9 and §12). The audit reads
+Each finding has a severity and a migration layer (blog post §9). The audit reads
 source with ``ast`` and has no type information, so it matches names rather than resolving them.
 """
 
@@ -48,7 +48,7 @@ Findings are tagged [SEVERITY/LAYER].
              BEHAVIOR   runs, but differs from Spark Classic in its result or in when it raises.
              PERF       correct, but makes a network round trip on every iteration of a loop.
 
-  LAYER      the part of a migration that the fix belongs to (companion guide §9):
+  LAYER      the part of a migration that the fix belongs to (blog post §9):
              L0 session creation        L1 pipeline logic          L2 data sources and catalogs
              L3 configuration           L4 dependencies            L5 execution and operations
              L6 security and identity

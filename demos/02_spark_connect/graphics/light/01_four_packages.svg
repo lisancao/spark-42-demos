@@ -73,5 +73,5 @@
         stroke-dasharray="10,8" marker-end="url(#arrow-muted)"/>
   <text x="735" y="999" font-size="24" fill="#57606a" text-anchor="middle">installs</text>
 
-  <text x="80" y="1046" font-size="20" fill="#57606a">Source: companion guide Table 3-1; installed sizes measured with du on CPython 3.10.20</text>
+  <text x="80" y="1046" font-size="20" fill="#57606a">Source: blog post Table 3-1; installed sizes measured with du on CPython 3.10.20</text>
 </svg>

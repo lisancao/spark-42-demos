@@ -74,5 +74,5 @@
   <text x="1010" y="884" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">session_id: random UUID</text>
   <text x="1010" y="928" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#8b949e">grpc_max_message_size: 134217728</text>
 
-  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: companion guide &#x00A7;5, Table 5-1</text>
+  <text x="80" y="1046" font-size="20" fill="#8b949e">Source: blog post &#x00A7;5, Table 5-1</text>
 </svg>

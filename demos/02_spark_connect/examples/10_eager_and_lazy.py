@@ -3,7 +3,7 @@
     python examples/10_eager_and_lazy.py classic    # full pyspark (.venv-full) and a JDK
     python examples/10_eager_and_lazy.py connect    # pyspark-client (.venv) and a server
 
-Companion guide §8.
+Blog post §8.
 """
 import os
 import sys
