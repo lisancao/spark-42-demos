@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+<defs>
+  <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="#2a2a4a" opacity="0.6"/>
+  </pattern>
+  
+</defs>
+<rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+  <line x1="40" y1="100" x2="40" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="40" x2="100" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="100" x2="1880" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="40" x2="1820" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="980" x2="40" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="1040" x2="100" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="980" x2="1880" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="1040" x2="1820" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+<text x="960" y="342" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="84" fill="#e6edf3" text-anchor="middle" font-weight="700">Metric Views in Apache Spark 4.2</text>
+  <text x="960" y="422" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="40" fill="#8b949e" text-anchor="middle">Define a Metric Once, Query It at Any Grain</text>
+  <text x="960" y="482" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="28" fill="#ff8a4c" text-anchor="middle">Apache Spark 4.2.0</text>
+  <line x1="960" y1="657" x2="660" y2="742" stroke="#7ee787" stroke-width="2" opacity="0.7"/>
+  <line x1="960" y1="657" x2="960" y2="742" stroke="#7ee787" stroke-width="2" opacity="0.7"/>
+  <line x1="960" y1="657" x2="1260" y2="742" stroke="#7ee787" stroke-width="2" opacity="0.7"/>
+  <rect x="830" y="587" width="260" height="70" rx="12" fill="#12261a" stroke="#7ee787" stroke-width="2"/>
+  <text x="960" y="630" font-family="Consolas, 'Courier New', monospace" font-size="26" fill="#7ee787" text-anchor="middle">MEASURE()</text>
+  <rect x="560" y="742" width="200" height="60" rx="10" fill="#12261a" stroke="#7ee787" stroke-width="2"/>
+  <text x="660" y="780" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#7ee787" text-anchor="middle">month</text>
+  <rect x="860" y="742" width="200" height="60" rx="10" fill="#12261a" stroke="#7ee787" stroke-width="2"/>
+  <text x="960" y="780" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#7ee787" text-anchor="middle">region</text>
+  <rect x="1160" y="742" width="200" height="60" rx="10" fill="#12261a" stroke="#7ee787" stroke-width="2"/>
+  <text x="1260" y="780" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#7ee787" text-anchor="middle">day</text>
+</svg>

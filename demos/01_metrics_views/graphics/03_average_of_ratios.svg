@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" font-family="'Segoe UI', Arial, Helvetica, sans-serif">
+<defs>
+  <pattern id="dotGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="#2a2a4a" opacity="0.6"/>
+  </pattern>
+  
+</defs>
+<rect x="0" y="0" width="1920" height="1080" fill="#1a1a2e"/>
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1920" height="6" fill="#e25a1c"/>
+  <line x1="40" y1="100" x2="40" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="40" x2="100" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="100" x2="1880" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="40" x2="1820" y2="40" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="980" x2="40" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="40" y1="1040" x2="100" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="980" x2="1880" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+  <line x1="1880" y1="1040" x2="1820" y2="1040" stroke="#e25a1c" stroke-width="3" opacity="0.35"/>
+<text x="80" y="104" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="48" fill="#e6edf3" text-anchor="start" font-weight="700">Averaging Rates Weights Every Region Equally</text>
+  <text x="80" y="150" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#8b949e" text-anchor="start">Conversion rate by region, June 2026</text>
+  <rect x="180.0" y="805.6" width="949.4000000000001" height="94.39999999999998" fill="#11213a" stroke="#79c0ff" stroke-width="2"/>
+  <rect x="1129.4" y="781.2" width="379.6999999999998" height="118.79999999999995" fill="#11213a" stroke="#79c0ff" stroke-width="2"/>
+  <rect x="1509.1" y="753.8" width="151.9000000000001" height="146.20000000000005" fill="#11213a" stroke="#79c0ff" stroke-width="2"/>
+  <rect x="1661.0" y="447.0" width="15.200000000000045" height="453.0" fill="#11213a" stroke="#79c0ff" stroke-width="2"/>
+  <rect x="1676.2" y="282.0" width="3.7999999999999545" height="618.0" fill="#11213a" stroke="#79c0ff" stroke-width="2"/>
+  <text x="571.7" y="861.8" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#e6edf3" text-anchor="start">metro</text><text x="651.3000000000001" y="861.8" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3" text-anchor="start">0.0787</text>
+  <text x="1236.25" y="849.6" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#e6edf3" text-anchor="start">urban</text><text x="1315.85" y="849.6" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3" text-anchor="start">0.0990</text>
+  <text x="1445.84" y="737.8" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#e6edf3" text-anchor="start">suburban</text><text x="1563.6" y="737.8" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3" text-anchor="start">0.1218</text>
+  <text x="654.7" y="930" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#8b949e" text-anchor="middle">50,000</text>
+  <text x="1319.25" y="930" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#8b949e" text-anchor="middle">20,000</text>
+  <text x="1585.05" y="930" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#8b949e" text-anchor="middle">8,000</text>
+  <line x1="1676.2" y1="447.0" x2="1700" y2="447" stroke="#8b949e" stroke-width="1"/>
+  <text x="1710" y="455" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#e6edf3" text-anchor="start">rural</text><text x="1789.6" y="455" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3" text-anchor="start">0.3775</text>
+  <line x1="1680.0" y1="282.0" x2="1700" y2="282" stroke="#8b949e" stroke-width="1"/>
+  <text x="1710" y="290" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="24" fill="#e6edf3" text-anchor="start">remote</text><text x="1802.32" y="290" font-family="Consolas, 'Courier New', monospace" font-size="24" fill="#e6edf3" text-anchor="start">0.5150</text>
+  <line x1="1668.6" y1="900.0" x2="1700" y2="933" stroke="#8b949e" stroke-width="1"/>
+  <text x="1710" y="940" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#8b949e" text-anchor="start">800</text>
+  <line x1="1678.1" y1="900.0" x2="1700" y2="963" stroke="#8b949e" stroke-width="1"/>
+  <text x="1710" y="970" font-family="Consolas, 'Courier New', monospace" font-size="22" fill="#8b949e" text-anchor="start">200</text>
+  <line x1="180" y1="613.9" x2="1680" y2="613.9" stroke="#ff7b72" stroke-width="3"/>
+  <text x="1650" y="603.9" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#ff7b72" text-anchor="end">Average of the five rates: 0.2384</text>
+  <line x1="180" y1="789.2" x2="1680" y2="789.2" stroke="#7ee787" stroke-width="3"/>
+  <text x="200" y="779.2" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#7ee787" text-anchor="start">Converted sessions / all sessions: 0.0923</text>
+  <text x="80" y="1000" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="26" fill="#e6edf3" text-anchor="start">The average counts 200 remote sessions as much as 50,000 metro sessions, and is 2.6 times the rate for the month.</text>
+  <text x="80" y="1046" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="20" fill="#8b949e" text-anchor="start">Source: examples/01_average_of_ratios.py; blog post §3</text>
+</svg>

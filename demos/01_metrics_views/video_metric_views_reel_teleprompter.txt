@@ -1,0 +1,70 @@
+METRIC VIEWS IN APACHE SPARK 4.2, IN FIVE MINUTES
+
+
+=== CHAPTER 0. OPEN (0:00 - 0:30) ===
+
+[TITLE CARD]
+
+Spark four point two adds metric views. In the next five minutes: the two aggregation errors they're designed for, how to define one, and the one thing they don't prevent.
+
+
+=== CHAPTER 1. AVERAGING RATES (0:30 - 1:30) ===
+
+[RUN LAUNCH CONFIGURATION 3 (EXAMPLE 01, AVERAGE OF RATIOS)]
+
+Here's a month of sessions for a food delivery service, split into five regions, each with its own conversion rate.
+
+Average the five rates, and you get twenty-three point eight percent. Divide total conversions by total sessions, and you get nine point two percent.
+
+[SHOW AVERAGE OF RATIOS GRAPHIC]
+
+The average gives every region the same weight, so two hundred remote sessions count as much as fifty thousand metro sessions. It comes out two point six times too high.
+
+
+=== CHAPTER 2. SUMMING DISTINCT COUNTS (1:30 - 2:15) ===
+
+[RUN LAUNCH CONFIGURATION 4 (EXAMPLE 02, SUMMING DISTINCT COUNTS)]
+
+Second error. Add up thirty days of distinct users and you get sixty-nine thousand four hundred twenty. Count distinct users over the month and it's nine thousand nine hundred ninety-four.
+
+Each user is counted once for every day they showed up.
+
+Both queries are valid SQL. The right formula depends on the grain of the question, and nothing in the query tells Spark which one you meant.
+
+
+=== CHAPTER 3. ONE DEFINITION (2:15 - 3:15) ===
+
+[RUN LAUNCH CONFIGURATION 5 (EXAMPLE 03, CREATE A METRIC VIEW)]
+
+A metric view puts the formula in the catalog. You write CREATE VIEW, WITH METRICS, LANGUAGE YAML, and a YAML definition.
+
+The definition names a source table, dimensions to group by, and measures. Conversion rate is converted sessions over sessions. Active users is a distinct count.
+
+In Spark four point two point oh, the version must be zero point one, and each dimension and measure has just a name and an expression.
+
+
+=== CHAPTER 4. EVERY GRAIN (3:15 - 4:00) ===
+
+[RUN LAUNCH CONFIGURATION 6 (EXAMPLE 04, MEASURES AT EVERY GRAIN)]
+
+To query it, wrap each measure in MEASURE.
+
+For the whole month, conversion rate is nine point two percent and active users is nine thousand nine hundred ninety-four. Group by region, and each region gets its own correct rate.
+
+Spark replaces MEASURE with the measure's formula and evaluates it at the query's grain. Nobody rewrites the formula.
+
+
+=== CHAPTER 5. WHAT IT DOES NOT PREVENT (4:00 - 4:40) ===
+
+[RUN LAUNCH CONFIGURATION 7 (EXAMPLE 05, WHAT IT DOES NOT PREVENT)]
+
+Here's the limit. Ask for active users by day with MEASURE, then add those numbers up in an outer query, and you get sixty-nine thousand four hundred twenty again.
+
+The result of MEASURE is an ordinary column, and summing it is ordinary SQL. So ask for each measure at the grain you report.
+
+
+=== CHAPTER 6. CLOSE (4:40 - 5:00) ===
+
+The full video covers why metric views were proposed, the rules Spark four point two point oh enforces, and a metric view over joined tables. The blog post has all of it, with citations.
+
+[END CARD WITH LINKS TO THE LONG-FORM VIDEO AND THE BLOG POST]

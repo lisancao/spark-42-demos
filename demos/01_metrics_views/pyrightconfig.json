@@ -1,6 +1,6 @@
 {
-  "//": "Lets VSCode/Pylance & PyCharm resolve `metrics_views_demo` from src/ without an editable install.",
-  "extraPaths": ["src"],
   "venvPath": ".",
-  "venv": ".venv"
+  "venv": ".venv",
+  "pythonVersion": "3.10",
+  "extraPaths": ["tools", "tests", "grammar_probe"]
 }
