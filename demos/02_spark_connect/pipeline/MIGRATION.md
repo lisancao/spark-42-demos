@@ -174,8 +174,8 @@ which this pipeline does not produce.
 
 ## Verifying Parity
 
-`parity.py` compares each table on its schema, its row count and an order-independent content hash.
-The row counts alone would miss a table with the right number of rows and
+`parity.py` compares each table on its schema, its row count and an order-independent content hash
+(blog post §12). The row counts alone would miss a table with the right number of rows and
 different values. `make pipeline` reported `7/7 tables identical` on four runs, and
 `tests/spark/test_parity.py` constructs each difference the comparison must detect.
 

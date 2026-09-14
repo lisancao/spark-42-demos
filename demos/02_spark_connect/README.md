@@ -217,7 +217,7 @@ reached, the Connect runs are skipped; with the cluster stopped, `make test` rep
 ├── tools/           doctor.py, compat_audit.py, check.py, teleprompter_export.py
 ├── setup/           TOPOLOGIES.md, standalone/start-connect-server.sh, kubernetes/
 ├── case_study/      lakehouse_stack/: the production pipeline migration, as a written case study
-├── extras/          Optional measurements (including the version sample in blog post §2) and the Rust client example
+├── extras/          Optional: the version sample in blog post §2 and the Rust client example
 ├── graphics/        Video graphics as 1920 by 1080 SVG (light versions in graphics/light/); blog figures in graphics/blog/
 ├── compose.yaml, Dockerfile, Makefile, pyproject.toml, uv.lock
 ├── blog_spark_connect.md, video_spark_connect.md, video_spark_connect_teleprompter.txt
@@ -236,16 +236,9 @@ Kubernetes manifests, which are untested here.
 
 ## Extras
 
-The demos do not use `extras/`. It holds two measurements and their recorded runs, so
-that the figures can be rerun, and the Rust client example from blog post §12.
+The demos do not use `extras/`. It holds a client and server version sample, with its recorded
+runs, and the Rust client example from blog post §13.
 
-- **`extras/bench/`: what the client and server split costs.** `protocol_overhead.py` times the same
-  work on Spark Classic and on Spark Connect on one machine: starting a session, small queries,
-  reading a schema, collecting results and aggregating. `shuffle_partitions.py` repeats one
-  aggregation at 8, 32, 200 and 800 shuffle partitions, because Connect's overhead grows with the
-  partition count. The JSON files are the recorded runs, made with CPython 3.12.3 before the project
-  was pinned to Python 3.10. There is no `make` target; each script's docstring shows how to run
-  it.
 - **`extras/version_matrix/`: whether a client and server of different versions work together.**
   `make matrix` starts a Spark 4.1.2 Connect server beside the 4.2.0 one, runs the same fourteen
   operations for each pairing of `pyspark-client` 4.1.2 or 4.2.0 with either server, twice, and
@@ -255,7 +248,7 @@ that the figures can be rerun, and the Rust client example from blog post §12.
 - **`extras/rust_polars/`: the Spark Connect Rust client with Polars.** A Cargo project that runs an
   aggregation on the Connect server with the `apache-spark-connect` 4.2.0 crate and continues in
   Polars, and `extras/rust_polars/examples/zip_check.rs`, which builds a plan that a 4.2.0 server
-  rejects. It needs Rust 1.95 or later and `protoc`; blog post §12 describes the build. Run it from
+  rejects. It needs Rust 1.95 or later and `protoc`; blog post §13 describes the build. Run it from
   that directory with `SPARK_REMOTE=sc://localhost:15002 cargo run --release`.
 
 ## Verification Status
@@ -267,7 +260,7 @@ On 2026-09-10, against the cluster in `compose.yaml`:
 - `make test` passed 38 unit tests, 16 Spark tests on Spark Classic, and 37 tests on Spark Connect.
 - `make matrix` gave identical results on both runs in every cell.
 - On 2026-09-11, the release build of `extras/rust_polars/` (Rust 1.98.1) printed the output shown in
-  blog post §12 on four runs, and `zip_check` reproduced the rejected plan.
+  blog post §13 on four runs, and `zip_check` reproduced the rejected plan.
 - `ruff check .` and Pyright reported no issues.
 - A copy of the project without virtual environments or `.env`, started from an empty cluster
   volume, ran `make setup`, `up`, `examples`, `doctor`, `audit`, `pipeline`, `test` and `check`, each

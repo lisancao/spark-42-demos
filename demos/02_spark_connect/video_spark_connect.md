@@ -1226,5 +1226,5 @@ Likely questions, with the correct answers:
 ### Cross-Promotion
 
 - Demo 1 of this series covers metric views in Spark 4.2 ([blog post](../01_metrics_views/blog_metric_views.md)).
-- [Companion Guide: Spark on Kubernetes](../../../companion_guide_spark_kubernetes.md) §12 for Connect on Kubernetes.
+- §12 of *Companion Guide: Spark on Kubernetes* (`companion_guide_spark_kubernetes.md`, a separate guide in the Spark content library) for Connect on Kubernetes.
 - Spark 4.2's Data Source V2 work (transactions, schema evolution, operation metrics, partition-statistics filtering) is material for a separate video.

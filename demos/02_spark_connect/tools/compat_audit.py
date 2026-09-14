@@ -2,7 +2,7 @@
 
     python tools/compat_audit.py path/to/code [--json] [--fail-on BLOCKER] [--no-legend]
 
-Each finding has a severity and a migration layer (blog post §9). The audit reads
+Each finding has a severity and a migration layer (blog post §9 and §12). The audit reads
 source with ``ast`` and has no type information, so it matches names rather than resolving them.
 """
 
