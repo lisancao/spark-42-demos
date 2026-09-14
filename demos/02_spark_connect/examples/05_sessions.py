@@ -2,7 +2,7 @@
 
     python examples/05_sessions.py
 
-Companion guide §7, "Session Reuse with getOrCreate()".
+Blog post §7, "Session Reuse with getOrCreate()".
 """
 import os
 

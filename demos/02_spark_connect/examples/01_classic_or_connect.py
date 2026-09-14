@@ -3,7 +3,7 @@
     python examples/01_classic_or_connect.py classic    # full pyspark (.venv-full) and a JDK
     python examples/01_classic_or_connect.py connect    # pyspark-client (.venv) and a server
 
-Companion guide §4 and §6.
+Blog post §4 and §6.
 """
 import os
 import sys

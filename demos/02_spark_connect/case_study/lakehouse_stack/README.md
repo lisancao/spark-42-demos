@@ -4,7 +4,7 @@ This case study explains why `~/lakehouse-stack/scripts/pipelines/pipeline_spark
 from Spark Classic to Spark Connect, and walks through the migration. The pipeline is 357 lines long
 and materializes 10 Iceberg tables (5 bronze, 2 silver, 3 gold) through a decorator framework modeled
 on Spark Declarative Pipelines. The changes are organized by the seven migration layers described in
-§9 of the [companion guide](../../companion_guide.md). Results were verified against Apache Spark
+§9 of the [blog post](../../blog_spark_connect.md). Results were verified against Apache Spark
 4.2.0 on 2026-09-09.
 
 > **Note** Running this case study requires the `~/lakehouse-stack` data and a locally built Iceberg
@@ -24,7 +24,7 @@ be checked rather than assumed.
 
 The pipeline was written for the lakehouse-stack deployment, where each run is submitted with
 `spark-submit` inside the Spark master container. That arrangement shows, in a single workload, the
-driver coupling that Spark Connect was proposed to remove (companion guide §1):
+driver coupling that Spark Connect was proposed to remove (blog post §1):
 
 - **The application must run beside the driver.** A script cannot be submitted from a laptop or a CI
   runner; it must first be copied into the container, which is why the repository's command-line

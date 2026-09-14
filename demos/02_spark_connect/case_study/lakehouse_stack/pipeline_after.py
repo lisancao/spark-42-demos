@@ -11,7 +11,7 @@
 #     SPARK_REMOTE=sc://localhost:15003 python pipeline_after.py     # Spark Connect
 #     python pipeline_after.py                                        # Spark Classic
 #
-# Migration layers (companion guide §9) and where each appears:
+# Migration layers (blog post §9) and where each appears:
 #     L0  session creation ............ build_session()
 #     L1  pipeline logic .............. unchanged
 #     L2  data sources and catalogs ... file paths and catalog names resolve on the server
@@ -78,7 +78,7 @@ DEFAULT_CATALOG = os.getenv("PIPELINE_CATALOG", "iceberg")
 def build_session(name: str) -> SparkSession:
     """Create a Spark Connect session if SPARK_REMOTE is set, otherwise a Spark Classic session.
 
-    SPARK_API_MODE=connect sets spark.api.mode instead (companion guide §6). With neither variable
+    SPARK_API_MODE=connect sets spark.api.mode instead (blog post §6). With neither variable
     set, the pipeline runs on Spark Classic as before, so a job can move back without code changes.
     """
     remote = os.getenv("SPARK_REMOTE")

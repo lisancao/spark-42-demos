@@ -4,7 +4,7 @@
     uv run --no-project --python 3.12 --with pyspark-client==4.2.0 --with "pandas<3" \
         examples/06_python_versions.py
 
-Companion guide §7, "Python Version Coupling".
+Blog post §7, "Python Version Coupling".
 """
 import os
 import sys

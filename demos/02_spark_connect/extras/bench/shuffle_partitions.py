@@ -4,7 +4,7 @@
     python extras/bench/shuffle_partitions.py --mode connect --remote sc://localhost:15002
     python extras/bench/shuffle_partitions.py --mode classic   # full pyspark and a JDK
 
-Results: companion guide §13, "Aggregations and Partition Count".
+The JSON files in this directory are the recorded runs.
 """
 
 from __future__ import annotations

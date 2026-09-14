@@ -1,4 +1,4 @@
-"""Spark Connect behavior that the companion guide describes, checked against a live server."""
+"""Spark Connect behavior that the blog post describes, checked against a live server."""
 import os
 
 import pytest

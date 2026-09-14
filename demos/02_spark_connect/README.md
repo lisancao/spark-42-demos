@@ -1,6 +1,6 @@
 # Demo 2: Spark Connect on Apache Spark 4.2
 
-This project accompanies the [companion guide](companion_guide.md) and the video script
+This project accompanies the [blog post](blog_spark_connect.md) and the video script
 ([`video_spark_connect.md`](video_spark_connect.md)). It contains two demos:
 
 - **Demo A: Setup.** Ten short examples, each showing one behavior of Spark Connect, and a `doctor`
@@ -19,7 +19,7 @@ Everything here was verified against Apache Spark **4.2.0** (released 2026-07-14
 Spark Connect, introduced in Spark 3.4, separates a client application from the Spark driver. The
 client builds a DataFrame plan and sends it over gRPC; the server resolves, optimizes and executes
 it, and returns results as Arrow. The session lives on the server, and the client holds a reference
-to it. Why Spark adopted this design is described in §1 of the companion guide.
+to it. Why Spark adopted this design is described in §1 of the blog post.
 
 For an application, session creation changes:
 
@@ -33,7 +33,7 @@ spark = SparkSession.builder.remote("sc://host:15002").getOrCreate()
 |---|---|
 | No JVM on the client | No JDK to install and no Spark JARs (456 MB in the full distribution). A client failure does not stop the driver. |
 | Credentials held by the server | Catalog passwords and object-storage keys are server configuration, rather than files mounted on every node that runs application code. |
-| Independent upgrades | The server can be upgraded without redeploying client applications. No compatibility matrix is published; companion guide §2 records a sample of mixed-version results. |
+| Independent upgrades | The server can be upgraded without redeploying client applications. No compatibility matrix is published; blog post §2 records a sample of mixed-version results. |
 | Embeddability | A notebook, web service or agent can hold a Spark session without a Spark distribution. |
 
 Two limitations apply:
@@ -84,7 +84,7 @@ configurations. The configurations read `.env`.
 `compose.yaml` builds `spark-connect-demo/spark:4.2.0` from the `Dockerfile`: the official
 `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` image with `pyarrow` 25.0.1 and `pandas` 2.3.3
 added. The official image does not include PyArrow, and Spark 4.2 runs Python UDFs through Arrow by
-default, so with default settings every Python UDF fails on the unmodified image (companion guide §7).
+default, so with default settings every Python UDF fails on the unmodified image (blog post §7).
 
 *Table 3. Services*
 
@@ -107,7 +107,7 @@ Table 4 says otherwise, an example runs in `.venv` (`pyspark-client`) and connec
 
 *Table 4. Examples in `examples/`*
 
-| File | Shows | Environment | Guide | Launch configurations |
+| File | Shows | Environment | Blog post | Launch configurations |
 |---|---|---|---|---|
 | `01_classic_or_connect.py` | The same DataFrame function on Spark Classic and on Spark Connect | `.venv-full` for `classic`, `.venv` for `connect` | §4, §6 | 1, 2 |
 | `02_first_query.py` | A query runs on the server; `explain()` prints the server's plan | | §2 | 3 |
@@ -217,10 +217,10 @@ reached, the Connect runs are skipped; with the cluster stopped, `make test` rep
 ├── tools/           doctor.py, compat_audit.py, check.py, teleprompter_export.py
 ├── setup/           TOPOLOGIES.md, standalone/start-connect-server.sh, kubernetes/
 ├── case_study/      lakehouse_stack/: the production pipeline migration, as a written case study
-├── extras/          Optional measurements behind companion guide §2 and §13; not needed for the demos
-├── graphics/        Video graphics as 1920 by 1080 SVG, with light versions in graphics/light/
+├── extras/          Optional measurements (including the version sample in blog post §2) and the Rust client example
+├── graphics/        Video graphics as 1920 by 1080 SVG (light versions in graphics/light/); blog figures in graphics/blog/
 ├── compose.yaml, Dockerfile, Makefile, pyproject.toml, uv.lock
-├── companion_guide.md, video_spark_connect.md, video_spark_connect_teleprompter.txt
+├── blog_spark_connect.md, video_spark_connect.md, video_spark_connect_teleprompter.txt
 └── .vscode/         Run configurations in video order, tasks and settings
 ```
 
@@ -236,22 +236,27 @@ Kubernetes manifests, which are untested here.
 
 ## Extras
 
-The demos do not use `extras/`. It holds the two measurements that the companion guide reports, so
-that the figures can be rerun.
+The demos do not use `extras/`. It holds two measurements and their recorded runs, so
+that the figures can be rerun, and the Rust client example from blog post §12.
 
 - **`extras/bench/`: what the client and server split costs.** `protocol_overhead.py` times the same
   work on Spark Classic and on Spark Connect on one machine: starting a session, small queries,
   reading a schema, collecting results and aggregating. `shuffle_partitions.py` repeats one
   aggregation at 8, 32, 200 and 800 shuffle partitions, because Connect's overhead grows with the
   partition count. The JSON files are the recorded runs, made with CPython 3.12.3 before the project
-  was pinned to Python 3.10. The results are in companion guide §13. There is no `make` target; each
-  script's docstring shows how to run it.
+  was pinned to Python 3.10. There is no `make` target; each script's docstring shows how to run
+  it.
 - **`extras/version_matrix/`: whether a client and server of different versions work together.**
   `make matrix` starts a Spark 4.1.2 Connect server beside the 4.2.0 one, runs the same fourteen
   operations for each pairing of `pyspark-client` 4.1.2 or 4.2.0 with either server, twice, and
   prints a table. `results/` holds each run's output, including the first line of every error. The
   summary, and the one surprising failure (a 4.2.0 client cannot create a DataFrame from local Python
-  data on a 4.1.2 server), are in companion guide §2, Table 2-1.
+  data on a 4.1.2 server), are in blog post §2, Table 2-1.
+- **`extras/rust_polars/`: the Spark Connect Rust client with Polars.** A Cargo project that runs an
+  aggregation on the Connect server with the `apache-spark-connect` 4.2.0 crate and continues in
+  Polars, and `extras/rust_polars/examples/zip_check.rs`, which builds a plan that a 4.2.0 server
+  rejects. It needs Rust 1.95 or later and `protoc`; blog post §12 describes the build. Run it from
+  that directory with `SPARK_REMOTE=sc://localhost:15002 cargo run --release`.
 
 ## Verification Status
 
@@ -261,6 +266,8 @@ On 2026-09-10, against the cluster in `compose.yaml`:
 - `make pipeline` reported 7 of 7 tables identical on four runs.
 - `make test` passed 38 unit tests, 16 Spark tests on Spark Classic, and 37 tests on Spark Connect.
 - `make matrix` gave identical results on both runs in every cell.
+- On 2026-09-11, the release build of `extras/rust_polars/` (Rust 1.98.1) printed the output shown in
+  blog post §12 on four runs, and `zip_check` reproduced the rejected plan.
 - `ruff check .` and Pyright reported no issues.
 - A copy of the project without virtual environments or `.env`, started from an empty cluster
   volume, ran `make setup`, `up`, `examples`, `doctor`, `audit`, `pipeline`, `test` and `check`, each
@@ -281,5 +288,5 @@ On 2026-09-10, against the cluster in `compose.yaml`:
   `SparkSession.builder.remote(url).create()` had not returned after about 18 minutes, when it was
   stopped. Run `make doctor` first; it tests the address with a three-second timeout.
 - **A 4.2.0 client cannot create a DataFrame from local Python data on a 4.1.2 server.** The failure
-  and its cause are described in companion guide §2.
+  and its cause are described in blog post §2.
 - **The Kubernetes manifests in `setup/kubernetes/` are untested.**

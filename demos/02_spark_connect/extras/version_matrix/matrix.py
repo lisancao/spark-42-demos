@@ -3,8 +3,8 @@
     python extras/version_matrix/matrix.py --cell B --run 1 --remote sc://localhost:15096
     python extras/version_matrix/matrix.py --report
 
-Results are written to extras/version_matrix/results/<cell>-run<N>.json and summarized in companion
-guide §2, Table 2-1. The operations are a sample, not a compatibility matrix.
+Results are written to extras/version_matrix/results/<cell>-run<N>.json and summarized in blog
+post §2, Table 2-1. The operations are a sample, not a compatibility matrix.
 """
 import argparse
 import json

@@ -2,7 +2,7 @@
 
     python examples/07_connection_strings.py
 
-Companion guide §5, "Constraints".
+Blog post §5, "Constraints".
 """
 import os
 

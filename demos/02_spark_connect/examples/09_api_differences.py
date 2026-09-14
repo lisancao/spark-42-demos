@@ -2,7 +2,7 @@
 
     python examples/09_api_differences.py
 
-Companion guide §7.
+Blog post §7.
 """
 import os
 

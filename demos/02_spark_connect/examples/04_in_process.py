@@ -2,7 +2,7 @@
 
     python examples/04_in_process.py    # full pyspark (.venv-full) and a JDK
 
-Companion guide §4 and setup/TOPOLOGIES.md §1.
+Blog post §4 and setup/TOPOLOGIES.md §1.
 """
 import socket
 import sys

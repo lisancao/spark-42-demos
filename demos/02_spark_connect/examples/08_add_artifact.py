@@ -2,7 +2,7 @@
 
     python examples/08_add_artifact.py
 
-Companion guide §9, Layer 4.
+Blog post §9, Layer 4.
 """
 import os
 from pathlib import Path

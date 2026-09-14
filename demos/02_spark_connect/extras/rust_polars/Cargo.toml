@@ -1,0 +1,11 @@
+[package]
+name = "spark-polars"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+apache-spark-connect = "=4.2.0"
+# Must be the same arrow major as apache-spark-connect 4.2.0 (^58) so RecordBatch types match.
+arrow = { version = "58", default-features = false, features = ["ipc", "prettyprint"] }
+# ipc_streaming provides IpcStreamReader. parquet works around pola-rs/polars#27898.
+polars = { version = "0.55", features = ["ipc_streaming", "lazy", "parquet"] }

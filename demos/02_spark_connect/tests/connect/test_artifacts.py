@@ -1,4 +1,4 @@
-"""A Python UDF's dependency reaches the executors through addArtifact (guide §9, Layer 4)."""
+"""A Python UDF's dependency reaches the executors through addArtifact (blog post §9, Layer 4)."""
 import os
 from pathlib import Path
 

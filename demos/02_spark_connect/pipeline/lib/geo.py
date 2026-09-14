@@ -1,7 +1,7 @@
 """Great-circle distance, used by a Python UDF that the executors import at run time.
 
 The module uses only the standard library. Under Spark Connect it reaches the executors through
-SparkSession.addArtifact (companion guide §9, Layer 4).
+SparkSession.addArtifact (blog post §9, Layer 4).
 """
 import math
 

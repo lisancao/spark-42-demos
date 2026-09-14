@@ -160,5 +160,5 @@
   </g>
 
   <!-- Footer -->
-  <text x="80" y="1046" font-size="20" fill="#57606a">Source: companion guide &#xa7;15, JIRA issues</text>
+  <text x="80" y="1046" font-size="20" fill="#57606a">Source: Spark 4.2.0 release notes and JIRA</text>
 </svg>

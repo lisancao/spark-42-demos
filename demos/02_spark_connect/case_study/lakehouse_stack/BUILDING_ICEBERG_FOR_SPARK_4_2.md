@@ -6,7 +6,7 @@
 > Iceberg release, carries no support from either project, and should not be used in production.
 >
 > Nothing else in this Spark Connect material depends on it. Connect is catalog-agnostic: Demo A
-> and the companion guide use no catalog at all, and the migration in Demo B works the same way
+> and the blog post use no catalog at all, and the migration in Demo B works the same way
 > against any catalog Spark supports.
 
 ## Why a Rebuild Is Required
