@@ -166,7 +166,7 @@ Add `--wait` to keep the server in the foreground (it sets `SPARK_NO_DAEMONIZE=1
 appropriate under a process supervisor or in a container, but not from an interactive shell.
 
 Clients connect to `sc://localhost:15002`. Without a binding setting the server listens on all
-interfaces, so other hosts can reach it too; add `--conf spark.connect.grpc.binding.host=127.0.0.1`
+interfaces, so other hosts can reach it too; add `--conf spark.connect.grpc.binding.address=127.0.0.1`
 to accept only local clients.
 
 Instructions written for Spark 3.5 add `--packages org.apache.spark:spark-connect_2.13:<version>`.
@@ -183,7 +183,7 @@ clients.
 ```bash
 ./sbin/start-connect-server.sh --wait \
   --master spark://master-host:7077 \
-  --conf spark.connect.grpc.binding.host=0.0.0.0 \
+  --conf spark.connect.grpc.binding.address=0.0.0.0 \
   --conf spark.connect.grpc.binding.port=15002 \
   --conf spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions \
   --conf spark.sql.catalog.iceberg=org.apache.iceberg.spark.SparkCatalog \
@@ -192,7 +192,7 @@ clients.
 
 Four aspects of this command are significant:
 
-- **`binding.host=0.0.0.0`.** States the listening interface explicitly. A 4.2.0 server with no
+- **`binding.address=0.0.0.0`.** States the listening interface explicitly. A 4.2.0 server with no
   binding setting already listens on all interfaces (blog post §4); a specific address
   restricts it.
 - **Catalog and extension configuration is set on the server.** These values are class names, and

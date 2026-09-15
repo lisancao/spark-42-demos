@@ -5,21 +5,7 @@ DataFrame plan and sends it to a server, which runs it and streams the results b
 post covers why Spark adopted that design, how it works, how to adopt it (including how to migrate
 an existing PySpark pipeline) and what it takes to build and use a Connect client. It is written for
 engineers who already run Spark and want to understand the architecture before they change it.
-Every claim is cited.
-
-> Verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-09: an official
-> `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` Connect server driven by
-> `pyspark-client==4.2.0`.
-
-Claims in this post carry one of three levels of provenance:
-
-- **Unmarked**: reproduced against a live 4.2.0 server, or read from the shipped
-  `pyspark-client==4.2.0` source. Package sizes, error classes, configuration defaults and API
-  behaviors are in this category.
-- **Per the documentation**: taken from the Spark documentation or a JIRA issue and cited, but not
-  exercised here.
-- **Untested here**: an environment that was not available for testing (Kubernetes, YARN), or a
-  third-party claim.
+Examples were tested on Spark 4.2.0.
 
 ---
 
@@ -45,10 +31,6 @@ Claims in this post carry one of three levels of provenance:
 
 ## 1. Why Spark Connect Exists
 
-This section describes the architecture Spark Connect was designed to replace, the limitations that
-motivated it, the design decision at its center, and how it has developed from Spark 3.4 to 4.2.
-Readers who are familiar with the history can skip to §2.
-
 ### The Driver-Coupled Architecture
 
 In a conventional Spark application, the application and the Spark driver are bound together. The
@@ -72,24 +54,12 @@ lifetime with the driver and, on a shared cluster, a failure domain.
 
 ### The Limitations That Motivated Connect
 
-In June 2022, Martin Grund filed the Spark Improvement Proposal (SPIP) for Spark Connect as
-[SPARK-39375](https://issues.apache.org/jira/browse/SPARK-39375). It observes that Spark "was
-designed nearly a decade ago, which, in the age of serverless computing and ubiquitous programming
-language use, poses a number of limitations," and that "most of the limitations stem from the
-tightly coupled Spark driver architecture and fact that clusters are typically shared across users."
-The SPIP names four, summarized in Table 1-1.
+The Spark Connect proposal targeted remote connectivity, client isolation, independent upgrades,
+and a smaller client runtime. The design shipped in Spark 3.4 and continued to expand through 4.2;
+the proposal and release-history links are collected in the citations below.
 
-*Table 1-1. Limitations of the driver-coupled architecture, as described in SPARK-39375*
-
-| Limitation | As stated in the SPIP |
-|---|---|
-| Remote connectivity | The driver runs both the client application and the scheduler, so the application must be close to the cluster. Apart from SQL, there was no built-in way to connect to a cluster remotely, and users relied on external projects such as Apache Livy. |
-| Developer experience | The architecture and APIs did not cater for interactive exploration in notebooks or for the tooling common in modern code editors. |
-| Stability | With a shared driver, one user causing a critical exception such as an out-of-memory error brings the cluster down for all users. |
-| Upgradability | Platform and client dependencies share one classpath, which prevents upgrading Spark independently of the applications that use it. |
-
-The SQL exception in the first row is the Thrift JDBC/ODBC server, which Spark has long provided for
-remote SQL access. It does not extend to the DataFrame API or to languages other than SQL.
+Spark has long provided remote SQL access through the Thrift JDBC/ODBC server, but that interface
+does not extend to the DataFrame API or to languages other than SQL.
 
 ### The Design Decision
 
@@ -112,9 +82,8 @@ Using the plan as the protocol has three consequences that recur throughout this
   in any language that can produce the protocol messages.
 - **The server keeps all of Spark's optimizations.** Once a plan arrives it enters the standard
   execution path, so Connect does not fork the engine.
-- **Anything that is not a plan cannot be expressed.** RDDs, direct access to the driver JVM, and
-  mutation of cluster-wide state have no representation in the protocol. These are the APIs Connect
-  does not support (§7).
+- **Some APIs remain client-inaccessible.** APIs that require direct driver-object access or lack a
+  Connect RPC representation cannot be used from the client (§7).
 
 The Spark Connect overview documents the operational benefits the design was intended to deliver:
 **stability**, because an application that uses too much memory "will now only impact [its] own
@@ -122,24 +91,9 @@ environment"; **upgradability**, because "the Spark driver can now seamlessly be
 independently of applications"; and **debuggability and observability**, because applications can
 be developed from an IDE and monitored with their own framework's metrics and logging.
 
-### A Short History
+### Release Status
 
-Table 1-2 lists the milestones. Each release row is taken from the Apache Spark release notes.
-
-*Table 1-2. Spark Connect milestones*
-
-| Date | Milestone | Reference |
-|---|---|---|
-| June 2022 | SPIP filed | [SPARK-39375](https://issues.apache.org/jira/browse/SPARK-39375) |
-| July 2022 | Announced by Databricks (Leone, Grund, van Hövell, Xin) | *Introducing Spark Connect* |
-| April 2023 | **Spark 3.4.0**: Python client for Spark Connect | Release notes |
-| September 2023 | **Spark 3.5.0**: Scala and Go clients; Structured Streaming in Python and Scala; pandas API support; PyTorch-based distributed ML | [SPARK-43351](https://issues.apache.org/jira/browse/SPARK-43351), [SPARK-42938](https://issues.apache.org/jira/browse/SPARK-42938), [SPARK-42497](https://issues.apache.org/jira/browse/SPARK-42497), [SPARK-42471](https://issues.apache.org/jira/browse/SPARK-42471) |
-| May 2025 | **Spark 4.0.0**: the `pyspark-client` pure-Python package; `spark.api.mode`; a release tarball with Connect enabled by default; ML on Spark Connect; a Swift client | [SPARK-47540](https://issues.apache.org/jira/browse/SPARK-47540), [SPARK-51212](https://issues.apache.org/jira/browse/SPARK-51212) |
-| December 2025 | **Spark 4.1.0**: JDBC driver for Spark Connect | [SPARK-53484](https://issues.apache.org/jira/browse/SPARK-53484) |
-| July 2026 | **Spark 4.2.0**: RDD-style APIs for the DataFrame client; execution status; YARN cluster mode; documentation of Connect's lazy analysis | [SPARK-55227](https://issues.apache.org/jira/browse/SPARK-55227), [SPARK-55606](https://issues.apache.org/jira/browse/SPARK-55606), [SPARK-55239](https://issues.apache.org/jira/browse/SPARK-55239), [SPARK-53882](https://issues.apache.org/jira/browse/SPARK-53882) |
-
-Two points of status are easy to misread. The SPIP ticket itself has no fix version and remains in
-the Reopened state, although the feature shipped in 3.4.0. And Spark Connect is **not** the default
+Spark Connect is **not** the default
 in Spark 4.x: [SPARK-50411](https://issues.apache.org/jira/browse/SPARK-50411), "Spark Connect as the
 default API in Spark 4," is open. An application uses Spark Classic unless it is configured otherwise
 (§6).
@@ -161,17 +115,18 @@ are configured on the server because that is where the session resolves names; t
 what tables exist by asking the server; and a client can change only those settings that the server
 reads at run time (§9, Layer 3).
 
-A single Connect server hosts many sessions, one per client, isolated from one another. Five
-analysts in five notebooks connected to one server have five independent sessions, each with its own
+A single Connect server hosts many sessions. Clients normally create distinct session IDs, but one
+client may create several sessions or explicitly reuse a session ID. Five analysts in five notebooks
+connected to one server normally have five independent sessions, each with its own
 temporary views, session configuration and current catalog. What they share is the server's JVM, its
 memory and its executors. Isolation stronger than that (hard resource limits, separate failure
 domains, or a different Spark version on the server) requires separate servers rather than separate
 sessions: every session on a server runs on that server's Spark build. The client library connecting
 to it is a separate matter, described in "Client and Server Versions" below.
 
-![Two notebook kernels and a CI job, each connected over gRPC to its own session on one Spark Connect server. Each session holds its own temporary views, session configuration, current catalog and artifacts. The JVM and its memory, the executors, the Spark version and the installed JARs are shared by every session.](graphics/blog/fig2-1_sessions_on_a_server.png)
+![Two notebook kernels and a CI job, each normally connected over gRPC with a distinct session ID on one Spark Connect server. Each session holds its own temporary views, session configuration, current catalog and artifacts. The JVM and its memory, the executors, the Spark version and the installed JARs are shared by every session.](graphics/blog/fig2-1_sessions_on_a_server.png)
 
-*Figure 2-1. One Connect server, with one isolated session for each client*
+*Figure 2-1. One Connect server with multiple isolated sessions*
 
 ### Client and Server Versions
 
@@ -438,7 +393,7 @@ command:
   - -c
   - >-
     /opt/spark/sbin/start-connect-server.sh --wait
-    --conf spark.connect.grpc.binding.host=0.0.0.0
+    --conf spark.connect.grpc.binding.address=0.0.0.0
     --conf spark.connect.grpc.binding.port=15002
 ```
 
@@ -449,8 +404,7 @@ command:
 | Configuration | Default | Since |
 |---|---|---|
 | `spark.api.mode` | `classic` | 4.0.0 |
-| `spark.connect.grpc.binding.host` | (none; all interfaces) | 4.0.0 |
-| `spark.connect.grpc.binding.address` | (none) | 4.0.0 |
+| `spark.connect.grpc.binding.address` | (none; all interfaces) | 4.0.0 |
 | `spark.connect.grpc.binding.port` | 15002 | 3.4.0 |
 | `spark.connect.grpc.port.maxRetries` | 0 | 4.0.0 |
 | `spark.connect.grpc.maxInboundMessageSize` | 134217728 | 3.4.0 |
@@ -461,11 +415,9 @@ command:
 | `spark.connect.jvmStacktrace.maxSize` | 1024 | 3.5.0 |
 | `spark.sql.connect.enrichError.enabled` | true | 4.0.0 |
 
-Both `binding.host` and `binding.address` are registered configurations; a live 4.2.0 server returns
-a value for each. `binding.host` is the one used in the Spark documentation and in this post. With
-neither setting, a 4.2.0 server listens on all interfaces: started from the official image with no
-binding configuration, it listened on `[::]:15002`. Set `binding.host` to `127.0.0.1` to accept only
-local connections, or to the address of a specific interface.
+`spark.connect.grpc.binding.address` is the registered Spark 4.2 configuration. When it is unset, the
+server binds all interfaces; in the official image it listened on `[::]:15002`. Set it to
+`127.0.0.1` to accept only loopback connections, or to the address of a specific interface.
 
 `port.maxRetries` defaults to 0. A port conflict is therefore a startup failure rather than a silent
 move to the next port, which keeps clients and server in agreement about where the server listens.
@@ -652,9 +604,8 @@ unavailable with it: `setLogLevel`, `addFile`, `addPyFile`, broadcast variables 
 `SparkContext.broadcast()`, and accumulators.
 
 Two entries warrant comment. `newSession()` is not prominent in the documentation; to obtain a second
-session, create one with `builder.create()` (see "Session Reuse" later in this section). And RDDs are
-a permanent difference rather than a pending one: the protocol has no representation for a closure
-executed against RDD partitions.
+session, create one with `builder.create()` (see "Session Reuse" later in this section). RDDs remain
+unsupported in Spark Connect 4.2 because the protocol has no RDD representation.
 
 ### `enableHiveSupport()`
 
@@ -685,7 +636,7 @@ and is supported. Table 7-1 distinguishes them.
 | `pyspark.sql.functions.broadcast(df)` (join hint) | Supported |
 | `SparkContext.broadcast(value)` (broadcast variable) | Unavailable |
 | Accumulators | Unavailable |
-| `DataFrame.observe()` with `Observation` | Supported; the replacement for accumulators |
+| `DataFrame.observe()` with `Observation` | Supported for aggregate DataFrame metrics; not a general accumulator replacement |
 
 `Observation` collects named metrics during an action:
 
@@ -844,8 +795,9 @@ first.count()     # Classic: rows of a    Connect: rows of b
 
 *Figure 8-1. What a DataFrame built on a temporary view holds in each mode*
 
-To avoid this, give each temporary view a unique name (appending a UUID is sufficient), or
-materialize the DataFrame before the view is replaced.
+To avoid this, give each temporary view a unique name (appending a UUID is sufficient); persist the
+DataFrame and run an action before replacing the view; or write to a stable table or path and read it
+back. Calling `cache()` alone is lazy and is not sufficient.
 
 ### UDFs That Capture Variables
 
@@ -916,17 +868,20 @@ The second form also benefits Spark Classic: the `withColumn` API documentation 
 
 ## 9. Migrating an Existing Pipeline
 
-A migration to Spark Connect is not a single change. It consists of seven independent layers, of
-which only the first is mandatory. This section describes each layer, what changes in it and what
-does not, and how to confirm it is complete. It ends with the order in which to carry the layers out.
+A migration to Spark Connect can touch seven related areas. Which ones apply depends on the
+application and deployment; a `spark-submit` job using `spark.api.mode=connect` may need no session-
+creation code change. This section describes each area and how to confirm the applicable changes.
 
-The worked example is `~/lakehouse-stack/scripts/pipelines/pipeline_spark41.py`: a 357-line pipeline
+The worked example is a 357-line pipeline copied from the `lakehouse-stack` project
 that materializes 10 Iceberg tables (5 bronze, 2 silver, 3 gold) through a decorator framework
 modeled on Spark Declarative Pipelines. The before and after files and an annotated diff are in the
 written case study, [`case_study/lakehouse_stack/`](case_study/lakehouse_stack/README.md). Across the
 migration, no line of transformation logic changes: Connect moves where the code executes, not the
 code itself. A smaller pipeline that runs without the lakehouse stack, with one change in each
 layer, is in [`pipeline/`](pipeline/MIGRATION.md).
+
+The case study uses OSS Apache Iceberg with a JDBC catalog. It does not test Delta UniForm or Unity
+Catalog interoperability.
 
 *Table 9-1. The seven layers of a Spark Connect migration*
 
@@ -1147,9 +1102,9 @@ session, cached state and temporary views on the server.
 
 Credentials move off client machines. In the worked example, the catalog configuration, including
 a Postgres password and object-storage keys, was mounted into the master and every worker, and was
-readable by any job. Under Connect those credentials are held only by the Connect server. Clients
-connect to a gRPC endpoint and hold no catalog credentials, so laptops, CI runners and notebooks no
-longer need them.
+readable by any job. With Connect, clients no longer need catalog or storage credentials. Keep
+catalog credentials in server/driver configuration, and give executors only the storage or delegated
+access they require.
 
 Four considerations apply:
 
@@ -1769,5 +1724,8 @@ Items 27 to 30 are separate guides in the Spark content library and are not in t
 
 ---
 
-*Verified against Apache Spark 4.2.0 (git revision `32f72996011`) with `pyspark-client==4.2.0`,
-2026-09-09 and 2026-09-10, and with the `apache-spark-connect` 4.2.0 crate on 2026-09-11.*
+*Methodology note: unmarked behavior was reproduced against a live Spark 4.2.0 server or checked in
+the shipped client; documentation claims are linked, and unavailable deployments are labeled
+untested. Databricks serverless compatibility was not tested here. Verified against Apache Spark
+4.2.0 (git revision `32f72996011`) with `pyspark-client==4.2.0`, 2026-09-09 and 2026-09-10, and with
+the `apache-spark-connect` 4.2.0 crate on 2026-09-11.*

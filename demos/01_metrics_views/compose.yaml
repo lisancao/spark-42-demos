@@ -11,7 +11,7 @@ services:
       - /opt/spark/sbin/start-connect-server.sh
       - --wait
       - --conf
-      - spark.connect.grpc.binding.host=0.0.0.0
+      - spark.connect.grpc.binding.address=0.0.0.0
       - --conf
       - spark.sql.warehouse.dir=file:/tmp/warehouse
     ports:

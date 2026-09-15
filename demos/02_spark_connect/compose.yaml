@@ -45,7 +45,7 @@ services:
       - --master
       - ${CONNECT_MASTER:-spark://spark-master:7077}
       - --conf
-      - spark.connect.grpc.binding.host=0.0.0.0
+      - spark.connect.grpc.binding.address=0.0.0.0
       - --conf
       - spark.driver.host=spark-connect
       - --conf
@@ -76,7 +76,7 @@ services:
       - /opt/spark/sbin/start-connect-server.sh
       - --wait
       - --conf
-      - spark.connect.grpc.binding.host=0.0.0.0
+      - spark.connect.grpc.binding.address=0.0.0.0
     ports:
       - "127.0.0.1:${CONNECT_41_PORT:-15096}:15002"
     healthcheck:
