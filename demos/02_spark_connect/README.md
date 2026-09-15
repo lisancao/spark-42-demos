@@ -8,7 +8,7 @@ This project accompanies the [blog post](blog_spark_connect.md) and the video sc
 - **Demo B: Migration.** A small pipeline migrated from Spark Classic to Spark Connect, with one
   change for each migration layer and a comparison showing that the output is unchanged.
 
-The migration of a 357-line production pipeline is included as a written case study, and
+The migration of a 357-line pipeline copied from the `lakehouse-stack` project is included as a written case study, and
 [`setup/TOPOLOGIES.md`](setup/TOPOLOGIES.md) describes where a Connect server can run.
 
 Everything here was verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-09 and
@@ -226,7 +226,8 @@ reached, the Connect runs are skipped; with the cluster stopped, `make test` rep
 
 ## Case Study
 
-`case_study/lakehouse_stack/` describes the migration of a 357-line production pipeline that writes
+`case_study/lakehouse_stack/` describes the migration of a 357-line pipeline copied from the
+`lakehouse-stack` project that writes
 10 Iceberg tables; parity was verified for all 10 tables, including 1,027,129 bronze orders. It
 requires `~/lakehouse-stack` data and a locally built Iceberg runtime, because Apache Iceberg has no
 Spark 4.2 release, and it has its own Makefile.

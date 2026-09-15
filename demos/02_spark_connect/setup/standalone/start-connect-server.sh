@@ -26,7 +26,7 @@ args=(
   # Stay in the foreground, as a process supervisor or a container expects. Without --wait, the
   # script starts the server in the background and returns.
   --wait
-  --conf "spark.connect.grpc.binding.host=${BIND_HOST}"
+  --conf "spark.connect.grpc.binding.address=${BIND_HOST}"
   --conf "spark.connect.grpc.binding.port=${CONNECT_PORT}"
 )
 

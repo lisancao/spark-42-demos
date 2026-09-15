@@ -5,24 +5,8 @@ Each measure is an aggregate expression written without a grouping, and a query 
 when it asks for the measure with `MEASURE()`. This post covers why Spark added metric views, how to
 define and query one, what a metric view does and does not guard against, and the rules Apache Spark
 4.2.0 applies to definitions, queries and catalog commands. It is written for data engineers and
-analysts who write Spark SQL and maintain metric definitions that other people query. Every claim is
-cited.
-
-> Verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-11: an official
-> `apache/spark:4.2.0-scala2.13-java21-python3-ubuntu` Spark Connect server driven by
-> `pyspark-client==4.2.0`, and a local Spark Classic session from `pyspark==4.2.0`.
-
-Claims in this post carry one of four levels of provenance:
-
-- **Unmarked**: reproduced against Spark 4.2.0 with the examples in this project or with
-  `grammar_probe/probe.py`. Results, error conditions and accepted or rejected statements are in this
-  category.
-- **Per the source**: read from the Spark source at tag `v4.2.0` and cited with a link, but not
-  exercised here.
-- **Per the documentation**: taken from project documentation, a JIRA issue or a mailing-list
-  message, and cited.
-- **Untested here**: a configuration that was not available for testing, such as a Data Source V2
-  catalog or a Hive metastore.
+analysts who write Spark SQL and maintain metric definitions that other people query. Examples were
+tested on Spark 4.2.0.
 
 ---
 
@@ -43,10 +27,6 @@ Claims in this post carry one of four levels of provenance:
 ---
 
 ## 1. Why Metric Views Exist
-
-This section describes the kind of measure that metric views are designed for, where definitions of
-such measures have usually been kept, and the proposal that added metric views to Spark. Readers who
-are familiar with the background can skip to §2.
 
 ### Additive and Non-Additive Measures
 
@@ -72,8 +52,9 @@ For ratios, the same page recommends keeping the additive parts:
 > the final non-additive fact.
 
 A conversion rate is then computed as converted sessions divided by sessions, at whatever grain the
-question needs. A distinct count has no additive components, so it has to be recomputed from the
-detail rows at each grain. In both cases the correct formula is known when the metric is defined, but
+question needs. Without a mergeable intermediate representation such as bitmaps or sketches, a
+distinct count has no additive components, so it has to be recomputed from the detail rows at each
+grain. In both cases the correct formula is known when the metric is defined, but
 it has to be applied each time a query is written.
 
 ### Where Metric Definitions Have Lived
@@ -109,32 +90,9 @@ The SPIP lists what it sees as the costs of keeping definitions in many views:
 
 ### The Proposal
 
-On October 31, 2025, Linhong Liu proposed "The metrics & semantic modeling in Spark" on the
-dev@spark.apache.org mailing list:
-
-> This feature enables defining business metrics once and reusing them across any breakdown,
-> ensuring consistent outcomes and bridging the semantic gap between business logic and data schemas
-> to help LLMs generate more precise results.
-
-The linked SPIP document lists Can Efeoglu, Justin Talbot, Linhong Liu, Gengliang Wang, Liang-Chi
-Hsieh and Daniel Tenedorio as authors and Wenchen Fan as shepherd. It states the objective:
-
-> We want a simple way for people to define important business metrics (like "active users,"
-> "revenue," or "revenue per customer") once and then ask for those metrics by any breakdown (by
-> date, by country, by product) and always get the same, correct answer. We propose adding a view
-> type to Spark called a metric view.
-
-In the discussion, Wenchen Fan gave the case for a dedicated construct:
-
-> I believe this is a very useful feature, as the other alternatives do not work well: people need
-> to either define many similar views with different grouping columns and aggregate functions, or
-> manually maintain a doc page to describe the semantic of these metrics that people need to follow
-> when writing queries to calculate these metrics.
-
-The vote opened on November 10, 2025, and passed on November 13 with 19 +1 votes, 5 of them binding,
-and no -1 votes. The work was tracked as SPARK-54119, "Metrics & semantic modeling in Spark". The
-SPIP document can still be edited; the quotations above are as fetched on 2026-09-11, with reviewer
-comment markers removed.
+The metric-views proposal aimed to define a business metric once and evaluate it consistently at
+whatever breakdown a query requests. Metric views shipped in Apache Spark 4.2; proposal and
+development links are collected in the citations below.
 
 ### The Design Decision
 
@@ -153,18 +111,6 @@ own grain.
 
 ### Development in Spark 4.2
 
-*Table 1-1. Metric view milestones*
-
-| Date | Milestone | Reference |
-|---|---|---|
-| 2025-10-31 | SPIP proposed on dev@spark.apache.org | [DISCUSS thread](https://lists.apache.org/thread/vdr5wgtccs33wvrbdmroz3wtslqh8s9d) |
-| 2025-11-13 | Vote passes with 19 +1 votes, 5 binding, and no -1 votes | [Vote result](https://www.mail-archive.com/dev@spark.apache.org/msg34518.html) |
-| 2025-12-10 | Parsing of metric view YAML committed | [SPARK-54403](https://issues.apache.org/jira/browse/SPARK-54403), [PR 53146](https://github.com/apache/spark/pull/53146) |
-| 2025-12-17 | `CREATE VIEW ... WITH METRICS` and query resolution committed | [SPARK-54405](https://issues.apache.org/jira/browse/SPARK-54405), [PR 53158](https://github.com/apache/spark/pull/53158) |
-| 2026-05-07 | Metric view creation on Data Source V2 catalogs committed | [SPARK-56920](https://issues.apache.org/jira/browse/SPARK-56920), [PR 55487](https://github.com/apache/spark/pull/55487) |
-| 2026-05-25 | SPARK-54119 resolved with fix version 4.2.0 | [SPARK-54119](https://issues.apache.org/jira/browse/SPARK-54119) |
-| 2026-07-14 | Apache Spark 4.2.0 released | [Release notes](https://spark.apache.org/releases/spark-release-4-2-0.html) |
-
 The 4.2.0 release notes list metric views among the release highlights. SPARK-54408, "Metric view
 Composability", covers a metric view used as the source of another and measures that refer to other
 measures; it is open with no fix version. As of 2026-09-11, the Spark 4.2.0 documentation has no
@@ -176,8 +122,6 @@ and can only be used to calculate a measure defined in a metric view."
 ---
 
 ## 2. The Demonstration Dataset
-
-This section describes the data that every example uses and how the examples reach it.
 
 `tools/generate_data.py` writes three Parquet files for one month, June 2026, of a food-delivery
 service. It uses numpy with a fixed seed, so every run writes the same rows, and it does not need
@@ -225,9 +169,6 @@ stops. §10 lists the commands that run everything.
 
 ## 3. Two Aggregation Errors
 
-This section shows two queries that answer a different question from the one they appear to answer.
-Both run without an error or a warning. Examples 01 and 02 run them.
-
 ### Averaging Ratios
 
 A report needs one conversion rate for the month. The regional rates in Table 2-2 are at hand, and
@@ -260,7 +201,8 @@ Of the 79,000 sessions, 7,295 converted, so the month's conversion rate is 0.092
 average of the five regional rates is 0.2384, or 23.8%, 2.6 times as high. The average gives each
 region the same weight, so the 200 sessions of the remote region count as much as the 50,000 sessions
 of the metro region. Dividing the totals weights each region by its sessions, which is what a rate
-for the month means. The two methods agree only when every region has the same number of sessions.
+for the month means. Equal group sizes guarantee agreement; with unequal sizes the two methods
+generally differ.
 Figure 3-1 shows the difference.
 
 ![Five bars, one for each region, with widths proportional to sessions: metro 50,000 sessions at a conversion rate of 0.0787, urban 20,000 at 0.0990, suburban 8,000 at 0.1218, rural 800 at 0.3775 and remote 200 at 0.5150. One line marks the unweighted average of the five rates, 0.2384. Another marks converted sessions divided by all sessions, 0.0923.](graphics/blog/fig3-1_average_of_ratios.png)
@@ -329,9 +271,6 @@ every query shares.
 
 ## 4. Defining a Metric View
 
-This section covers the statement that creates a metric view, the YAML document inside it, and what
-Spark records in the catalog. Example 03 creates the view that §5 and §6 query.
-
 ### The CREATE VIEW Statement
 
 Example 03 creates the view with this statement, where the body between the `$$` markers is the YAML
@@ -341,21 +280,8 @@ document in the next subsection:
 CREATE VIEW delivery_metrics WITH METRICS LANGUAGE YAML AS $$ ... $$
 ```
 
-Per the source, the grammar rule at tag `v4.2.0` is:
-
-```antlr
-| CREATE (OR REPLACE)?
-    VIEW (IF errorCapturingNot EXISTS)? identifierReference
-    identifierCommentList?
-    ((WITH METRICS) |
-     routineLanguage |
-     commentSpec |
-     (TBLPROPERTIES propertyList))*
-    AS codeLiteral                                                 #createMetricView
-```
-
 `WITH METRICS` distinguishes a metric view from an ordinary view, and `LANGUAGE YAML` names the
-language of the body. Per the source, both clauses are required, and YAML is the only language the
+language of the body. Both clauses are required, and YAML is the only language the
 parser accepts. The body is a dollar-quoted string (`codeLiteral`); a single-quoted string in its
 place failed to parse. `COMMENT` and `TBLPROPERTIES` are accepted. There is no temporary form:
 `CREATE TEMPORARY VIEW ... WITH METRICS` failed with `PARSE_SYNTAX_ERROR`.
@@ -451,10 +377,6 @@ which is how to read a definition back (§7). The catalog API reports the type d
 ---
 
 ## 5. Querying with MEASURE()
-
-This section runs queries against the metric view at three grains, explains how Spark resolves
-`MEASURE()`, and lists the filtering, grouping and ordering clauses a query can use. Example 04 runs
-the queries.
 
 ### One Definition at Every Grain
 
@@ -600,8 +522,6 @@ of the source, as `COUNT(*)` does.
 
 ## 6. What a Metric View Does Not Prevent
 
-This section writes the two queries from §3 against the metric view. Example 05 runs them.
-
 A metric view evaluates a measure at the grain of the query that uses it. It does not follow the
 result into an enclosing query. The inner query below returns each day's distinct users correctly,
 and the outer query sums them:
@@ -649,7 +569,8 @@ also has no way to mark a measure as non-additive, because a column has only `na
 
 What a metric view provides is a single place for each formula: the author writes it once, and a
 query at any grain evaluates it without restating it. A query that asks for a measure at the grain it
-reports gets the correct value. A query that computes a measure at one grain and aggregates the
+reports returns the defined value consistently, assuming the definition and modeled source are
+correct. A query that computes a measure at one grain and aggregates the
 results to another reintroduces the error, whether the inner values came from a metric view or not.
 Consumers of a metric view should therefore ask for each measure at the grain they report.
 
@@ -659,8 +580,8 @@ Consumers of a metric view should therefore ask for each measure at the grain th
 
 ## 7. Definition Rules and Lifecycle
 
-This section lists what Spark 4.2.0 accepts and rejects when a metric view is created, altered,
-inspected and dropped. The results come from `grammar_probe/probe.py`, which runs 87 cases and
+Spark 4.2.0 accepts only a specific definition and lifecycle surface. The results below come from
+`grammar_probe/probe.py`, which runs 87 cases and
 records, for every statement, the rows it returned or its error condition. Two runs over Spark
 Connect produced identical results, and a run on Spark Classic accepted and rejected the same
 statements with the same conditions. The recorded results are in `grammar_probe/results/`, and
@@ -775,9 +696,6 @@ Java exception.
 
 ## 8. Modeling the Source
 
-This section builds a metric view over a query that joins sessions to orders, with a filter, derived
-dimensions, and measures of order value. Example 08 creates and queries it.
-
 ```yaml
 version: 0.1
 source: >
@@ -859,7 +777,8 @@ The average of the four slices' AOV is 32.23 and the average of their ARPPU is 4
 values are 32.02 and 46.10. Neither average weights the slices by their orders or users, the same
 error as in §3. ARPPU differs more because its denominator is a distinct count: a user who ordered on
 both a weekday and a weekend day counts once in the month's `paying_users` but once in each of two
-slices. No combination of the slice values gives the month's ARPPU, and a query that needs it asks
+slices. The four slice-level ARPPU values alone cannot generally be rolled up to the month's ARPPU,
+and a query that needs it asks
 for `MEASURE(arppu)` at the month's grain.
 
 The same measures can also be defined over a table that holds the joined rows. A table created with
@@ -871,9 +790,6 @@ approaches for performance.
 ---
 
 ## 9. Metric Views and Other Semantic Layers
-
-This section compares metric views with the semantic layers mentioned in §1, limited to what their
-documentation states and what was tested here.
 
 LookML and the dbt Semantic Layer define metrics in a modeling layer and generate SQL from those
 definitions (§1). A Spark metric view is a catalog object, queried directly with Spark SQL or the
@@ -908,7 +824,7 @@ The Databricks pages do not say which fields version 0.1 of their specification 
 that uses any field Spark 4.2.0 rejects has to be reduced to `version`, `source`, `filter`,
 `dimensions` and `measures` before Spark 4.2.0 accepts it.
 
-**Citations:** [What is LookML?](https://cloud.google.com/looker/docs/what-is-lookml), [dbt Semantic Layer](https://docs.getdbt.com/docs/use-dbt-semantic-layer/dbt-sl), [Databricks: Unity Catalog metric views](https://docs.databricks.com/aws/en/uc-semantics/metric-views/), [Databricks: metric view YAML syntax reference](https://docs.databricks.com/aws/en/uc-semantics/metric-views/yaml-reference), [Databricks: metric view feature availability](https://docs.databricks.com/aws/en/uc-semantics/metric-views/feature-availability), `grammar_probe/results/connect-1.json`
+**Citations:** [What is LookML?](https://cloud.google.com/looker/docs/what-is-lookml), [dbt Semantic Layer](https://docs.getdbt.com/docs/use-dbt-semantic-layer/dbt-sl), [Databricks: Unity Catalog metric views](https://docs.databricks.com/metric-views/), [Databricks: metric view YAML syntax reference](https://docs.databricks.com/metric-views/data-modeling/syntax), [Databricks: metric view feature availability](https://docs.databricks.com/aws/en/uc-semantics/metric-views/feature-availability), `grammar_probe/results/connect-1.json`
 
 ---
 
@@ -963,5 +879,7 @@ Examples 04 and 05 query the view that example 03 creates. `make probe` records 
 
 ---
 
-*Verified against Apache Spark 4.2.0 (git revision `32f72996011`) with `pyspark-client==4.2.0` and
-`pyspark==4.2.0`, 2026-09-11.*
+*Methodology note: unmarked behavior was reproduced with this project's examples or
+`grammar_probe/probe.py`; source and documentation claims are linked, while unavailable catalog and
+metastore configurations are labeled untested. Verified against Apache Spark 4.2.0 (git revision
+`32f72996011`) with `pyspark-client==4.2.0` and `pyspark==4.2.0`, 2026-09-11.*

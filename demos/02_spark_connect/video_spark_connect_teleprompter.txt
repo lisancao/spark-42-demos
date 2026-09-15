@@ -33,7 +33,7 @@ In PySpark, that's literal. Your Python process starts a driver JVM, and calls i
 
 So the application has to run close to the cluster. It has to carry a full Spark runtime and a JDK. And it shares the driver's lifetime.
 
-In June of twenty twenty-two, Martin Grund filed the Spark Improvement Proposal for Spark Connect.
+The Spark Connect proposal targeted remote connectivity, client isolation, independent upgrades, and a smaller client runtime.
 
 [SHOW SPARK-39375]
 
@@ -60,13 +60,7 @@ The server resolves it, optimizes it with Catalyst, runs it, and streams the res
 
 [SHOW TIMELINE]
 
-Spark Connect shipped as a Python client in Spark three point four, in twenty twenty-three.
-
-Spark three point five added Scala and Go clients.
-
-Spark four point oh added the pure-Python package, pyspark dash client, and a setting called spark dot api dot mode.
-
-And Spark four point two, which is what we're running today, is largely about operating it in production.
+Spark Connect shipped in Spark three point four and continued to expand through four point two.
 
 
 -- THE SESSION LIVES ON THE SERVER --
@@ -457,7 +451,7 @@ The rest are private handles into the JVM.
 
 New session is also on the list. It isn't prominent in the documentation, so it's worth knowing about.
 
-And RDDs are a permanent difference. The protocol has no way to represent a function that runs directly against RDD partitions.
+RDDs remain unsupported in Spark Connect four point two because the protocol has no RDD representation.
 
 [RUN LAUNCH CONFIGURATION 13 (EXAMPLE 09, API DIFFERENCES), THEN ZOOM ON THE THREE ERRORS]
 
@@ -500,7 +494,7 @@ And empty DataFrame is a method that takes a schema. It isn't a property.
 
 A Connect migration isn't one change.
 
-It's seven independent layers, and only one of them is mandatory.
+It can touch seven related areas. Which ones apply depends on the application and deployment, and a spark-submit job using API mode connect may need no session-code change.
 
 Treating it as a single cutover is what makes it hard to predict.
 
@@ -550,7 +544,7 @@ In the lakehouse-stack deployment from the case study, the catalog credentials a
 
 Any job that's submitted can read them.
 
-After the migration, only the Connect server needs them. Laptops, CI runners, and notebooks don't hold catalog credentials at all.
+After the migration, clients no longer need catalog or storage credentials. Keep catalog credentials in server or driver configuration, and give executors only the storage or delegated access they require.
 
 Remember, though, that Spark Connect has no built-in authentication. It belongs behind an authenticating proxy.
 

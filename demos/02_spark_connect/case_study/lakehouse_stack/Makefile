@@ -43,7 +43,7 @@ up:  ## Start a Connect server with two Iceberg warehouses on port 15003
 	  --entrypoint bash apache/spark:4.2.0-scala2.13-java21-python3-ubuntu -c \
 	  '/opt/spark/sbin/start-connect-server.sh --wait \
 	     --jars /jars/iceberg.jar \
-	     --conf spark.connect.grpc.binding.host=0.0.0.0 \
+	     --conf spark.connect.grpc.binding.address=0.0.0.0 \
 	     --conf spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions \
 	     --conf spark.sql.catalog.iceberg=org.apache.iceberg.spark.SparkCatalog \
 	     --conf spark.sql.catalog.iceberg.type=hadoop \

@@ -61,13 +61,9 @@ Tools such as Looker's LookML and the dbt Semantic Layer define metrics in a mod
 
 [SHOW TIMELINE]
 
-On October thirty-first, twenty twenty-five, Linhong Liu proposed metrics and semantic modeling for Spark on the dev mailing list.
-
 The proposal's goal is to let people define a business metric once, then ask for it by any breakdown, and always get the same answer.
 
-The vote passed on November thirteenth, with nineteen plus-one votes, five of them binding, and none against.
-
-Parsing of the YAML definitions landed in December, followed by the create command and query resolution. Support for Data Source V2 catalogs followed in May. It all shipped in Spark four point two point oh, in July twenty twenty-six.
+Metric views shipped in Spark four point two.
 
 One piece is still open: composability. That's a metric view built on another metric view, or measures built from other measures. It's tracked as SPARK five four four oh eight.
 

@@ -19,10 +19,10 @@ command and short examples that check what the server actually does.
 
 **Demo B** migrates a small pipeline from Spark Classic to Spark Connect, with one change for each
 migration layer, and verifies with a parity check that the output data is unchanged. The migration
-of a 357-line production pipeline is summarized from the written case study.
+of a 357-line pipeline copied from the lakehouse-stack project is summarized from the written case study.
 
-Between the demos, the organizing idea: a Connect migration consists of seven independent layers, of
-which only one is mandatory.
+Between the demos, the organizing idea is that a Connect migration can touch seven related areas;
+which ones apply depends on the application and deployment.
 
 Everything runs against a Spark 4.2.0 cluster built from the official image, with
 `pyspark-client==4.2.0` on Python 3.10. Every measurement on screen can be reproduced with a `make`
@@ -85,7 +85,7 @@ This script is formatted for a teleprompter.
 >
 > So the application has to run close to the cluster. It has to carry a full Spark runtime and a JDK. And it shares the driver's lifetime.
 >
-> In June of twenty twenty-two, Martin Grund filed the Spark Improvement Proposal for Spark Connect.
+> The Spark Connect proposal targeted remote connectivity, client isolation, independent upgrades, and a smaller client runtime.
 
 **CUE:** SHOW SPARK-39375
 
@@ -111,13 +111,7 @@ This script is formatted for a teleprompter.
 
 **CUE:** SHOW TIMELINE
 
-> Spark Connect shipped as a Python client in Spark three point four, in twenty twenty-three.
->
-> Spark three point five added Scala and Go clients.
->
-> Spark four point oh added the pure-Python package, pyspark dash client, and a setting called spark dot api dot mode.
->
-> And Spark four point two, which is what we're running today, is largely about operating it in production.
+> Spark Connect shipped in Spark three point four and continued to expand through four point two.
 
 **SECTION 1C. THE SESSION LIVES ON THE SERVER**
 
@@ -446,7 +440,7 @@ spark-connect:
     - --master
     - ${CONNECT_MASTER:-spark://spark-master:7077}
     - --conf
-    - spark.connect.grpc.binding.host=0.0.0.0
+    - spark.connect.grpc.binding.address=0.0.0.0
     - --conf
     - spark.driver.host=spark-connect
     - --conf
@@ -674,7 +668,7 @@ spark-submit --master spark://host:7077 --conf spark.api.mode=connect job.py
 >
 > New session is also on the list. It isn't prominent in the documentation, so it's worth knowing about.
 >
-> And RDDs are a permanent difference. The protocol has no way to represent a function that runs directly against RDD partitions.
+> RDDs remain unsupported in Spark Connect four point two because the protocol has no RDD representation.
 
 **CUE:** RUN LAUNCH CONFIGURATION 13 (EXAMPLE 09, API DIFFERENCES), THEN ZOOM ON THE THREE ERRORS
 
@@ -738,7 +732,7 @@ spark.emptyDataFrame("a int")          # SPARK-56256: a method that takes a sche
 
 > A Connect migration isn't one change.
 >
-> It's seven independent layers, and only one of them is mandatory.
+> It can touch seven related areas. Which ones apply depends on the application and deployment, and a spark-submit job using API mode connect may need no session-code change.
 >
 > Treating it as a single cutover is what makes it hard to predict.
 
@@ -792,7 +786,7 @@ spark.emptyDataFrame("a int")          # SPARK-56256: a method that takes a sche
 >
 > Any job that's submitted can read them.
 >
-> After the migration, only the Connect server needs them. Laptops, CI runners, and notebooks don't hold catalog credentials at all.
+> After the migration, clients no longer need catalog or storage credentials. Keep catalog credentials in server or driver configuration, and give executors only the storage or delegated access they require.
 >
 > Remember, though, that Spark Connect has no built-in authentication. It belongs behind an authenticating proxy.
 

@@ -8,7 +8,7 @@ place for each of the seven migration layers described in §9 of the
 unchanged.
 
 The pipeline is small so that it runs in seconds on the cluster in `compose.yaml`. The same layers
-applied to a 357-line production pipeline are described in the
+applied to a 357-line pipeline copied from the `lakehouse-stack` project are described in the
 [case study](../case_study/lakehouse_stack/README.md). Results were recorded on 2026-09-10 against
 Apache Spark 4.2.0.
 
