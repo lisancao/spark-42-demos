@@ -1,12 +1,10 @@
 # Metric Views in Apache Spark 4.2: How They Work and How to Use Them
 
-A metric view is a view whose definition names dimensions and measures instead of a fixed query.
-Each measure is an aggregate expression written without a grouping, and a query supplies the grouping
-when it asks for the measure with `MEASURE()`. This post covers why Spark added metric views, how to
-define and query one, what a metric view does and does not guard against, and the rules Apache Spark
-4.2.0 applies to definitions, queries and catalog commands. It is written for data engineers and
-analysts who write Spark SQL and maintain metric definitions that other people query. Examples were
-tested on Spark 4.2.0.
+A metric view stores dimensions and measures instead of one fixed query. Each measure is an
+aggregate expression without a grouping; a query supplies the grain when it calls `MEASURE()`.
+This lets data engineers keep one formula for conversion rate, distinct users, or another metric
+while analysts group it differently. The examples also show the limit: metric views don't prevent
+every unsafe re-aggregation. All examples were tested on Spark 4.2.0.
 
 ---
 
@@ -57,9 +55,10 @@ distinct count has no additive components, so it has to be recomputed from the d
 grain. In both cases the correct formula is known when the metric is defined, but
 it has to be applied each time a query is written.
 
-### Where Metric Definitions Have Lived
+### Where metric definitions live
 
-The SPIP that proposed metric views describes the usual practice in Spark:
+Teams commonly encode each grain in a separate SQL view. The metric-view proposal describes the
+problem:
 
 > Today, users create many SQL views: one view for "active users by month," another for "active
 > users by region," and so on. These standard views are typically designed to answer a specific
@@ -76,7 +75,7 @@ queries against a particular database." Per the dbt documentation, the dbt Seman
 query construction". In both, the definitions live in a tool that generates SQL, and a query written
 directly against the tables does not use them.
 
-The SPIP lists what it sees as the costs of keeping definitions in many views:
+That design duplicates logic across views and leaves definitions outside the engine:
 
 > Using many SQL views instead of a metric-specific construct leads to:
 >
@@ -87,12 +86,6 @@ The SPIP lists what it sees as the costs of keeping definitions in many views:
 >   depends on.
 > - Client-side semantic layers help, but live outside the engine, so the optimizer and permissions
 >   can't enforce correctness.
-
-### The Proposal
-
-The metric-views proposal aimed to define a business metric once and evaluate it consistently at
-whatever breakdown a query requests. Metric views shipped in Apache Spark 4.2; proposal and
-development links are collected in the citations below.
 
 ### The Design Decision
 
@@ -108,6 +101,16 @@ Per the source, `MEASURE()` is an aggregate function that is never evaluated: th
 with the measure's expression, and the aggregation then runs over the source at the query's grain
 (§5). The author of a metric writes its formula once, and every query evaluates that formula at its
 own grain.
+
+```text
+SELECT region, MEASURE(conversion_rate) ... GROUP BY region
+  └── resolve conversion_rate
+      └── SUM(CAST(converted AS INT)) / COUNT(1)
+          └── aggregate sessions at region grain
+```
+
+This path matches the definition and query in `examples/03_create_metric_view.py` and
+`examples/04_measure_at_every_grain.py`.
 
 ### Development in Spark 4.2
 

@@ -1,11 +1,10 @@
-# Case Study: Migrating the lakehouse-stack Pipeline to Spark Connect
+# Case study: migrating the lakehouse-stack pipeline to Spark Connect
 
-This case study explains why `~/lakehouse-stack/scripts/pipelines/pipeline_spark41.py` was migrated
-from Spark Classic to Spark Connect, and walks through the migration. The pipeline is 357 lines long
-and materializes 10 Iceberg tables (5 bronze, 2 silver, 3 gold) through a decorator framework modeled
-on Spark Declarative Pipelines. The changes are organized by the seven migration layers described in
-§9 of the [blog post](../../blog_spark_connect.md). Results were verified against Apache Spark
-4.2.0 on 2026-09-09.
+The 357-line `~/lakehouse-stack/scripts/pipelines/pipeline_spark41.py` pipeline materializes 10
+Iceberg tables (5 bronze, 2 silver, 3 gold) through a decorator framework modeled on Spark
+Declarative Pipelines. Its move from Spark Classic to Spark Connect is organized by the 7 migration
+layers in §9 of the [blog post](../../blog_spark_connect.md). Results were verified against Apache
+Spark 4.2.0 on 2026-09-09.
 
 > **Note** Running this case study requires the `~/lakehouse-stack` data and a locally built Iceberg
 > runtime ([`BUILDING_ICEBERG_FOR_SPARK_4_2.md`](BUILDING_ICEBERG_FOR_SPARK_4_2.md)). The pipeline in
@@ -17,6 +16,18 @@ changes in the layers below. A diff of the two files shows nine hunks rather tha
 because some layers add a comment alongside the code change. No transformation line changes, which is
 what makes the comparison in `parity.py` meaningful: that the migration altered no business logic can
 be checked rather than assumed.
+
+```text
+pipeline_after.py
+└── Pipeline.run()
+    ├── preflight()                  # Confirm the server can use the catalog
+    ├── _get_execution_order()       # Sort tables from spark.table(...) dependencies
+    └── table function
+        └── DataFrame.saveAsTable()  # Write each bronze, silver, or gold table
+```
+
+This call tree follows `pipeline_after.py`; it omits table functions that don't affect the migration
+flow.
 
 ## Background
 
@@ -40,7 +51,7 @@ APIs, and its decorator framework is modeled on Spark Declarative Pipelines
 ([SPARK-51727](https://issues.apache.org/jira/browse/SPARK-51727), Spark 4.1.0), so the changes it
 needs are the ones most DataFrame pipelines need.
 
-### Where the Layers Come From
+### Why these layers
 
 The Spark Connect overview lists three ways in which a Connect client application differs from a
 Spark Classic application. Each accounts for one or more of the migration layers (Table 1).
@@ -53,8 +64,7 @@ Spark Classic application. Each accounts for one or more of the migration layers
 | The protocol uses Spark's logical plans as its abstraction, and "consequently … does not support all the execution APIs of Spark, most importantly RDDs." | No RDDs; names are sent unresolved and resolved against the server's catalogs | 1, 2 |
 | "Spark Connect provides a session-based client." The client "does not have access to the static Spark configuration or the SparkContext." | A session is obtained differently, and configuration divides between client and server | 0, 3 |
 
-The layers are therefore not an arbitrary checklist: each is a consequence of one of the three
-documented design properties of Spark Connect.
+Each layer follows from one of these 3 documented Spark Connect design properties.
 
 **Citations:** [Spark Connect Overview](https://spark.apache.org/docs/latest/spark-connect-overview.html), [SPARK-39375](https://issues.apache.org/jira/browse/SPARK-39375), [SPARK-51727](https://issues.apache.org/jira/browse/SPARK-51727)
 

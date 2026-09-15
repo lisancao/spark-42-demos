@@ -1,8 +1,14 @@
-# Spark 4.2 Demos — contained sandbox
+# Spark 4.2 demos
 
-A self-contained workspace for building 5 DevRel demos on Apache Spark 4.2 features.
-Deliberately isolated from the live `~/lakehouse-stack` infrastructure and untouching of
+A self-contained workspace for 5 Apache Spark 4.2 demos. Its Docker network, ports, volumes, and
+Compose namespace are isolated from the live `~/lakehouse-stack` infrastructure and
 `~/repos/safe-spark-agents`.
+
+```text
+spark-42-demos/
+├── demos/01_metrics_views/   # Metric definitions evaluated at the query's grain
+└── demos/02_spark_connect/   # Decoupled clients, servers, and pipeline migration
+```
 
 ## Containment contract
 
@@ -14,7 +20,7 @@ Deliberately isolated from the live `~/lakehouse-stack` infrastructure and untou
 | Project   | `-p spark42demos`                        | own compose namespace                      |
 | Image     | `lakehouse/spark:5.0.0-snapshot-cdc`     | reused read-only; no rebuild of shared img |
 
-The stack is **parked** — bringing it up is opt-in, never part of setup:
+The stack is parked. Bringing it up is opt-in and never part of setup:
 
 ```bash
 cd ~/Documents/spark_content/spark_42_demos
@@ -24,7 +30,7 @@ docker compose -p spark42demos -f compose/docker-compose.yml down -v    # full t
 
 ## The 5 demos
 
-Brainstorm + rationale lives in Obsidian:
+The brainstorm and rationale live in Obsidian:
 `obsidian_vault/spark_content/Spark 4.2 — 5 Demos Brainstorm.md`
 
 | # | Demo                    | Feature                        | Priority |
