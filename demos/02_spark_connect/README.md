@@ -1,7 +1,8 @@
 # Demo 2: Spark Connect on Apache Spark 4.2
 
-This project accompanies the [blog post](blog_spark_connect.md) and the video script
-([`video_spark_connect.md`](video_spark_connect.md)). It contains two demos:
+Use this project to run a Spark Connect client/server setup and migrate a small DataFrame pipeline
+without changing its output. The [blog post](blog_spark_connect.md) and
+[video script](video_spark_connect.md) explain the same two demos:
 
 - **Demo A: Setup.** Ten short examples, each showing one behavior of Spark Connect, and a `doctor`
   command that checks a client and a server.
@@ -20,6 +21,15 @@ Spark Connect, introduced in Spark 3.4, separates a client application from the 
 client builds a DataFrame plan and sends it over gRPC; the server resolves, optimizes and executes
 it, and returns results as Arrow. The session lives on the server, and the client holds a reference
 to it. Why Spark adopted this design is described in §1 of the blog post.
+
+```text
+Python application
+  └── SparkSession.remote(...)
+      └── DataFrame operations build an unresolved plan
+          └── gRPC sends the plan to the Connect server
+              └── Spark resolves, optimizes, and executes it
+                  └── Arrow returns result batches to the client
+```
 
 For an application, session creation changes:
 
@@ -206,22 +216,19 @@ The `spark` tier runs the same tests in both modes: its session fixture uses Spa
 reached, the Connect runs are skipped; with the cluster stopped, `make test` reported 38 passed,
 16 passed and 37 skipped.
 
-## Project Layout
+## Project layout
 
-```
+```text
 02_spark_connect/
-├── examples/        Demo A: ten numbered scripts
-├── pipeline/        Demo B: pipeline_before.py, pipeline_after.py, parity.py, MIGRATION.md,
-│                    lib/ (transformations and the UDF dependency), input/ (generated data)
-├── tests/           unit/, spark/ and connect/ tiers
-├── tools/           doctor.py, compat_audit.py, check.py, teleprompter_export.py
-├── setup/           TOPOLOGIES.md, standalone/start-connect-server.sh, kubernetes/
-├── case_study/      lakehouse_stack/: the production pipeline migration, as a written case study
-├── extras/          Optional measurements (including the version sample in blog post §2) and the Rust client example
-├── graphics/        Video graphics as 1920 by 1080 SVG (light versions in graphics/light/); blog figures in graphics/blog/
-├── compose.yaml, Dockerfile, Makefile, pyproject.toml, uv.lock
-├── blog_spark_connect.md, video_spark_connect.md, video_spark_connect_teleprompter.txt
-└── .vscode/         Run configurations in video order, tasks and settings
+├── examples/          # 10 focused client and server behaviors
+├── pipeline/          # Classic/Connect pair, shared transforms, and parity check
+├── case_study/        # Migration of the lakehouse-stack pipeline
+├── tests/             # Unit, Spark parity, and Connect server checks
+├── tools/             # Diagnose, audit compatibility, and check documents
+├── extras/            # Version matrix, benchmarks, and Rust/Polars client
+├── setup/             # Standalone and Kubernetes server examples
+├── compose.yaml       # Master, worker, and Connect services
+└── blog_spark_connect.md  # Architecture and adoption guide
 ```
 
 ## Case Study

@@ -1,20 +1,20 @@
 # Demo 1: Metric Views in Apache Spark 4.2
 
-This project accompanies the [blog post](blog_metric_views.md) and two video scripts: a long-form
-video ([`video_metric_views.md`](video_metric_views.md)) and a short reel
-([`video_metric_views_reel.md`](video_metric_views_reel.md)). It contains eight short examples, each
-showing one behavior of metric views, a `doctor` command that checks the setup, and a probe that
-records how Spark treats metric view definitions, queries and catalog commands.
+Use this project to see how Spark evaluates metric views at different grains and where it still
+allows unsafe re-aggregation. Eight short examples cover one behavior each. A `doctor` command
+checks the setup, and a probe records how Spark treats definitions, queries, and catalog commands.
+The [blog post](blog_metric_views.md), [long-form video script](video_metric_views.md), and
+[short reel script](video_metric_views_reel.md) explain the same examples.
 
 Everything here was verified against Apache Spark **4.2.0** (released 2026-07-14) on 2026-09-11;
 "Verification Status", below, lists what was run.
 
-## About Metric Views
+## About metric views
 
-A metric view, added in Spark 4.2 (SPARK-54119), is a view whose definition is a YAML document of
-dimensions and measures. A measure is an aggregate expression written without a grouping. A query
-asks for it with `MEASURE()` and supplies the grouping, and Spark evaluates the measure's formula at
-that grain. Why Spark added metric views is described in §1 of the blog post.
+A metric view, added in Spark 4.2 (SPARK-54119), defines dimensions and measures in YAML. A measure
+is an aggregate expression without a grouping. The query supplies that grouping through
+`MEASURE()`, so Spark evaluates the formula at the requested grain. The blog post's §1 explains the
+motivation.
 
 ```sql
 CREATE VIEW delivery_metrics WITH METRICS LANGUAGE YAML AS $$ ... $$;
@@ -192,19 +192,19 @@ The unit tests recompute every figure in `tests/figures.py` from the generated d
 Spark Connect. `make check` runs `tools/check.py`, which checks that the documents quote only numbers
 in `tests/figures.py` and error conditions that the probe recorded.
 
-## Project Layout
+## Project layout
 
-```
+```text
 01_metrics_views/
-├── examples/        Eight numbered scripts
-├── grammar_probe/   probe.py, and results/ with the recorded runs
-├── tests/           figures.py, and the unit/, spark/ and connect/ tiers
-├── tools/           generate_data.py, doctor.py, check.py, teleprompter_export.py
-├── graphics/        Video graphics as 1920 by 1080 SVG (light versions in graphics/light/); blog figures in graphics/blog/
-├── data/            The generated dataset; not in version control
-├── compose.yaml, Makefile, pyproject.toml, uv.lock
-├── blog_metric_views.md, video_metric_views.md, video_metric_views_reel.md, and teleprompter exports
-└── .vscode/         Run configurations in video order, tasks and settings
+├── examples/          # 8 behaviors, from aggregation errors to modeled sources
+├── grammar_probe/     # Run grammar cases and retain the recorded results
+├── tests/             # Recompute figures and compare Classic with Connect
+├── tools/             # Generate data, diagnose setup, and check the documents
+├── graphics/          # Video SVGs and rendered blog figures
+├── data/              # Generated Parquet data (not version-controlled)
+├── compose.yaml       # Run the Spark Connect server
+├── Makefile           # Setup, example, probe, test, and cleanup entry points
+└── blog_metric_views.md  # Full explanation and measured behavior
 ```
 
 ## Verification Status

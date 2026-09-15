@@ -1,11 +1,10 @@
 # Spark Connect in Apache Spark 4.2: How It Works and How to Adopt It
 
-Spark Connect separates a Spark application from the Spark driver. The application builds a
-DataFrame plan and sends it to a server, which runs it and streams the results back as Arrow. This
-post covers why Spark adopted that design, how it works, how to adopt it (including how to migrate
-an existing PySpark pipeline) and what it takes to build and use a Connect client. It is written for
-engineers who already run Spark and want to understand the architecture before they change it.
-Examples were tested on Spark 4.2.0.
+Spark Connect separates a Spark application from the driver. The application sends a DataFrame plan
+to a server, which runs it and streams Arrow results back. For engineers adopting Connect, that
+boundary determines where sessions, dependencies, configuration, credentials, logs, and file paths
+live. This guide follows those consequences through setup and a PySpark pipeline migration. Examples
+were tested on Spark 4.2.0.
 
 ---
 
@@ -101,8 +100,16 @@ default API in Spark 4," is open. An application uses Spark Classic unless it is
 
 ## 2. How Spark Connect Works
 
-This section describes where a Connect session lives, what travels between client and server, and
-the RPCs that make up the protocol.
+The client holds a reference to a session on the server. Plans travel to that session over gRPC;
+results return as Arrow batches.
+
+```text
+SparkSession.remote(...).getOrCreate()
+  └── DataFrame transformations build a protobuf plan
+      └── ExecutePlan sends the plan over gRPC
+          └── the server resolves and executes the plan
+              └── Arrow batches stream back to the client
+```
 
 ### The Session Lives on the Server
 
@@ -285,8 +292,8 @@ what remains.
 ## 3. Installing the Client
 
 PyPI carries four distributions that provide the `pyspark` namespace. Only one of them is a client
-without a JVM, and the names are close enough to be confused. This section compares them and shows
-how to tell which one is installed.
+without a JVM, and their similar names make them easy to confuse. Their contents determine what the
+client installs and whether it starts a JVM.
 
 ### The Four Distributions
 
@@ -364,8 +371,7 @@ smaller than the disk usage that `du` reports.
 
 ## 4. Running a Server
 
-This section covers starting a Connect server, its principal configuration, where to run it, and how
-a client locates it.
+A Connect deployment needs a server process, server-side configuration, and a client URL.
 
 ### Starting the Server
 
@@ -582,8 +588,8 @@ supports two practices:
 ## 7. API Differences
 
 Because Spark Connect communicates in logical plans, APIs that operate outside a plan are not
-available to a Connect client. This section lists them as they appear in the 4.2.0 client source,
-describes the substitutes, and notes the gaps Spark 4.2 closed.
+available to a Connect client. The 4.2.0 client source identifies the unsupported surface; the
+sections below cover substitutes and the gaps Spark 4.2 closed.
 
 ### Unsupported APIs
 
@@ -751,8 +757,8 @@ In Spark Classic, a DataFrame is analyzed as soon as it is defined: column names
 against the catalog, types are checked, and a malformed reference raises an `AnalysisException` on
 the line that introduced it. Spark Connect defers this work. The client builds an unresolved plan
 (see §2) and sends it to the server only when it needs an answer: when an action runs, or when the
-client requests the schema. This section describes the four behavior differences that follow from
-that design, and how to write code that behaves the same way in both modes.
+client requests the schema. Four behavior differences follow from that timing, along with patterns
+that behave the same way in both modes.
 
 The Spark 4.2 documentation covers the same material in *Eager vs Lazy: Spark Connect vs Spark
 Classic* ([SPARK-53882](https://issues.apache.org/jira/browse/SPARK-53882)). The page is not linked
@@ -870,7 +876,7 @@ The second form also benefits Spark Classic: the `withColumn` API documentation 
 
 A migration to Spark Connect can touch seven related areas. Which ones apply depends on the
 application and deployment; a `spark-submit` job using `spark.api.mode=connect` may need no session-
-creation code change. This section describes each area and how to confirm the applicable changes.
+creation code change. The layers below show where to inspect and how to confirm each change.
 
 The worked example is a 357-line pipeline copied from the `lakehouse-stack` project
 that materializes 10 Iceberg tables (5 bronze, 2 silver, 3 gold) through a decorator framework
@@ -1177,8 +1183,7 @@ the warning *"PySpark does not yet fully support pandas >= 3.0.0"*; pin `pandas<
 
 ## 11. Operating Spark Connect
 
-Most of the Connect changes in Spark 4.2 concern running a server in production. This section
-summarizes them.
+Most Spark 4.2 Connect changes concern production servers.
 
 **Execution status.** `GetStatus` has a server-side implementation
 ([SPARK-55606](https://issues.apache.org/jira/browse/SPARK-55606)) and client support
@@ -1230,9 +1235,8 @@ JDK 17 and 21 are not affected.
 
 Every example so far has used the Python client, but the client is not what makes Spark Connect
 work; the protocol is. Any program that can build the protocol's messages and call its gRPC service
-is a Spark client, in any language and with no JVM. This section describes what a client implements,
-lists the clients that exist, and works through one of them: the Rust client, handing its results to
-Polars.
+is a Spark client, in any language and with no JVM. The rest of this section sketches what a client
+implements, lists the available clients, and follows a Rust client that hands its results to Polars.
 
 ### What a Client Implements
 
