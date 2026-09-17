@@ -99,7 +99,7 @@ Prompt: *T1 vertical 4-step flow, dark. Step 1 client builds a protobuf "plan" t
 execute"; step 4 yellow "Arrow batches" stream left to client. Reveal one step at a time.*
 
 **A-5 · Only result rows cross the wire** — data movement is minimal. · T4 ·
-Content: "Only result rows travel to the client, as Arrow." Source `blog:967`. Pair with C-8's 5M→7.
+Content: "Only result rows travel to the client, as Arrow." Source `blog:967`. Pair with M-3's 5M→7.
 
 **A-6 · What Connect gives up** — the trade. · T2 ·
 Content: red chips `SparkContext`, `RDDs`, `direct driver-JVM access`. Source `blog:284`.
